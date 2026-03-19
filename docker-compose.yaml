@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  # Go Echo Serverアプリケーション
+  go-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: video-app-go-server
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    networks:
+      - video-app-network
+    restart: unless-stopped
+
+  # Next.jsフロントエンド
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=http://localhost
+    container_name: video-app-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost
+      - NODE_ENV=production
+    depends_on:
+      - go-server
+    networks:
+      - video-app-network
+    restart: unless-stopped
+
+  # Caddy リバースプロキシ
+  caddy:
+    image: caddy:latest
+    container_name: video-app-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - ACME_AGREE=true
+    depends_on:
+      - go-server
+      - frontend
+    networks:
+      - video-app-network
+    restart: unless-stopped
+
+networks:
+  video-app-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -4,7 +4,7 @@
 
 # Echo Serverコード生成
 generate-server:
-	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g go-echo-server -o /local/server/generated --skip-validate-spec --additional-properties=packageName=generated,hideGenerationTimestamp=true,serverPort=8000"
+	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g go-gin-server -o /local/server/generated --skip-validate-spec --additional-properties=packageName=generated,hideGenerationTimestamp=true,serverPort=8000"
 
 # React Query TypeScriptクライアント生成
 generate-client:

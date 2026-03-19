@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/GIT_USER_ID/GIT_REPO_ID/handlers"
+	"github.com/hogecode/CommentVideo/handlers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -15,7 +15,6 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
 
 	// ApiV1CapturesGet - キャプチャ一覧を取得
 	e.GET("/api/v1/captures", c.ApiV1CapturesGet)
@@ -37,7 +36,6 @@ func main() {
 
 	// ApiV1VideosSearchGet - ビデオを検索
 	e.GET("/api/v1/videos/search", c.ApiV1VideosSearchGet)
-
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8000"))
