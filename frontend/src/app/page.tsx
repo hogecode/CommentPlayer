@@ -1,6 +1,7 @@
 "use client"; // Client Component
 
 import { Container, Typography, Button, Box, AppBar, Toolbar } from "@mui/material";
+import '../styles/globals.css'
 
 export default function HomePage() {
   return (
