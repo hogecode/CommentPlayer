@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /d/Downloads/exe/app/video-app -not -path */node_modules/* -type d)"
+      "Bash(find /d/Downloads/exe/app/video-app -not -path */node_modules/* -type d)",
+      "Bash(xargs grep:*)",
+      "Bash(ls:*)",
+      "Bash(go mod:*)",
+      "Bash(go build:*)"
     ]
   }
 }

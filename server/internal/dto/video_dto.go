@@ -1,0 +1,90 @@
+package dto
+
+import "github.com/hogecode/CommentVideo/internal/entity"
+
+// ApiComment - コメント
+type ApiComment struct {
+	Time   float64 `json:"time" validate:"required,min=0"`
+	Type   string  `json:"type" validate:"required,oneof=right top bottom"`
+	Size   string  `json:"size" validate:"required,oneof=big medium small"`
+	Color  string  `json:"color" validate:"required"`
+	Author *string `json:"author"`
+	Text   string  `json:"text" validate:"required"`
+}
+
+// VideoListRequest - ビデオ一覧取得リクエスト
+type VideoListRequest struct {
+	IDs     []int  `form:"ids" validate:"dive,min=1"`
+	FilterBy string `form:"filterBy"`
+	Page    int    `form:"page" validate:"min=1"`
+	Limit   int    `form:"limit" validate:"min=1,max=100"`
+	Sort    string `form:"sort" validate:"oneof=created_at views file_name duration"`
+	Order   string `form:"order" validate:"oneof=asc desc"`
+}
+
+// SetDefaults - デフォルト値を設定
+func (v *VideoListRequest) SetDefaults() {
+	if v.Page == 0 {
+		v.Page = 1
+	}
+	if v.Limit == 0 {
+		v.Limit = 20
+	}
+	if v.Sort == "" {
+		v.Sort = "created_at"
+	}
+	if v.Order == "" {
+		v.Order = "desc"
+	}
+}
+
+// VideoListResponse - ビデオ一覧取得レスポンス
+type VideoListResponse struct {
+	Data       []entity.Video `json:"data"`
+	Pagination Pagination     `json:"pagination"`
+}
+
+// VideoSearchRequest - ビデオ検索リクエスト
+type VideoSearchRequest struct {
+	Q        string `form:"q" validate:"required,min=1"`
+	Page     int    `form:"page" validate:"min=1"`
+	Limit    int    `form:"limit" validate:"min=1,max=100"`
+	Order    string `form:"order" validate:"oneof=asc desc"`
+	FilterBy string `form:"filterBy"`
+}
+
+// SetDefaults - デフォルト値を設定
+func (v *VideoSearchRequest) SetDefaults() {
+	if v.Page == 0 {
+		v.Page = 1
+	}
+	if v.Limit == 0 {
+		v.Limit = 20
+	}
+	if v.Order == "" {
+		v.Order = "desc"
+	}
+}
+
+// VideoResponse - ビデオ詳細レスポンス
+type VideoResponse struct {
+	IsSuccess bool          `json:"is_success"`
+	Src       string        `json:"src"`
+	Title     *string       `json:"title"`
+	Description *string    `json:"description"`
+	Comments  []ApiComment  `json:"comments"`
+}
+
+// ThumbnailRegenerateRequest - サムネイル再生成リクエスト
+type ThumbnailRegenerateRequest struct {
+	Width     *int     `json:"width" validate:"omitempty,min=1"`
+	Height    *int     `json:"height" validate:"omitempty,min=1"`
+	Timestamp *float64 `json:"timestamp" validate:"omitempty,min=0"`
+}
+
+// ThumbnailRegenerateResponse - サムネイル再生成レスポンス
+type ThumbnailRegenerateResponse struct {
+	ID            int                  `json:"id"`
+	ThumbnailInfo *entity.ThumbnailInfo `json:"thumbnail_info"`
+	Message       string               `json:"message"`
+}

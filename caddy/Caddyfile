@@ -1,4 +1,4 @@
-https://localhost {
+localhost {
   
   # Goサーバーへのリバースプロキシ
   reverse_proxy /api/* go-server:8000

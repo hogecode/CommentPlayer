@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "invalid_query_params": "Invalid query parameters",
+    "invalid_request_body": "Invalid request body",
+    "invalid_video_id": "Invalid video ID",
+    "invalid_page": "Page must be greater than or equal to 1",
+    "invalid_limit": "Limit must be between 1 and 100",
+    "video_not_found": "Video not found",
+    "capture_not_found": "Capture not found",
+    "file_required": "File is required",
+    "video_id_required": "Video ID is required",
+    "failed_fetch_videos": "Failed to fetch videos",
+    "failed_search_videos": "Failed to search videos",
+    "failed_fetch_captures": "Failed to fetch captures",
+    "failed_create_capture": "Failed to create capture",
+    "internal_error": "An internal server error occurred"
+  },
+  "success": {
+    "thumbnail_regenerated": "Thumbnail regenerated successfully"
+  }
+}

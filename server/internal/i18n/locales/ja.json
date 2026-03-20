@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "invalid_query_params": "無効なクエリパラメータです",
+    "invalid_request_body": "無効なリクエストボディです",
+    "invalid_video_id": "無効なビデオIDです",
+    "invalid_page": "ページ番号は1以上である必要があります",
+    "invalid_limit": "制限値は1〜100の間である必要があります",
+    "video_not_found": "ビデオが見つかりません",
+    "capture_not_found": "キャプチャが見つかりません",
+    "file_required": "ファイルは必須です",
+    "video_id_required": "ビデオIDは必須です",
+    "failed_fetch_videos": "ビデオの取得に失敗しました",
+    "failed_search_videos": "ビデオの検索に失敗しました",
+    "failed_fetch_captures": "キャプチャの取得に失敗しました",
+    "failed_create_capture": "キャプチャの作成に失敗しました",
+    "internal_error": "内部サーバーエラーが発生しました"
+  },
+  "success": {
+    "thumbnail_regenerated": "サムネイルが正常に再生成されました"
+  }
+}

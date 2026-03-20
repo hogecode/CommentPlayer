@@ -1,46 +1,37 @@
-"use client"; // Client Component
+"use client";
 
-import { Container, Typography, Button, Box, AppBar, Toolbar } from "@mui/material";
-import '../styles/globals.css'
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {/* ナビゲーションバー */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            CommeVideo
-          </Typography>
-          <Button color="inherit">ログイン</Button>
-        </Toolbar>
-      </AppBar>
+      <header className="bg-primary text-primary-foreground shadow-md">
+        <div className="container mx-auto flex items-center justify-between p-4">
+          <h1 className="text-xl font-bold">CommeVideo</h1>
+          <Button variant="outline">ログイン</Button>
+        </div>
+      </header>
 
       {/* メインコンテンツ */}
-      <Container maxWidth="md" sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h3" gutterBottom>
-          ようこそ、CommeVideoへ
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+      <main className="flex-1 container mx-auto mt-16 text-center px-4">
+        <h2 className="text-4xl font-bold mb-4">ようこそ、CommeVideoへ</h2>
+        <p className="text-gray-600 mb-8">
           ここでは動画再生と弾幕コメントを楽しめます。サンプルボタンをクリックしてみてください。
-        </Typography>
+        </p>
 
-        <Box mt={4}>
-          <Button variant="contained" color="primary" size="large" sx={{ mr: 2 }}>
-            動画を見る
-          </Button>
-          <Button variant="outlined" color="secondary" size="large">
+        <div className="flex justify-center gap-4">
+          <Button size="lg">動画を見る</Button>
+          <Button variant="outline" size="lg">
             サンプル弾幕
           </Button>
-        </Box>
-      </Container>
+        </div>
+      </main>
 
       {/* フッター */}
-      <Box component="footer" sx={{ mt: 8, py: 4, textAlign: "center", bgcolor: "background.paper" }}>
-        <Typography variant="body2" color="text.secondary">
-          &copy; 2026 CommeVideo. All rights reserved.
-        </Typography>
-      </Box>
-    </>
+      <footer className="bg-muted text-muted-foreground py-6 text-center mt-16">
+        <p className="text-sm">&copy; 2026 CommeVideo. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }
