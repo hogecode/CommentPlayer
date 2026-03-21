@@ -5,7 +5,19 @@
       "Bash(xargs grep:*)",
       "Bash(ls:*)",
       "Bash(go mod:*)",
-      "Bash(go build:*)"
+      "Bash(go build:*)",
+      "Bash(rm .gitkeep)",
+      "Bash(yarn init:*)",
+      "Bash(yarn install:*)",
+      "Bash(cp -r d:/Downloads/exe/app/CommePlayer/frontend/src/lib d:/Downloads/exe/app/CommePlayer/apps/web/src/)",
+      "Bash(cp -r d:/Downloads/exe/app/CommePlayer/frontend/src/types d:/Downloads/exe/app/CommePlayer/apps/web/src/)",
+      "Bash(cp -r d:/Downloads/exe/app/CommePlayer/frontend/src/services d:/Downloads/exe/app/CommePlayer/apps/web/src/)",
+      "Bash(cp -r d:/Downloads/exe/app/CommePlayer/frontend/src/stores d:/Downloads/exe/app/CommePlayer/apps/web/src/)",
+      "Bash(cp -r d:/Downloads/exe/app/CommePlayer/frontend/src/generated d:/Downloads/exe/app/CommePlayer/apps/web/src/)",
+      "Bash(yarn build:*)",
+      "Bash(timeout 10 yarn dev)",
+      "Bash(timeout 5 yarn dev)"
     ]
-  }
+  },
+  "max_tokens": 2000
 }
