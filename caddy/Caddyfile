@@ -3,7 +3,7 @@ localhost {
   # Goサーバーへのリバースプロキシ
   reverse_proxy /api/* go-server:8000
 
-  # Next.js フロントエンドへのリバースプロキシ
+  # React フロントエンドへのリバースプロキシ
   reverse_proxy / frontend:3000
 
   # ログ出力（任意）

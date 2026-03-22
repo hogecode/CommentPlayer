@@ -17,7 +17,8 @@
       "Bash(yarn build:*)",
       "Bash(timeout 10 yarn dev)",
       "Bash(timeout 5 yarn dev)",
-      "Bash(make help:*)"
+      "Bash(make help:*)",
+      "Bash(chmod +x d:/Downloads/exe/app/CommePlayer/.devcontainer/post-create.sh)"
     ]
   },
   "max_tokens": 2000

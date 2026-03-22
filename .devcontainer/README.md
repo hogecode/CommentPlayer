@@ -82,7 +82,6 @@ make db-dump          # スキーマダンプ
 make db-new name=...  # 新規マイグレーション作成
 
 # ツール
-make sqlc-generate    # sqlc コード生成
 make generate-all     # Swagger + クライアント生成
 ```
 

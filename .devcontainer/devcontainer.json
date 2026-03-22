@@ -1,13 +1,8 @@
 {
   "name": "CommePlayer Dev",
-  "image": "mcr.microsoft.com/devcontainers/go:latest",
-  "features": {
-    "ghcr.io/devcontainers/features/node:latest": {
-      "version": "20"
-    },
-    "ghcr.io/devcontainers/features/git:latest": {},
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:latest": {}
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
   "forwardPorts": [
     3000,
     7001,
@@ -32,13 +27,13 @@
       "extensions": [
         "golang.Go",
         "ms-vscode.makefile-tools",
-        "Zignd.html-css-class-completion",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "Vue.volar",
         "bradlc.vscode-tailwindcss",
         "GitHub.copilot",
-        "ms-vscode.vscode-typescript-next"
+        "ms-vscode.vscode-typescript-next",
+        "Vue.volar",
+        "ms-azuretools.vscode-docker"
       ],
       "settings": {
         "[go]": {
@@ -63,10 +58,13 @@
         ],
         "[makefile]": {
           "editor.insertSpaces": false
-        }
+        },
+        "workbench.startupEditor": "none",
+        "workbench.activityBar.visible": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
       }
     }
   },
-  "postCreateCommand": "make setup-dev",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "vscode"
 }

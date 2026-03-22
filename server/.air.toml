@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "make templ-generate && APP_ENV=dev op run --env-file=.env -- go build -o ./tmp/main ./cmd/server"
+  cmd = " go build -o ./tmp/main ./cmd"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "web"]
   exclude_file = []

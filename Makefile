@@ -98,9 +98,6 @@ db-migrate-test: ## テスト環境のマイグレーションを実行（非推
 ## コード生成・ツール
 ## ========================
 
-sqlc-generate: ## SQLクエリからGoコードを生成
-	cd server && sqlc generate
-
 seed: ## 開発環境用のシードデータを生成
 	@echo "シードデータを生成しています..."
 	cd server && APP_ENV=dev op run --env-file=".env" -- go run cmd/seed/main.go
