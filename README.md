@@ -7,7 +7,7 @@
 ```
 CommePlayer/
 ├── apps/web/              # Vite + React フロントエンド (SPA)
-├── server/                # Go + Chi バックエンド API
+├── server/                # Go + Gin バックエンド API
 ├── caddy/                 # リバースプロキシ設定
 ├── .devcontainer/         # VS Code 開発環境（参考用）
 ├── docker-compose.yaml    # 開発環境（ホットリロード）
@@ -17,7 +17,7 @@ CommePlayer/
 
 **技術スタック:**
 - **フロントエンド:** Vite, React 19, TanStack Router, TypeScript
-- **バックエンド:** Go, Chi, SQLite
+- **バックエンド:** Go, Gin, SQLite
 - **リバースプロキシ:** Caddy (HTTPS)
 
 ## 🚀 開発環境のセットアップ

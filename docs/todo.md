@@ -1,11 +1,8 @@
 
 ### 全般
 
-- [ ] apps/webのDockerfile
-- [ ] Devcontainerの拡張機能とAPIキーの設定を見直す
-- [ ] Caddyでのリバプロ動作確認
-- [ ] docker-compose.yamlの動作確認
-- [ ] Makefileの動作確認
+- [x] Caddyでのリバプロ動作確認
+- [ ] MakefileのランナーをCIで使う
 - [ ] サーバー側でopenapi生成→フロント生成の流れ
 - [ ] CLAUDE.md修正
 

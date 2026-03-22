@@ -43,8 +43,10 @@
     "autoprefixer": "^10.4.27",
     "eslint": "^9",
     "postcss": "^8.5.8",
+    "sass": "^1.98.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^0.21.1"
   }
 }

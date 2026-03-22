@@ -3,7 +3,8 @@ version: '3.9'
 services:
   # フロントエンド - Vite ホットリロード開発サーバー
   frontend:
-    image: node:20-alpine
+    
+    image: node:20-alpine # エラーが出るのでDockerfile使わずに開発環境を構築
     container_name: commeplayer-frontend
     ports:
       - "3000:3000"    # Vite Dev Server
@@ -17,7 +18,7 @@ services:
     networks:
       - commeplayer-network
     restart: unless-stopped
-    command: sh -c "yarn install --frozen-lockfile && yarn dev"
+    command: sh -c "yarn install && yarn dev"
 
   # バックエンド - Go ホットリロード開発サーバー
   backend:
