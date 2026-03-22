@@ -1,7 +1,7 @@
 import { RootRoute, Route, createRouter } from '@tanstack/react-router'
-import RootLayout from './app/videos/layout'
-import HomePage from './app/videos/index'
-import VideoPage from './app/videos/[id]'
+import RootLayout from './app/layout'
+import HomePage from './app/page'
+import VideoPage from './app/videos/[id]/page'
 
 /**
  * ルート定義

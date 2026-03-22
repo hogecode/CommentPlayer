@@ -1,5 +1,3 @@
-'use client';
-
 import { Comment } from '@/types/danmaku';
 import { useState } from 'react';
 import DPlayer from './DPlayer';
