@@ -1,9 +1,376 @@
 basePath: /api/v1
+definitions:
+  dto.CaptureListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entity.Capture'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.Pagination'
+    type: object
+  dto.ErrorResponse:
+    properties:
+      code:
+        type: string
+      error:
+        type: string
+    type: object
+  dto.Pagination:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ThumbnailRegenerateRequest:
+    properties:
+      height:
+        minimum: 1
+        type: integer
+      timestamp:
+        minimum: 0
+        type: number
+      width:
+        minimum: 1
+        type: integer
+    type: object
+  dto.ThumbnailRegenerateResponse:
+    properties:
+      id:
+        type: integer
+      message:
+        type: string
+      thumbnail_info:
+        $ref: '#/definitions/entity.ThumbnailInfo'
+    type: object
+  dto.VideoListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entity.Video'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.Pagination'
+    type: object
+  entity.Capture:
+    properties:
+      created_at:
+        type: string
+      filename:
+        type: string
+      id:
+        type: integer
+      video_id:
+        type: integer
+    type: object
+  entity.ThumbnailInfo:
+    properties:
+      generated_at:
+        type: string
+      height:
+        type: integer
+      width:
+        type: integer
+    type: object
+  entity.Video:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      duration:
+        type: number
+      file_name:
+        type: string
+      file_size:
+        type: integer
+      folder_id:
+        description: Folderテーブルへの外部キー
+        type: integer
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      jikkyo_comment_count:
+        type: integer
+      jikkyo_date:
+        type: string
+      liked:
+        type: boolean
+      screenshot_file_path:
+        type: string
+      status:
+        description: ready, processing, error
+        type: string
+      thumbnail_info:
+        $ref: '#/definitions/entity.ThumbnailInfo'
+      updated_at:
+        type: string
+      views:
+        type: integer
+    type: object
 host: localhost:8000
 info:
   contact: {}
   description: ビデオ管理アプリケーションのREST API
   title: commentPlayer API
   version: 1.0.0
-paths: {}
+paths:
+  /api/v1/captures:
+    get:
+      description: キャプチャ一覧をページネーション付きで取得します
+      parameters:
+      - description: ビデオID（フィルタリング用）
+        in: query
+        name: video_id
+        type: integer
+      - default: 1
+        description: ページ番号
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 1ページあたりのアイテム数
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CaptureListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: キャプチャ一覧を取得
+      tags:
+      - Captures
+    post:
+      description: 新しいキャプチャを作成します
+      parameters:
+      - description: キャプチャファイル
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: ビデオID
+        in: formData
+        name: video_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Capture'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: キャプチャを作成
+      tags:
+      - Captures
+  /api/v1/videos:
+    get:
+      description: ページネーション対応のビデオ一覧を取得します
+      parameters:
+      - collectionFormat: csv
+        description: ビデオID（複数指定可能）
+        in: query
+        items:
+          type: integer
+        name: ids
+        type: array
+      - description: フィルター
+        in: query
+        name: filterBy
+        type: string
+      - default: 1
+        description: ページ番号
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 1ページあたりのアイテム数
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: ソート対象フィールド
+        in: query
+        name: sort
+        type: string
+      - default: desc
+        description: ソート順序
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.VideoListResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ビデオ一覧を取得
+      tags:
+      - Videos
+  /api/v1/videos/{id}:
+    get:
+      description: 特定のビデオの詳細情報を取得します
+      parameters:
+      - description: ビデオID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Video'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ビデオ詳細を取得
+      tags:
+      - Videos
+  /api/v1/videos/{id}/download:
+    get:
+      description: ビデオファイルをダウンロードします
+      parameters:
+      - description: ビデオID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ビデオをダウンロード
+      tags:
+      - Videos
+  /api/v1/videos/{id}/thumbnail/regenerate:
+    post:
+      description: ビデオのサムネイルを再生成します
+      parameters:
+      - description: ビデオID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: リクエストボディ
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/dto.ThumbnailRegenerateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ThumbnailRegenerateResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: サムネイルを再生成
+      tags:
+      - Videos
+  /api/v1/videos/search:
+    get:
+      description: キーワードでビデオを検索します
+      parameters:
+      - description: 検索キーワード
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 1
+        description: ページ番号
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 1ページあたりのアイテム数
+        in: query
+        name: limit
+        type: integer
+      - default: desc
+        description: ソート順序
+        in: query
+        name: order
+        type: string
+      - description: フィルター
+        in: query
+        name: filterBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.VideoListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ビデオを検索
+      tags:
+      - Videos
 swagger: "2.0"

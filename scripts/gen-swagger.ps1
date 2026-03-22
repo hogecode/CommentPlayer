@@ -9,4 +9,4 @@ if (-not (Test-Path $swagPath)) {
 $env:Path += ";$gopath\bin"
 
 cd server
-swag init -g cmd/main.go -o ../docs
+swag init --parseDependency --parseDepth 2 --dir internal/handler  -g app.go -o ../docs
