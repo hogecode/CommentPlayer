@@ -15,17 +15,22 @@ import (
 
 // RegisterCaptureRoutes - キャプチャ関連ルートを登録
 func (a *App) RegisterCaptureRoutes(capturesGroup *gin.RouterGroup) {
-	// GET /api/v1/captures
-	// @Summary キャプチャ一覧を取得
-	// @Description キャプチャ一覧をページネーション付きで取得します
-	// @Tags Captures
-	// @Param video_id query int false "ビデオID（フィルタリング用）"
-	// @Param page query int false "ページ番号" default(1)
-	// @Param limit query int false "1ページあたりのアイテム数" default(20)
-	// @Produce json
-	// @Success 200 {object} dto.CaptureListResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/captures [get]
+	a.GetCaptures(capturesGroup)
+	a.CreateCapture(capturesGroup)
+}
+
+// GetCaptures - キャプチャ一覧を取得
+// @Summary キャプチャ一覧を取得
+// @Description キャプチャ一覧をページネーション付きで取得します
+// @Tags Captures
+// @Param video_id query int false "ビデオID（フィルタリング用）"
+// @Param page query int false "ページ番号" default(1)
+// @Param limit query int false "1ページあたりのアイテム数" default(20)
+// @Produce json
+// @Success 200 {object} dto.CaptureListResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/captures [get]
+func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 	capturesGroup.GET("", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
@@ -72,20 +77,22 @@ func (a *App) RegisterCaptureRoutes(capturesGroup *gin.RouterGroup) {
 			},
 		})
 	})
+}
 
-	// POST /api/v1/captures
-	// @Summary キャプチャを作成
-	// @Description 新しいキャプチャを作成します
-	// @Tags Captures
-	// @Param file formData file true "キャプチャファイル"
-	// @Param video_id formData int true "ビデオID"
-	// @Consume multipart/form-data
-	// @Produce json
-	// @Success 201 {object} entity.Capture
-	// @Failure 400 {object} dto.ErrorResponse
-	// @Failure 404 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/captures [post]
+// CreateCapture - キャプチャを作成
+// @Summary キャプチャを作成
+// @Description 新しいキャプチャを作成します
+// @Tags Captures
+// @Param file formData file true "キャプチャファイル"
+// @Param video_id formData int true "ビデオID"
+// @Consume multipart/form-data
+// @Produce json
+// @Success 201 {object} entity.Capture
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/captures [post]
+func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 	capturesGroup.POST("", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 

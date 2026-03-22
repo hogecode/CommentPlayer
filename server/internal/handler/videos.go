@@ -23,22 +23,29 @@ import (
 // @host localhost:8000
 // @basePath /
 func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
+	a.GetVideos(videosGroup)
+	a.SearchVideos(videosGroup)
+	a.GetVideoByID(videosGroup)
+	a.DownloadVideo(videosGroup)
+	a.RegenerateThumbnail(videosGroup)
+}
 
-	// GET /api/v1/videos
-	// @Summary ビデオ一覧を取得
-	// @Description ページネーション対応のビデオ一覧を取得します
-	// @Tags Videos
-	// @Param ids query []int false "ビデオID（複数指定可能）"
-	// @Param filterBy query string false "フィルター"
-	// @Param page query int false "ページ番号" default(1)
-	// @Param limit query int false "1ページあたりのアイテム数" default(20)
-	// @Param sort query string false "ソート対象フィールド" default(created_at)
-	// @Param order query string false "ソート順序" default(desc)
-	// @Produce json
-	// @Success 200 {object} dto.VideoListResponse
-	// @Failure 422 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/videos [get]
+// GetVideos - ビデオ一覧を取得
+// @Summary ビデオ一覧を取得
+// @Description ページネーション対応のビデオ一覧を取得します
+// @Tags Videos
+// @Param ids query []int false "ビデオID（複数指定可能）"
+// @Param filterBy query string false "フィルター"
+// @Param page query int false "ページ番号" default(1)
+// @Param limit query int false "1ページあたりのアイテム数" default(20)
+// @Param sort query string false "ソート対象フィールド" default(created_at)
+// @Param order query string false "ソート順序" default(desc)
+// @Produce json
+// @Success 200 {object} dto.VideoListResponse
+// @Failure 422 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos [get]
+func (a *App) GetVideos(videosGroup *gin.RouterGroup) {
 	videosGroup.GET("", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
@@ -85,21 +92,23 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 			},
 		})
 	})
+}
 
-	// GET /api/v1/videos/search
-	// @Summary ビデオを検索
-	// @Description キーワードでビデオを検索します
-	// @Tags Videos
-	// @Param q query string true "検索キーワード"
-	// @Param page query int false "ページ番号" default(1)
-	// @Param limit query int false "1ページあたりのアイテム数" default(20)
-	// @Param order query string false "ソート順序" default(desc)
-	// @Param filterBy query string false "フィルター"
-	// @Produce json
-	// @Success 200 {object} dto.VideoListResponse
-	// @Failure 400 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/videos/search [get]
+// SearchVideos - ビデオを検索
+// @Summary ビデオを検索
+// @Description キーワードでビデオを検索します
+// @Tags Videos
+// @Param q query string true "検索キーワード"
+// @Param page query int false "ページ番号" default(1)
+// @Param limit query int false "1ページあたりのアイテム数" default(20)
+// @Param order query string false "ソート順序" default(desc)
+// @Param filterBy query string false "フィルター"
+// @Produce json
+// @Success 200 {object} dto.VideoListResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/search [get]
+func (a *App) SearchVideos(videosGroup *gin.RouterGroup) {
 	videosGroup.GET("/search", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
@@ -146,17 +155,19 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 			},
 		})
 	})
+}
 
-	// GET /api/v1/videos/:id
-	// @Summary ビデオ詳細を取得
-	// @Description 特定のビデオの詳細情報を取得します
-	// @Tags Videos
-	// @Param id path int true "ビデオID"
-	// @Produce json
-	// @Success 200 {object} entity.Video
-	// @Failure 404 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/videos/{id} [get]
+// GetVideoByID - ビデオ詳細を取得
+// @Summary ビデオ詳細を取得
+// @Description 特定のビデオの詳細情報を取得します
+// @Tags Videos
+// @Param id path int true "ビデオID"
+// @Produce json
+// @Success 200 {object} entity.Video
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/{id} [get]
+func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 	videosGroup.GET("/:id", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
@@ -181,30 +192,32 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 			})
 			return
 		}
-		 
+
 		// コメントファイルを取得してApiComment[]に変換
 		comments := a.getCommentsFromFile(video.FilePath)
 
-		 response := dto.VideoResponse{
-			 IsSuccess:   true,
-			 Src:         video.FilePath, 
-			 Title:       &video.FileName,
-			 Description: video.Description,
-			 Comments:    comments,
-		 }
-		 ctx.JSON(http.StatusOK, response)
+		response := dto.VideoResponse{
+			IsSuccess:   true,
+			Src:         video.FilePath,
+			Title:       &video.FileName,
+			Description: video.Description,
+			Comments:    comments,
+		}
+		ctx.JSON(http.StatusOK, response)
 	})
+}
 
-	// GET /api/v1/videos/:id/download
-	// @Summary ビデオをダウンロード
-	// @Description ビデオファイルをダウンロードします
-	// @Tags Videos
-	// @Param id path int true "ビデオID"
-	// @Produce octet-stream
-	// @Success 200 {file} file
-	// @Failure 404 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/videos/{id}/download [get]
+// DownloadVideo - ビデオをダウンロード
+// @Summary ビデオをダウンロード
+// @Description ビデオファイルをダウンロードします
+// @Tags Videos
+// @Param id path int true "ビデオID"
+// @Produce octet-stream
+// @Success 200 {file} file
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/{id}/download [get]
+func (a *App) DownloadVideo(videosGroup *gin.RouterGroup) {
 	videosGroup.GET("/:id/download", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
@@ -231,18 +244,20 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 		// ファイルをダウンロード（実装は省略 - FilePath から実際のファイルを提供）
 		ctx.File(video.FilePath)
 	})
+}
 
-	// POST /api/v1/videos/:id/thumbnail/regenerate
-	// @Summary サムネイルを再生成
-	// @Description ビデオのサムネイルを再生成します
-	// @Tags Videos
-	// @Param id path int true "ビデオID"
-	// @Param body body dto.ThumbnailRegenerateRequest false "リクエストボディ"
-	// @Produce json
-	// @Success 200 {object} dto.ThumbnailRegenerateResponse
-	// @Failure 404 {object} dto.ErrorResponse
-	// @Failure 500 {object} dto.ErrorResponse
-	// @Router /api/v1/videos/{id}/thumbnail/regenerate [post]
+// RegenerateThumbnail - サムネイルを再生成
+// @Summary サムネイルを再生成
+// @Description ビデオのサムネイルを再生成します
+// @Tags Videos
+// @Param id path int true "ビデオID"
+// @Param body body dto.ThumbnailRegenerateRequest false "リクエストボディ"
+// @Produce json
+// @Success 200 {object} dto.ThumbnailRegenerateResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/{id}/thumbnail/regenerate [post]
+func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
 	videosGroup.POST("/:id/thumbnail/regenerate", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
