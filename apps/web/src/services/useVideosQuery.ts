@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { VideosApi } from "@/generated";
+import Message from "@/message";
 
 // APIクライアントのセットアップ
 const videosApi = new VideosApi();
@@ -72,7 +73,10 @@ export function useVideoQuery(id: number | null, options?: any) {
   return useQuery({
     queryKey: ["video", id],
     queryFn: async () => {
-      if (!id) throw new Error("Video ID is required");
+      if (!id) {
+        Message.error("ビデオIDが必要です");
+        throw new Error("Video ID is required");
+      }
       return videosApi.apiV1VideosIdGet(id);
     },
     enabled: !!id,
@@ -115,7 +119,7 @@ export function useRegenerateThumbnailMutation() {
 export function useVideoDownload() {
   return async (id: number, filename?: string) => {
     try {
-      const response = await videosApi.apiV1VideosIdDownloadGet(id );
+      const response = await videosApi.apiV1VideosIdDownloadGet(id);
 
       // ブラウザでダウンロード処理
       const url = window.URL.createObjectURL(response.data as Blob);

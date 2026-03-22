@@ -1,7 +1,6 @@
 
 ### 全般
 
-- [ ] サーバー側でopenapi生成→フロント生成の流れ
 - [ ] CLAUDE.md編集
 
 
@@ -67,6 +66,6 @@
 - [ ] POST /api/v1/captures
 
 **DB**
-- [ ] GORMでテーブル作成
+- [ ] SQLite初期化
 
 
