@@ -5,19 +5,19 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	
-	"github.com/hogecode/CommentVideo/internal/dto"
-	"github.com/hogecode/CommentVideo/internal/i18n"
+
+	"github.com/hogecode/commentPlayer/internal/dto"
+	"github.com/hogecode/commentPlayer/internal/i18n"
 )
 
 // RegisterVideoRoutes - ビデオ関連ルートを登録
-// @title CommentVideo API
+// @title commentPlayer API
 // @version 1.0.0
 // @description ビデオ管理アプリケーションのREST API
 // @host localhost:8000
 // @basePath /
 func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
-	
+
 	// GET /api/v1/videos
 	// @Summary ビデオ一覧を取得
 	// @Description ページネーション対応のビデオ一覧を取得します

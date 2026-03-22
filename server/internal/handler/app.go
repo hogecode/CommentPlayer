@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/hogecode/CommentVideo/internal/query"
+	"github.com/hogecode/commentPlayer/internal/query"
 	"gorm.io/gorm"
 )
 

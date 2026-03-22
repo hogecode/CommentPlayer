@@ -1,4 +1,4 @@
-module github.com/hogecode/CommentVideo
+module github.com/hogecode/commentPlayer
 
 go 1.25.0
 

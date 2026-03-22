@@ -1,31 +1,15 @@
-app.local {
-  tls internal
+https://{$LOCAL_DOMAIN} {
+	tls internal
 
-  header / {
-    X-Frame-Options "SAMEORIGIN"
-    X-Content-Type-Options "nosniff"
-  }
+	handle /api/v1/* {
+		reverse_proxy http://backend:8000
+	}
 
-  reverse_proxy /api/* backend:8000
-  reverse_proxy / frontend:3000
+	handle {
+		reverse_proxy http://frontend:3000
+	}
 
-  log {
-    level info
-  }
-}
-
-localhost {
-  tls internal
-
-  header / {
-    X-Frame-Options "SAMEORIGIN"
-    X-Content-Type-Options "nosniff"
-  }
-
-  reverse_proxy /api/* backend:8000
-  reverse_proxy / frontend:3000
-
-  log {
-    level info
-  }
+	log {
+		level info
+	}
 }

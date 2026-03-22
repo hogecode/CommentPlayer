@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/hogecode/CommentVideo/internal/entity"
+import "github.com/hogecode/commentPlayer/internal/entity"
 
 // CaptureList
 // CaptureListRequest - キャプチャ一覧取得リクエスト
@@ -25,7 +25,6 @@ type CaptureListResponse struct {
 	Data       []entity.Capture `json:"data"`
 	Pagination Pagination       `json:"pagination"`
 }
-
 
 // CaptureCreate
 // CaptureCreateRequest - キャプチャ作成リクエスト

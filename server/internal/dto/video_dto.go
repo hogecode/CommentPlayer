@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/hogecode/CommentVideo/internal/entity"
+import "github.com/hogecode/commentPlayer/internal/entity"
 
 // ApiComment - コメント
 type ApiComment struct {
@@ -12,16 +12,15 @@ type ApiComment struct {
 	Text   string  `json:"text" validate:"required"`
 }
 
-
 // VideoList
 // VideoListRequest - ビデオ一覧取得リクエスト
 type VideoListRequest struct {
-	IDs     []int  `form:"ids" validate:"dive,min=1"`
+	IDs      []int  `form:"ids" validate:"dive,min=1"`
 	FilterBy string `form:"filterBy"`
-	Page    int    `form:"page" validate:"min=1"`
-	Limit   int    `form:"limit" validate:"min=1,max=100"`
-	Sort    string `form:"sort" validate:"oneof=created_at views file_name duration"`
-	Order   string `form:"order" validate:"oneof=asc desc"`
+	Page     int    `form:"page" validate:"min=1"`
+	Limit    int    `form:"limit" validate:"min=1,max=100"`
+	Sort     string `form:"sort" validate:"oneof=created_at views file_name duration"`
+	Order    string `form:"order" validate:"oneof=asc desc"`
 }
 
 // SetDefaults - デフォルト値を設定
@@ -46,7 +45,6 @@ type VideoListResponse struct {
 	Pagination Pagination     `json:"pagination"`
 }
 
-
 // VideoSearch
 // VideoSearchRequest - ビデオ検索リクエスト
 type VideoSearchRequest struct {
@@ -70,17 +68,15 @@ func (v *VideoSearchRequest) SetDefaults() {
 	}
 }
 
-
 // Video
 // VideoResponse - ビデオ詳細レスポンス
 type VideoResponse struct {
-	IsSuccess bool          `json:"is_success"`
-	Src       string        `json:"src"`
-	Title     *string       `json:"title"`
-	Description *string    `json:"description"`
-	Comments  []ApiComment  `json:"comments"`
+	IsSuccess   bool         `json:"is_success"`
+	Src         string       `json:"src"`
+	Title       *string      `json:"title"`
+	Description *string      `json:"description"`
+	Comments    []ApiComment `json:"comments"`
 }
-
 
 // ThumbnailRegenerate
 // ThumbnailRegenerateRequest - サムネイル再生成リクエスト
@@ -92,7 +88,7 @@ type ThumbnailRegenerateRequest struct {
 
 // ThumbnailRegenerateResponse - サムネイル再生成レスポンス
 type ThumbnailRegenerateResponse struct {
-	ID            int                  `json:"id"`
+	ID            int                   `json:"id"`
 	ThumbnailInfo *entity.ThumbnailInfo `json:"thumbnail_info"`
-	Message       string               `json:"message"`
+	Message       string                `json:"message"`
 }

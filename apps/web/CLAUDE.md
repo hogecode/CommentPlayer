@@ -5,8 +5,9 @@
 ```
 apps/web/
 ├── src/
-│   ├── routes/           # TanStack Router ルート定義
-│   ├── components/       # React コンポーネント
+│   ├── app/             # TanStack Router ルート定義
+│   ├── components/      # React コンポーネント
+│   │   └── /common      # ヘッダー等共通コンポーネント   
 │   │   └── ui/          # shadcn-ui コンポーネント
 │   ├── pages/           # ページコンポーネント（ルート対応）
 │   ├── lib/             # ユーティリティ関数
@@ -32,6 +33,8 @@ cd apps/web
 yarn install           # 初回のみ
 yarn dev              # 開発サーバー起動（http://localhost:3000）
 ```
+
+npmコマンドは使わず、必ずyarnを使用してください。
 
 ### コード品質チェック
 
@@ -74,18 +77,6 @@ export function VideoPlayer({ id, commentList }: VideoPlayerProps) {
 ### 型安全性
 
 ```tsx
-// any は避ける
-const data: any = response.json()  // ❌ NG
-
-// 明示的な型定義
-interface Video {
-  id: string
-  title: string
-  src: string
-}
-
-const data: Video = response.json()  // ✅ OK
-
 // 複雑な型は Zod で検証
 import { z } from 'zod'
 
@@ -113,161 +104,13 @@ const formatted = format(now, 'yyyy-MM-dd')
 
 ## TanStack Router
 
-### ルート定義
 
-```tsx
-// src/router.ts で一括定義
-import { RootRoute, Route, createRouter } from '@tanstack/react-router'
-import RootLayout from './routes/__root'
-import HomePage from './routes/index'
-import VideoPage from './routes/videos/$id'
+TanStack QueryとOpenAPIで自動生成されたファイルを使用してください。
 
-const rootRoute = new RootRoute({
-  component: RootLayout,
-})
-
-const indexRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: HomePage,
-})
-
-const videoRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: '/videos/$id',
-  component: VideoPage,
-})
-
-export const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, videoRoute]),
-})
-```
-
-### ルートコンポーネント
-
-```tsx
-// src/routes/index.tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/')({
-  component: HomePage,
-})
-
-function HomePage() {
-  return <h1>Home</h1>
-}
-```
-
-### パラメータ取得
-
-```tsx
-// 動的ルート：/videos/$id
-import { useParams } from '@tanstack/react-router'
-
-export default function VideoPage() {
-  const { id } = useParams({ from: '/videos/$id' })
-
-  return <h1>Video: {id}</h1>
-}
-```
-
-## TanStack Query（API データ管理）
-
-### クエリ定義
-
-```tsx
-// src/services/useVideosQuery.ts
-import { useQuery } from '@tanstack/react-query'
-
-export function useVideoQuery(id: string) {
-  return useQuery({
-    queryKey: ['videos', id],
-    queryFn: () => fetch(`/api/v1/videos/${id}`).then(r => r.json()),
-    staleTime: 5 * 60 * 1000, // 5分
-  })
-}
-
-// コンポーネント内での使用
-export function VideoPage({ id }: { id: string }) {
-  const { data, isLoading, error } = useVideoQuery(id)
-
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  return <div>{data.title}</div>
-}
-```
-
-### ミューテーション（更新操作）
-
-```tsx
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-
-export function useAddCommentMutation() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (comment: Comment) =>
-      fetch('/api/v1/comments', {
-        method: 'POST',
-        body: JSON.stringify(comment),
-      }).then(r => r.json()),
-
-    onSuccess: () => {
-      // キャッシュを無効化して再フェッチ
-      queryClient.invalidateQueries({ queryKey: ['comments'] })
-    },
-  })
-}
-```
 
 ## Zustand（状態管理）
 
-```tsx
-// src/stores/sidebar-store.ts
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-
-interface SidebarStore {
-  isOpen: boolean
-  toggle: () => void
-}
-
-export const useSidebarStore = create<SidebarStore>()(
-  persist(
-    (set) => ({
-      isOpen: true,
-      toggle: () => set((state) => ({ isOpen: !state.isOpen })),
-    }),
-    { name: 'sidebar-store' }
-  )
-)
-
-// コンポーネント内での使用
-export function Sidebar() {
-  const { isOpen, toggle } = useSidebarStore()
-  return <button onClick={toggle}>{isOpen ? 'Close' : 'Open'}</button>
-}
-```
-
 ## Tailwind CSS + shadcn-ui
-
-### コンポーネント使用
-
-```tsx
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-
-export function VideoCard() {
-  return (
-    <Card>
-      <div className="p-6">
-        <Button variant="outline">Play</Button>
-      </div>
-    </Card>
-  )
-}
-```
 
 
 ## ビルド・デプロイ
@@ -282,29 +125,6 @@ yarn build
 yarn preview
 ```
 
-## トラブルシューティング
-
-### 型エラー
-```bash
-yarn typecheck    # 型エラーを詳細に表示
-```
-
-### リント エラー
-```bash
-yarn lint --fix   # 自動修正（可能な場合）
-```
-
-### ホットリロードが動作しない
-```bash
-# vite.config.ts を確認
-// server: { watch: { usePolling: true } }
-```
-
-### ポート競合（3000 が使用中）
-```bash
-# vite.config.ts でポート変更
-// server: { port: 3001 }
-```
 
 ## 参考資料
 

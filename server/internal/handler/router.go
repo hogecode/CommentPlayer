@@ -5,7 +5,7 @@ import (
 )
 
 // RegisterRoutes - ルートを登録
-// @title CommentVideo API
+// @title commentPlayer API
 // @version 1.0.0
 // @description ビデオ管理アプリケーションのREST API
 // @host localhost:8000

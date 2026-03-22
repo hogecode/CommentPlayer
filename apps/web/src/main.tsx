@@ -4,8 +4,8 @@ import { RouterProvider } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { router } from "@/router";
 import { queryClient } from "@/providers/QueryClientProvider";
-import { Toaster } from "./components/ui/sonner";
-import { App } from "./App";
+import { App } from "@/App";
+import { SnackbarContainer } from "./components/ui/snackbar";
 
 import "@/styles/globals.css";
 import "@/styles/mixin.scss";
@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <Toaster />
+      <SnackbarContainer />
       <App />
     </QueryClientProvider>
   </React.StrictMode>,

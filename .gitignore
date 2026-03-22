@@ -23,3 +23,15 @@ bin/
 *.o
 *.a
 *.so
+/server/bin/
+/server/dist/
+
+# Database
+*.db
+*.db-journal
+
+# Server config
+/server/config.*.yaml
+/server/.env
+/server/.env.local
+/server/.env.*.local

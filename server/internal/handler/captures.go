@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hogecode/CommentVideo/internal/dto"
-	"github.com/hogecode/CommentVideo/internal/entity"
-	"github.com/hogecode/CommentVideo/internal/i18n"
+	"github.com/hogecode/commentPlayer/internal/dto"
+	"github.com/hogecode/commentPlayer/internal/entity"
+	"github.com/hogecode/commentPlayer/internal/i18n"
 )
 
 // ============ Router Registration ============

@@ -1,7 +1,7 @@
 package query
 
 import (
-	"github.com/hogecode/CommentVideo/internal/entity"
+	"github.com/hogecode/commentPlayer/internal/entity"
 	"gorm.io/gorm"
 )
 

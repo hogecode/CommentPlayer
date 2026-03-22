@@ -64,8 +64,11 @@ services:
       - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./xxx/mkcert/ssl:/certs/mkcert/ssl:ro
       - caddy_data:/data
       - caddy_config:/config
+    env_file:
+      - ./caddy/env/.env.caddy
     environment:
       - ACME_AGREE=true
     depends_on:

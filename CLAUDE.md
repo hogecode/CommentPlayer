@@ -13,6 +13,9 @@ CommePlayer/
 └── Makefile              # コマンドライン インターフェース
 ```
 
+フロント、バックエンドは/apps/web/CLAUDE.md、server/CLAUDE.mdをそれぞれ参照してください。
+
+
 ## 開発環境のセットアップ
 
 ### 推奨: Docker Compose ホットリロード開発
