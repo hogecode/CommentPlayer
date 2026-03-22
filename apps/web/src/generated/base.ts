@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Video App API
+ * commentPlayer API
  * ビデオ管理アプリケーションのREST API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -19,7 +19,7 @@ import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 
-export const BASE_PATH = "http://localhost:8000".replace(/\/+$/, "");
+export const BASE_PATH = "http://localhost:8000/api/v1".replace(/\/+$/, "");
 
 export const COLLECTION_FORMATS = {
     csv: ",",

@@ -1,13 +1,19 @@
 package handler
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/i18n"
+	"github.com/hogecode/commentPlayer/internal/service"
 )
 
 // RegisterVideoRoutes - ビデオ関連ルートを登録
@@ -158,6 +164,7 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				// TODO: i18n.Tに変換
 				Error: i18n.GetErrorMessage(locale, "invalid_video_id"),
 				Code:  "INVALID_ID",
 			})
@@ -168,13 +175,24 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 		video, err := a.VideoQuery.GetVideoByID(id)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+				// TODO: i18n.Tに変換
 				Error: i18n.GetErrorMessage(locale, "video_not_found"),
 				Code:  "NOT_FOUND",
 			})
 			return
 		}
+		 
+		// コメントファイルを取得してApiComment[]に変換
+		comments := a.getCommentsFromFile(video.FilePath)
 
-		ctx.JSON(http.StatusOK, video)
+		 response := dto.VideoResponse{
+			 IsSuccess:   true,
+			 Src:         video.FilePath, 
+			 Title:       &video.FileName,
+			 Description: video.Description,
+			 Comments:    comments,
+		 }
+		 ctx.JSON(http.StatusOK, response)
 	})
 
 	// GET /api/v1/videos/:id/download
@@ -266,4 +284,181 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 			Message:       i18n.GetSuccessMessage(locale, "thumbnail_regenerated"),
 		})
 	})
+}
+
+// getCommentsFromFile - ビデオファイルに対応するコメントファイルを取得してApiCommentに変換
+func (a *App) getCommentsFromFile(videoFilePath string) []dto.ApiComment {
+	baseFileName := service.GetBaseFileName(filepath.Base(videoFilePath))
+	folderPath := filepath.Dir(videoFilePath)
+
+	// XMLまたはJSONのコメントファイルを探す
+	commentExtensions := []string{".xml", ".json"}
+	for _, ext := range commentExtensions {
+		commentPath := filepath.Join(folderPath, baseFileName+ext)
+		if _, err := os.Stat(commentPath); err == nil {
+			comments, err := a.convertCommentsToAPI(commentPath)
+			if err == nil && comments != nil {
+				return comments
+			}
+		}
+	}
+
+	return []dto.ApiComment{}
+}
+
+// convertCommentsToAPI - コメントファイルをApiCommentに変換
+func (a *App) convertCommentsToAPI(commentPath string) ([]dto.ApiComment, error) {
+	fileBytes, err := os.ReadFile(commentPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// JSONとしてパース試行
+	if comments, err := a.convertJSONCommentsToAPI(fileBytes); err == nil && comments != nil {
+		return comments, nil
+	}
+
+	// XMLとしてパース試行
+	if comments, err := a.convertXMLCommentsToAPI(fileBytes); err == nil && comments != nil {
+		return comments, nil
+	}
+
+	return nil, nil
+}
+
+// convertXMLCommentsToAPI - XMLコメントをApiCommentに変換
+func (a *App) convertXMLCommentsToAPI(data []byte) ([]dto.ApiComment, error) {
+	var packet service.PacketXML
+	if err := xml.Unmarshal(data, &packet); err != nil {
+		return nil, err
+	}
+
+	if len(packet.Chats) == 0 {
+		return []dto.ApiComment{}, nil
+	}
+
+	comments := make([]dto.ApiComment, 0, len(packet.Chats))
+	for _, chat := range packet.Chats {
+		comment := a.chatXMLToApiComment(chat)
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}
+
+// convertJSONCommentsToAPI - JSONコメントをApiCommentに変換
+func (a *App) convertJSONCommentsToAPI(data []byte) ([]dto.ApiComment, error) {
+	var root service.PacketJSONRoot
+	if err := json.Unmarshal(data, &root); err != nil {
+		return nil, err
+	}
+
+	if len(root.Packet) == 0 {
+		return []dto.ApiComment{}, nil
+	}
+
+	comments := make([]dto.ApiComment, 0, len(root.Packet))
+	for _, item := range root.Packet {
+		comment := a.chatJSONToApiComment(item.Chat)
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}
+
+// chatXMLToApiComment - ChatXMLをApiCommentに変換
+func (a *App) chatXMLToApiComment(chat service.ChatXML) dto.ApiComment {
+	// vpos（ビデオ位置）を秒単位の浮動小数点数に変換
+	time := float64(0)
+	if chat.VPos != "" {
+		if vpos, err := strconv.ParseInt(chat.VPos, 10, 64); err == nil {
+			time = float64(vpos) / 100.0 // vposは10ミリ秒単位
+		}
+	}
+
+	// mailフィールドからコメント表示スタイルを解析
+	commentType, commentSize, commentColor := a.parseMailAttribute(chat.Mail)
+
+	// UserIDがある場合は表示、ない場合はnil
+	var author *string
+	if chat.UserID != "" && chat.Anonymity != "1" {
+		author = &chat.UserID
+	}
+
+	return dto.ApiComment{
+		Time:   time,
+		Type:   commentType,
+		Size:   commentSize,
+		Color:  commentColor,
+		Author: author,
+		Text:   chat.Content,
+	}
+}
+
+// chatJSONToApiComment - ChatJSONをApiCommentに変換
+func (a *App) chatJSONToApiComment(chat service.ChatJSON) dto.ApiComment {
+	// vpos（ビデオ位置）を秒単位の浮動小数点数に変換
+	time := float64(0)
+	if chat.VPos != "" {
+		if vpos, err := strconv.ParseInt(chat.VPos, 10, 64); err == nil {
+			time = float64(vpos) / 100.0 // vposは10ミリ秒単位
+		}
+	}
+
+	// mailフィールドからコメント表示スタイルを解析
+	commentType, commentSize, commentColor := a.parseMailAttribute(chat.Mail)
+
+	// UserIDがある場合は表示、ない場合はnil
+	var author *string
+	if chat.UserID != "" && chat.Anonymity != "1" {
+		author = &chat.UserID
+	}
+
+	return dto.ApiComment{
+		Time:   time,
+		Type:   commentType,
+		Size:   commentSize,
+		Color:  commentColor,
+		Author: author,
+		Text:   chat.Content,
+	}
+}
+
+// parseMailAttribute - mailフィールドからコメント表示スタイルを解析
+// ニコニコ動画形式: "top" "bottom" "right" を含む場合は位置、"small" "medium" "big" を含む場合はサイズ
+func (a *App) parseMailAttribute(mail string) (commentType, commentSize, commentColor string) {
+	// デフォルト値
+	commentType = "right"  // デフォルトは右下
+	commentSize = "medium" // デフォルトは中
+	commentColor = "white" // デフォルトは白
+
+	if mail == "" {
+		return
+	}
+
+	// mailを空白で分割
+	parts := strings.Fields(mail)
+	for _, part := range parts {
+		switch part {
+		case "top":
+			commentType = "top"
+		case "bottom":
+			commentType = "bottom"
+		case "right", "ue", "naka":
+			commentType = "right"
+		case "small":
+			commentSize = "small"
+		case "medium":
+			commentSize = "medium"
+		case "big":
+			commentSize = "big"
+		default:
+			// 16進数カラーコード（#xxxxxx形式）をチェック
+			if strings.HasPrefix(part, "#") && len(part) == 7 {
+				commentColor = part
+			}
+		}
+	}
+
+	return
 }

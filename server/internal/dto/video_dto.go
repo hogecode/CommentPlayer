@@ -2,7 +2,7 @@ package dto
 
 import "github.com/hogecode/commentPlayer/internal/entity"
 
-// ApiComment - コメント
+// ---ApiComment---
 type ApiComment struct {
 	Time   float64 `json:"time" validate:"required,min=0"`
 	Type   string  `json:"type" validate:"required,oneof=right top bottom"`
@@ -12,7 +12,8 @@ type ApiComment struct {
 	Text   string  `json:"text" validate:"required"`
 }
 
-// VideoList
+
+// ---VideoList---
 // VideoListRequest - ビデオ一覧取得リクエスト
 type VideoListRequest struct {
 	IDs      []int  `form:"ids" validate:"dive,min=1"`
@@ -68,7 +69,8 @@ func (v *VideoSearchRequest) SetDefaults() {
 	}
 }
 
-// Video
+
+// ---Video---
 // VideoResponse - ビデオ詳細レスポンス
 type VideoResponse struct {
 	IsSuccess   bool         `json:"is_success"`
@@ -78,7 +80,8 @@ type VideoResponse struct {
 	Comments    []ApiComment `json:"comments"`
 }
 
-// ThumbnailRegenerate
+
+// ---ThumbnailRegenerate---
 // ThumbnailRegenerateRequest - サムネイル再生成リクエスト
 type ThumbnailRegenerateRequest struct {
 	Width     *int     `json:"width" validate:"omitempty,min=1"`

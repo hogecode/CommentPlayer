@@ -20,8 +20,9 @@ type ThumbnailInfo struct {
 type Video struct {
 	ID                  int            `gorm:"primaryKey" json:"id"`
 	FileName            string         `json:"file_name"`
-	FolderPath          string         `json:"folder_path"`
-	FilePath            string         `json:"file_path"`
+	FolderID            int            `json:"folder_id"` // Folderテーブルへの外部キー
+	FilePath            string         `json:"-"`
+	Description         *string        `json:"description"`
 	Status              string         `json:"status"` // ready, processing, error
 	FileHash            string         `json:"-"`      // 非公開
 	FileSize            int64          `json:"file_size"`
@@ -33,6 +34,7 @@ type Video struct {
 	Duration            float64        `json:"duration"`
 	ThumbnailInfoJSON   json.RawMessage `gorm:"type:json" json:"-"`
 	ThumbnailInfo       *ThumbnailInfo `gorm:"-" json:"thumbnail_info"`
+	IsDeleted           bool           `json:"is_deleted"`
 	CreatedAt           time.Time      `json:"created_at"`
 	UpdatedAt           time.Time      `json:"updated_at"`
 }

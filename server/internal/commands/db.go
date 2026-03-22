@@ -66,6 +66,7 @@ func initDB(dsn string) (*gorm.DB, error) {
 // migrateDB - データベースマイグレーション
 func migrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
+		&entity.Folder{},
 		&entity.Video{},
 		&entity.Capture{},
 		&entity.User{},

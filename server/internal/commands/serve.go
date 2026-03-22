@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/hogecode/commentPlayer/internal/handler"
 	"github.com/hogecode/commentPlayer/internal/i18n"
 	"github.com/hogecode/commentPlayer/internal/middleware"
+	"github.com/hogecode/commentPlayer/internal/service"
 )
 
 // ServeCmd - サーバー起動コマンド
@@ -38,6 +40,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		log.Printf("Failed to load config: %v (using defaults)\n", err)
+		// TODO: errorCode: 1 を返すようにする
 		cfg = &config.Config{
 			Server: config.ServerConfig{Host: "0.0.0.0", Port: 8000},
 			DB:     config.DBConfig{DSN: "app.db", MaxOpenConns: 10, MaxIdleConns: 5},
@@ -69,6 +72,22 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	// ルートを登録
 	app.RegisterRoutes(engine)
 
+	// ファイルウォッチャーを初期化・開始
+	// TODO: Configに値を設定するようにする
+	screenshotDir := filepath.Join(".", "public", "screenshots")
+	watcher, err := service.NewFileWatcher(db, screenshotDir)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize file watcher: %v\n", err)
+	} else {
+		// DBの監視対象フォルダをロードして同期
+		if err := watcher.SyncFoldersWithDB(); err != nil {
+			log.Printf("Warning: Failed to sync folders: %v\n", err)
+		}
+		// ファイルウォッチャーを開始
+		watcher.Start()
+		log.Println("File watcher started")
+	}
+
 	// サーバーを起動（グレースフルシャットダウン対応）
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 	server := &http.Server{
@@ -93,6 +112,15 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 
 	// グレースフルシャットダウン
 	log.Println("\nReceived shutdown signal. Starting graceful shutdown...")
+	
+	// ファイルウォッチャーを停止
+	if watcher != nil {
+		if err := watcher.Stop(); err != nil {
+			log.Printf("Error stopping file watcher: %v\n", err)
+		}
+		log.Println("File watcher stopped")
+	}
+	
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
