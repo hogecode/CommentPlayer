@@ -14,23 +14,16 @@ const rootRoute = new RootRoute({
   component: RootLayout,
 })
 
-// ホームページ
-const indexRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: HomePage,
-})
+// ページ定義を配列でまとめる
+const pages: { path: string; component: any }[] = [
+  { path: '/', component: HomePage },
+  { path: '/videos/$id', component: VideoPage },
+]
 
-// 動画ページ
-const videoRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: '/videos/$id',
-  component: VideoPage,
-})
-
-// ルートツリーを構築
-const routeTree = rootRoute.addChildren([indexRoute, videoRoute])
-
+// 配列から Route インスタンスを生成して一括追加
+const routeTree = rootRoute.addChildren(
+  pages.map(p => new Route({ getParentRoute: () => rootRoute, ...p }))
+)
 // ルータを作成
 export const router = createRouter({ routeTree })
 

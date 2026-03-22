@@ -3,7 +3,7 @@
 // All API calls go through this module.
 
 import type { ApiError, AuthResponse } from "@/types";
-import { API_V1, REFRESH_TOKEN_KEY, TOKEN_KEY } from "./config";
+import { API_V1, REFRESH_TOKEN_KEY, TOKEN_KEY } from "@/lib/config";
 
 // ─── Token Management ─────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
-import DPlayerVideo from '@/components/video/DPlayerVideo'
+import DPlayerVideo from '@/components/video'
 import type { VideoResponse } from '@/types/video'
 import { sampleDanmaku } from '@/misc/sampleDanmaku'
 
