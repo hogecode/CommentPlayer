@@ -10,11 +10,7 @@ import {
   getNormalizedLocalClientSettings,
   hashClientSettings,
 } from "@/lib/settings";
-<<<<<<< HEAD
 import { initializeApiClient } from "@/lib/api/api-setup";
-=======
-import { initializeApiClient } from "@/lib/api-setup";
->>>>>>> e7a14292703828cb82ee594bcb26ec70ba79b5f4
 
 /**
  * アプリケーション全体の初期化と Service Worker 管理を行うコンポーネント

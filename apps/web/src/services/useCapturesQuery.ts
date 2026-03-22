@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CapturesApi } from '@/generated';
+import { CapturesApi } from '@/generated/apis';
 
 // APIクライアントのセットアップ
 const capturesApi = new CapturesApi();
@@ -17,11 +17,11 @@ export function useCapturesQuery(
   return useQuery({
     queryKey: ['captures', params],
     queryFn: async () => {
-      return capturesApi.apiV1CapturesGet(
-        params?.video_id,
-        params?.page,
-        params?.limit,
-      );
+      return capturesApi.apiV1CapturesGet({
+        videoId: params?.video_id,
+        page: params?.page,
+        limit: params?.limit,
+      });
     },
     staleTime: 1000 * 60 * 5,
     ...options,
@@ -36,14 +36,10 @@ export function useCreateCaptureMutation() {
 
   return useMutation({
     mutationFn: async (data: { file: File; video_id: number }) => {
-      const formData = new FormData();
-      formData.append('file', data.file);
-      formData.append('video_id', data.video_id.toString());
-
-      return capturesApi.apiV1CapturesPost(
-        data.file,
-        data.video_id
-    );
+      return capturesApi.apiV1CapturesPost({
+        file: data.file,
+        videoId: data.video_id,
+      });
     },
     onSuccess: () => {
       // キャプチャリスト情報を無効化して再フェッチ
