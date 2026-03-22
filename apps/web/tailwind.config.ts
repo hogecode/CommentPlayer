@@ -11,6 +11,15 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
+      transitionTimingFunction: {
+        'material': 'cubic-bezier(0, 0, 0.2, 1)',
+      },
+      colors: {
+        success: '#10b981',
+        warning: '#f59e0b',
+        error: '#ef4444',
+        info: '#3b82f6',
+      },
     },
   },
   plugins: [],

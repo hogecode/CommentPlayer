@@ -1,0 +1,66 @@
+
+// スクロールバーのスタイル
+// なるべく ::webkit-scrollbar を優先させるため、::webkit-scrollbar 未対応の Firefox でのみ scrollbar-color/width を有効化する
+@supports (-moz-appearance: none) {
+    * {
+        scrollbar-color: rgb(var(--v-theme-gray)) rgb(var(--v-theme-background));
+        scrollbar-width: thin;
+    }
+}
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+    background: rgb(var(--v-theme-background));
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(var(--v-theme-background-lighten-2));
+    &:hover {
+        background: rgb(var(--v-theme-gray));
+    }
+}
+
+// Android でタップしたときのハイライトが出ないようにする
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+// 選択時の色
+*::selection {
+	background-color: #E64F9780;
+}
+
+// リンクの既定の CSS をリセット
+a, a:link, a:visited, a:hover, a:active {
+    color: inherit;
+    text-decoration: none;
+}
+
+// ***** SPA 全体に適用されるスタイル *****
+
+// ページ遷移アニメーション (View Transitions API)
+// ref: https://developer.mozilla.org/ja/docs/Web/API/View_Transitions_API
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.25s;  // 0.25 秒クロスフェード
+}
+
+// 全体のスタイル
+html {
+    overflow-y: auto !important;
+    touch-action: manipulation;
+    overscroll-behavior-x: none;
+
+    // scrollbar-gutter: stable を指定すると、overflow: hidden 指定時にもスクロールバー分の領域が確保される
+    // ref: https://ics.media/entry/230206/
+    scrollbar-gutter: stable;
+    &:has(.watch-container), &:has(.timetable-container) {
+        // 視聴画面・番組表では全体のスクロールバーが不要なため、スクロールバー分の領域を確保しない
+        scrollbar-gutter: auto;
+    }
+    @media all and (display-mode: picture-in-picture) {
+        // Document Picture-in-Picture モードでは全体のスクロールバーが不要なため、スクロールバー分の領域を確保しない
+        scrollbar-gutter: auto;
+    }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Comment } from '@/types/danmaku';
+import { useSettingsStore } from '@/stores/settings-store';
 import { useEffect, useRef, useState } from 'react';
 
 interface Props {
@@ -31,6 +32,7 @@ export default function DPlayerVideo({ src = '', commentList: danList = [] }: Pr
   const commentListRef     = useRef<Comment[]>(danList); // apiBackend.read から参照する弾幕データ
 
   const [delay, setDelay] = useState(0);
+  const { settings } = useSettingsStore();
 
   // danList が変わったら ref を同期
   useEffect(() => {
@@ -49,19 +51,40 @@ export default function DPlayerVideo({ src = '', commentList: danList = [] }: Pr
 
       const dp = new DPlayer({
         container: containerRef.current,
-        lang: 'ja',
+        theme: "#E64F97",
+        lang: "ja-jp",
+        // ループ再生 (ライブ視聴では無効)
+        loop: true,
+        // 自動再生
+        autoplay: true,
+        // ショートカットキー（こちらで制御するため無効化）
+        hotkey: true,
+        // スクリーンショット (こちらで制御するため無効化)
+        screenshot: true,
+        // CORS を有効化
+        crossOrigin: "anonymous",
+        // 音量の初期値
+        volume: 1.0,
+        // 再生速度の設定 (x1.1 を追加)
+        playbackSpeed: [0.25, 0.5, 0.75, 1, 1.1, 1.25, 1.5, 1.75, 2],
         video: {
           url: src,
-          type: 'normal',
+          type: "normal",
         },
         // 弾幕データをローカルの danList から提供するカスタムバックエンド
         apiBackend: {
-          read:  (options: any) => options.success(commentListRef.current),
-          send:  (options: any) => options.success(),  // コメント送信はローカルのみ
+          read: (options: any) => options.success(commentListRef.current),
+          send: (options: any) => options.success(), // コメント送信はローカルのみ
         },
         danmaku: {
-          id: 'local',
-          user: 'ユーザー',
+          id: "local",
+          user: "ユーザー",
+          // コメントの流れる速度
+          speedRate: settings.comment_speed_rate,
+          // コメントのフォントサイズ
+          fontSize: settings.comment_font_size,
+          // コメント送信後にコメントフォームを閉じるかどうか
+          closeCommentFormAfterSend: settings.close_comment_form_after_sending,
         },
       });
 

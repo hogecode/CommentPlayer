@@ -20,7 +20,12 @@
       "Bash(make help:*)",
       "Bash(chmod +x d:/Downloads/exe/app/CommePlayer/.devcontainer/post-create.sh)",
       "Bash(find d:/Downloads/exe/app/CommePlayer/server/cmd -type f -name *.go)",
-      "Bash(curl -I http://localhost:3000/)"
+      "Bash(curl -I http://localhost:3000/)",
+      "Bash(npx shadcn-ui@latest add sonner)",
+      "Bash(npx shadcn@latest add sonner)",
+      "Bash(cd /d D:DownloadsexeappCommePlayerappsweb)",
+      "Bash(yarn typecheck:*)",
+      "Bash(yarn lint:*)"
     ]
   },
   "max_tokens": 2000

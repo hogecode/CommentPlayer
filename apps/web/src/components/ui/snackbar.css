@@ -1,0 +1,37 @@
+/* Tailwind では対応できない複雑なトランジション効果 */
+
+.snackbar-transition {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s cubic-bezier(0, 0, 0.2, 1),
+    visibility 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* 削除時のアニメーション：高さを 0.3 秒かけて 0px にして、なめらかにスタックの空白を詰める */
+.snackbar-destroying {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  transition:
+    height 0.3s cubic-bezier(0, 0, 0.2, 1),
+    margin 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* デフォルトレベル用の色（CSS変数対応） */
+.bg-background-lighten-2 {
+  background-color: var(--background, #f9fafb);
+  color: var(--foreground, #111827);
+}
+
+/* プライマリカラー（CSS変数対応） */
+.text-primary {
+  color: hsl(var(--primary, 209, 100%, 50%));
+}
+
+/* Mobile対応：safe-area-inset-bottom */
+@media (max-width: 640px) {
+  .snackbar-container-mobile {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 56px);
+  }
+}
