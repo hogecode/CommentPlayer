@@ -1,21 +1,30 @@
-localhost {
-  # ヘッダー設定
+app.local {
+  tls internal
+
   header / {
     X-Frame-Options "SAMEORIGIN"
     X-Content-Type-Options "nosniff"
   }
 
-  # API: Go バックエンドへのリバースプロキシ
   reverse_proxy /api/* backend:8000
+  reverse_proxy / frontend:3000
 
-  # React フロントエンドへのリバースプロキシ
-  reverse_proxy / frontend:3000 {
-    # WebSocket サポート
-    header_up Connection "upgrade"
-    header_up Upgrade "websocket"
+  log {
+    level info
+  }
+}
+
+localhost {
+  tls internal
+
+  header / {
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
   }
 
-  # ログ出力
+  reverse_proxy /api/* backend:8000
+  reverse_proxy / frontend:3000
+
   log {
     level info
   }

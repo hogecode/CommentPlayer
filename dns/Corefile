@@ -1,0 +1,25 @@
+# dnsmasq 設定ファイル
+
+# DNS サーバーを起動するポート
+port=53
+
+# ログ出力
+log-queries
+log-facility=/var/log/dnsmasq.log
+
+# app.local をカスタムホストと定義
+address=/app.local/127.0.0.1
+
+# ローカルホストもサポート
+address=/localhost/127.0.0.1
+
+# upstreamのDNS（外部DNSクエリ用）
+server=8.8.8.8
+server=8.8.4.4
+
+# インターフェース設定
+listen-address=0.0.0.0
+bind-interfaces
+
+# キャッシュサイズ
+cache-size=1000

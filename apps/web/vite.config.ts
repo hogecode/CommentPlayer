@@ -4,6 +4,16 @@ import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // Dev server 設定
+  server: {
+    host: '0.0.0.0',
+    port: 3000,
+    allowedHosts: ['frontend', 'localhost', 'app.local', '127.0.0.1'],
+    watch: {
+      usePolling: true,
+    },
+    middlewareMode: false,
+  },
   // ビルド時に環境変数をバージョン情報として埋め込む
   define: {
     'process.env': {},
@@ -61,18 +71,6 @@ export default defineConfig({
       scss: {
 
       },
-    },
-  },
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    watch: {
-      usePolling: true,
-    },
-    hmr: {
-      host: 'localhost',
-      protocol: 'ws',
-      port: 3000,
     },
   },
   // プレビューサーバー設定
