@@ -16,4 +16,6 @@ func init() {
 
 	// DBCmdにサブコマンドを追加
 	DBCmd.AddCommand(DBMigrateCmd)
+	DBCmd.AddCommand(DBSeedCmd)
+	DBCmd.AddCommand(DBSeedClearCmd)
 }
