@@ -1,1 +1,25 @@
+# 環境変数ファイル
+.env
+.env.local
+.env.*.local
 
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+yarn-error.log
+
+# Go
+bin/
+*.o
+*.a
+*.so

@@ -33,7 +33,17 @@
         "GitHub.copilot",
         "ms-vscode.vscode-typescript-next",
         "Vue.volar",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "Anthropic.claude-vsx",
+        "REST-client.rest-client",
+        "cweijan.vscode-database-client2",
+        "streetsidesoftware.code-spell-checker",
+        "rangav.vscode-thunder-client",
+        "ms-vscode.remote-explorer",
+        "eamodio.gitlens",
+        "GitLab.gitlab-workflow",
+        "ms-vscode-remote.remote-containers",
+        "wix.vscode-import-cost"
       ],
       "settings": {
         "[go]": {
@@ -66,5 +76,9 @@
     }
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "CLAUDE_API_KEY": "${localEnv:CLAUDE_API_KEY}",
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
+  }
 }

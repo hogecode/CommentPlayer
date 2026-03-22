@@ -26,6 +26,9 @@ RUN apt-get update && \
     apt-get install -y caddy && \
     rm -rf /var/lib/apt/lists/*
 
+# Claude CLI のインストール
+RUN curl -fsSL https://claude.ai/install.sh | bash 2>&1 || echo "Warning: Claude CLI installation failed, will retry in post-create"
+
 # 作業ディレクトリ
 WORKDIR /workspace
 

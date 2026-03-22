@@ -8,6 +8,44 @@ VS Code Dev Containers を使用した開発環境。
 - VS Code がインストール済み
 - "Dev Containers" 拡張機能がインストール済み
 
+## Claude AI の設定
+
+### API キー の取得と設定
+
+1. **API キーを取得** - https://console.anthropic.com/ から API キーを取得
+
+2. **環境変数を設定** - `.env.local` または `.env` ファイルを作成：
+
+```bash
+# プロジェクトルートに .env ファイルを作成
+CLAUDE_API_KEY=sk-ant-xxxxxxxxxxxxx
+```
+
+または、環境変数として設定：
+
+```bash
+# Windows
+set CLAUDE_API_KEY=sk-ant-xxxxxxxxxxxxx
+
+# macOS/Linux
+export CLAUDE_API_KEY=sk-ant-xxxxxxxxxxxxx
+```
+
+3. **Dev Container を開く** - VS Code で開くと自動的に環境変数が読み込まれます
+
+### Claude CLI の使用
+
+```bash
+# Claude CLI で質問
+claude "このコードの問題点は何ですか？"
+
+# ファイルの内容を解析
+claude --file ./src/main.tsx
+
+# 対話型シェル
+claude --interactive
+```
+
 ## 使用方法
 
 ### 1. Dev Container を開く

@@ -18,28 +18,11 @@ services:
       - "8000:8000"    # API Server (Go)
     networks:
       - commeplayer
-
-  # Optional: PostgreSQL for development
-  # postgres:
-  #   image: postgres:15-alpine
-  #   environment:
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DB=commeplayer_dev
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - commeplayer
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+    stdin_open: true
+    tty: true
+    command: /bin/bash
 
 networks:
   commeplayer:
     driver: bridge
 
-# volumes:
-#   postgres_data:
