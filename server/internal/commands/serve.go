@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,6 +18,7 @@ import (
 	"github.com/hogecode/commentPlayer/internal/config"
 	"github.com/hogecode/commentPlayer/internal/handler"
 	"github.com/hogecode/commentPlayer/internal/i18n"
+	"github.com/hogecode/commentPlayer/internal/logger"
 	"github.com/hogecode/commentPlayer/internal/middleware"
 	"github.com/hogecode/commentPlayer/internal/service"
 )
@@ -42,11 +44,19 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 		log.Printf("Failed to load config: %v (using defaults)\n", err)
 		// TODO: errorCode: 1 を返すようにする
 		cfg = &config.Config{
-			Server: config.ServerConfig{Host: "0.0.0.0", Port: 8000},
-			DB:     config.DBConfig{DSN: "app.db", MaxOpenConns: 10, MaxIdleConns: 5},
-			Log:    config.LogConfig{Level: "info"},
+			Environment: config.Development,
+			Server:      config.ServerConfig{Host: "0.0.0.0", Port: 8000},
+			DB:          config.DBConfig{DSN: "app.db", MaxOpenConns: 10, MaxIdleConns: 5},
+			Log:         config.LogConfig{Level: "info", UseColor: true},
 		}
 	}
+
+	// ロガーを初期化
+	if err := logger.Init(cfg); err != nil {
+		log.Printf("Warning: Failed to initialize logger: %v\n", err)
+	}
+
+	slog.Info("Application starting", "environment", string(cfg.Environment), "port", cfg.Server.Port)
 
 	// データベース接続を初期化
 	db, err := initDB(cfg.DB.DSN)

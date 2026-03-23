@@ -1,7 +1,7 @@
 FROM golang:1.26-alpine
 
 # ビルドに必要なパッケージ
-RUN apk add --no-cache git build-base sqlite-dev
+RUN apk add --no-cache git build-base sqlite-dev ffmpeg
 
 WORKDIR /app
 

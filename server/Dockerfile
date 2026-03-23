@@ -4,7 +4,7 @@
 FROM golang:1.26-alpine AS builder
 
 # 必要なパッケージ
-RUN apk add --no-cache git build-base
+RUN apk add --no-cache git build-base ffmpeg sqlite-dev
 
 WORKDIR /app
 

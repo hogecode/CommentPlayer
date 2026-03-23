@@ -4,13 +4,113 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log/slog"
 	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
+
+var (
+	ffprobePath string
+	ffmpegPath  string
+)
+
+// init - ffmpeg/ffprobe のパスを初期化
+func init() {
+	initFFmpegPaths()
+}
+
+// initFFmpegPaths - ffmpeg/ffprobe のパスを探す
+func initFFmpegPaths() {
+	// 複数の候補パスを定義（Windows/Linux/Mac対応）
+	ffprobeCandidates := []string{
+		"ffprobe",
+		"ffprobe.exe",
+		// Linux/Unix
+		"/usr/bin/ffprobe",
+		"/usr/local/bin/ffprobe",
+		"/bin/ffprobe",
+		// macOS
+		"/opt/homebrew/bin/ffprobe",
+		"/usr/local/opt/ffmpeg/bin/ffprobe",
+		// Windows - 一般的なインストール先
+		"C:\\Program Files\\ffmpeg\\bin\\ffprobe.exe",
+		"C:\\Program Files (x86)\\ffmpeg\\bin\\ffprobe.exe",
+		"D:\\ffmpeg\\bin\\ffprobe.exe",
+		"E:\\ffmpeg\\bin\\ffprobe.exe",
+		// Windows - WinGet のインストール先
+		"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe",
+		os.ExpandEnv("$LOCALAPPDATA\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffprobe.exe"),
+	}
+
+	ffmpegCandidates := []string{
+		"ffmpeg",
+		"ffmpeg.exe",
+		// Linux/Unix
+		"/usr/bin/ffmpeg",
+		"/usr/local/bin/ffmpeg",
+		"/bin/ffmpeg",
+		// macOS
+		"/opt/homebrew/bin/ffmpeg",
+		"/usr/local/opt/ffmpeg/bin/ffmpeg",
+		// Windows - 一般的なインストール先
+		"C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe",
+		"C:\\Program Files (x86)\\ffmpeg\\bin\\ffmpeg.exe",
+		"D:\\ffmpeg\\bin\\ffmpeg.exe",
+		"E:\\ffmpeg\\bin\\ffmpeg.exe",
+		// Windows - WinGet のインストール先
+		"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+		os.ExpandEnv("$LOCALAPPDATA\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe"),
+	}
+
+	// ffprobe のパスを探す
+	ffprobePath = "ffprobe" // デフォルト値
+	for _, candidate := range ffprobeCandidates {
+		// LookPath で探す
+		if path, err := exec.LookPath(candidate); err == nil {
+			ffprobePath = path
+			slog.Info("initFFmpegPaths: ffprobe found",
+				"path", ffprobePath)
+			break
+		}
+		// 絶対パスの場合、ファイルが存在するか確認
+		if _, err := os.Stat(candidate); err == nil {
+			ffprobePath = candidate
+			slog.Info("initFFmpegPaths: ffprobe found",
+				"path", ffprobePath)
+			break
+		}
+	}
+	if ffprobePath == "ffprobe" {
+		slog.Warn("initFFmpegPaths: ffprobe not found, using system default (may fail at runtime)")
+	}
+
+	// ffmpeg のパスを探す
+	ffmpegPath = "ffmpeg" // デフォルト値
+	for _, candidate := range ffmpegCandidates {
+		// LookPath で探す
+		if path, err := exec.LookPath(candidate); err == nil {
+			ffmpegPath = path
+			slog.Info("initFFmpegPaths: ffmpeg found",
+				"path", ffmpegPath)
+			break
+		}
+		// 絶対パスの場合、ファイルが存在するか確認
+		if _, err := os.Stat(candidate); err == nil {
+			ffmpegPath = candidate
+			slog.Info("initFFmpegPaths: ffmpeg found",
+				"path", ffmpegPath)
+			break
+		}
+	}
+	if ffmpegPath == "ffmpeg" {
+		slog.Warn("initFFmpegPaths: ffmpeg not found, using system default (may fail at runtime)")
+	}
+}
 
 // VideoMetadata - ビデオメタデータ
 type VideoMetadata struct {
@@ -48,7 +148,7 @@ func GetFileSize(filePath string) (int64, error) {
 // GetVideoDuration - ffprobeを使用して動画の長さを取得（秒数）
 func GetVideoDuration(filePath string) (float64, error) {
 	cmd := exec.Command(
-		"ffprobe",
+		ffprobePath,
 		"-v", "error",
 		"-show_entries", "format=duration",
 		"-of", "default=noprint_wrappers=1:nokey=1:nokey=1",
@@ -57,11 +157,21 @@ func GetVideoDuration(filePath string) (float64, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
+		slog.Error("GetVideoDuration: ffprobe command failed",
+			"ffprobe_path", ffprobePath,
+			"video_path", filePath,
+			"error", err.Error())
 		return 0, err
 	}
 
-	duration, err := strconv.ParseFloat(string(output[:len(output)-1]), 64)
+	// Windows の改行文字（\r\n）を含む可能性があるため、トリム処理を行う
+	durationStr := strings.TrimSpace(string(output))
+	duration, err := strconv.ParseFloat(durationStr, 64)
 	if err != nil {
+		slog.Error("GetVideoDuration: Failed to parse duration",
+			"ffprobe_output", durationStr,
+			"video_path", filePath,
+			"error", err.Error())
 		return 0, err
 	}
 
@@ -77,7 +187,7 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 	// TODO: 動画の長さに応じてスクリーンショットを撮る位置をランダムで撮るようにする
 	// 動画の中央付近（30%）からスクリーンショットを撮る
 	cmd := exec.Command(
-		"ffmpeg",
+		ffmpegPath,
 		"-i", videoPath,
 		"-ss", "00:00:15",
 		"-vframes", "1",
@@ -86,6 +196,11 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 	)
 
 	if err := cmd.Run(); err != nil {
+		slog.Error("CaptureScreenshot: ffmpeg command failed",
+			"ffmpeg_path", ffmpegPath,
+			"video_path", videoPath,
+			"output_path", screenshotPath,
+			"error", err.Error())
 		return nil, fmt.Errorf("failed to capture screenshot: %w", err)
 	}
 
@@ -97,18 +212,28 @@ func ExtractVideoMetadata(videoPath string, screenshotOutputDir string) (*VideoM
 	// ハッシュを計算
 	hash, err := CalculateFileHash(videoPath)
 	if err != nil {
+		slog.Debug("ExtractVideoMetadata: Failed to calculate hash",
+			"video_path", videoPath,
+			"error", err.Error())
 		return nil, fmt.Errorf("failed to calculate hash: %w", err)
+
 	}
 
 	// ファイルサイズを取得
 	size, err := GetFileSize(videoPath)
 	if err != nil {
+		slog.Debug("ExtractVideoMetadata: Failed to get file size",
+			"video_path", videoPath,
+			"error", err.Error())
 		return nil, fmt.Errorf("failed to get file size: %w", err)
 	}
 
 	// 動画の長さを取得
 	duration, err := GetVideoDuration(videoPath)
 	if err != nil {
+		slog.Debug("ExtractVideoMetadata: Failed to get video duration",
+			"video_path", videoPath,
+			"error", err.Error())
 		return nil, fmt.Errorf("failed to get video duration: %w", err)
 	}
 

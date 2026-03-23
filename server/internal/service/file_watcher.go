@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
@@ -40,6 +41,11 @@ func NewFileWatcher(db *gorm.DB, screenshotOutputDir string) (*FileWatcher, erro
 
 // AddFolder - 監視対象のフォルダを追加
 func (fw *FileWatcher) AddFolder(folder *entity.Folder) error {
+
+	slog.Debug("AddFolder: Adding folder to watch",
+		"folder_id", folder.ID,
+		"path", folder.Path)
+		
 	// フォルダの存在確認
 	if _, err := os.Stat(folder.Path); err != nil {
 		return fmt.Errorf("folder does not exist: %s", folder.Path)
@@ -51,6 +57,15 @@ func (fw *FileWatcher) AddFolder(folder *entity.Folder) error {
 
 	fw.watchPaths[folder.ID] = folder.Path
 	log.Printf("Started watching folder: %s (ID: %d)\n", folder.Path, folder.ID)
+
+	// フォルダ内の既存ファイルを処理
+	slog.Debug("AddFolder: Processing existing files in folder",
+		"folder_id", folder.ID,
+		"path", folder.Path)
+	fw.processExistingFiles(folder)
+	slog.Debug("AddFolder: Finished processing existing files",
+		"folder_id", folder.ID,
+		"path", folder.Path)
 
 	return nil
 }
@@ -68,6 +83,23 @@ func (fw *FileWatcher) RemoveFolder(folderID int) error {
 
 	delete(fw.watchPaths, folderID)
 	log.Printf("Stopped watching folder: %s (ID: %d)\n", path, folderID)
+
+	// フォルダに属するビデオをマーク削除
+	slog.Debug("RemoveFolder: Marking videos as deleted for folder",
+		"folder_id", folderID,
+		"path", path)
+	if err := fw.db.Model(&entity.Video{}).
+		Where("folder_id = ?", folderID).
+		Update("is_deleted", true).Error; err != nil {
+		slog.Error("RemoveFolder: Failed to mark videos as deleted",
+			"folder_id", folderID,
+			"path", path,
+			"error", err.Error())
+		return fmt.Errorf("failed to mark videos as deleted: %w", err)
+	}
+	slog.Debug("RemoveFolder: Successfully marked videos as deleted",
+		"folder_id", folderID,
+		"path", path)
 
 	return nil
 }

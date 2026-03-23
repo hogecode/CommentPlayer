@@ -1,0 +1,77 @@
+@baseUrl = http://localhost:8000/api/v1
+
+### ビデオAPI テスト
+
+## 1. ビデオ一覧を取得
+GET {{baseUrl}}/videos?page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 2. ビデオを検索
+GET {{baseUrl}}/videos/search?q=test&page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 3. 特定のビデオを取得
+GET {{baseUrl}}/videos/1
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 4. ビデオをダウンロード
+GET {{baseUrl}}/videos/1/download
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 5. サムネイルを再生成
+POST {{baseUrl}}/videos/1/thumbnail/regenerate
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "timestamp": 10.5
+}
+
+###
+
+## 6. ビデオ一覧をページネーション付きで取得（英語）
+GET {{baseUrl}}/videos?page=1&limit=10&sort=created_at&order=asc
+Accept: application/json
+Accept-Language: en
+
+###
+
+## 7. フィルター付きでビデオを検索
+GET {{baseUrl}}/videos?filterBy=liked&page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 8. 複数のビデオIDで検索
+GET {{baseUrl}}/videos?ids=1&ids=2&ids=3&page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 9. 存在しないビデオを取得
+GET {{baseUrl}}/videos/99999
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 10. キーワード検索（複数ワード）
+GET {{baseUrl}}/videos/search?q=test%20video&page=1&limit=20&order=desc
+Accept: application/json
+Accept-Language: ja
+
+###

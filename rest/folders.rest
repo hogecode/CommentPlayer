@@ -1,0 +1,114 @@
+@baseUrl = http://localhost:8000/api/v1
+
+### フォルダAPI テスト
+
+## 1. 監視対象フォルダ一覧を取得
+GET {{baseUrl}}/folders
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 2. 新しいフォルダを追加（新規作成）
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "D:\\ビデオ"
+}
+
+###
+
+## 3. 既存フォルダを再度追加（既存フォルダの復旧）
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "C:\\Users\\user\\Videos"
+}
+
+###
+
+## 4. フォルダを削除（ソフトデリート）
+DELETE {{baseUrl}}/folders/1
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 5. フォルダ一覧を確認（削除後）
+GET {{baseUrl}}/folders
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 6. 複数フォルダを追加
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "D:\\Movies"
+}
+
+###
+
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "E:\\Downloads"
+}
+
+###
+
+## 7. Windowsアニメフォルダの例（Docker経由でのマウントパス）
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "/mnt/d/デスクトップ/アニメ/年別/3/15"
+}
+
+###
+
+## 8. ネットワークパスの例
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "\\\\SERVER\\share\\folder"
+}
+
+###
+
+## 7. 英語でのテスト
+GET {{baseUrl}}/folders
+Accept: application/json
+Accept-Language: en
+
+###
+
+## 8. 無効なフォルダIDで削除を試みる
+DELETE {{baseUrl}}/folders/99999
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 9. 不正なリクエストボディで追加を試みる
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "invalid_key": "some_value"
+}
+
+###

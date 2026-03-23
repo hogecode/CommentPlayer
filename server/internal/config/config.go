@@ -6,11 +6,22 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Environment - 環境の種類
+type Environment string
+
+const (
+	Development Environment = "development"
+	Production  Environment = "production"
+	Staging     Environment = "staging"
+	Testing     Environment = "testing"
+)
+
 // Config - アプリケーション設定
 type Config struct {
-	Server ServerConfig
-	DB     DBConfig
-	Log    LogConfig
+	Environment Environment
+	Server      ServerConfig
+	DB          DBConfig
+	Log         LogConfig
 }
 
 // ServerConfig - サーバー設定
@@ -29,8 +40,9 @@ type DBConfig struct {
 
 // LogConfig - ログ設定
 type LogConfig struct {
-	Level  string `mapstructure:"level"`
-	Format string `mapstructure:"format"`
+	Level     string `mapstructure:"level"`
+	Format    string `mapstructure:"format"`
+	UseColor  bool   `mapstructure:"use_color"`
 }
 
 // LoadConfig - 設定ファイルから読み込む
@@ -39,10 +51,12 @@ func LoadConfig(configPath string) (*Config, error) {
 	viper.SetConfigFile(configPath)
 
 	// 環境変数をバインド
+	viper.BindEnv("environment", "APP_ENV")
 	viper.BindEnv("server.port", "SERVER_PORT")
 	viper.BindEnv("server.host", "SERVER_HOST")
 	viper.BindEnv("db.dsn", "DB_DSN")
 	viper.BindEnv("log.level", "LOG_LEVEL")
+	viper.BindEnv("log.use_color", "LOG_USE_COLOR")
 
 	// デフォルト値の設定
 	setDefaults()
@@ -60,11 +74,27 @@ func LoadConfig(configPath string) (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
+	// Environment を文字列から型に変換
+	envStr := viper.GetString("environment")
+	switch envStr {
+	case "production":
+		cfg.Environment = Production
+	case "staging":
+		cfg.Environment = Staging
+	case "testing":
+		cfg.Environment = Testing
+	case "development":
+		fallthrough
+	default:
+		cfg.Environment = Development
+	}
+
 	return cfg, nil
 }
 
 // setDefaults - デフォルト値の設定
 func setDefaults() {
+	viper.SetDefault("environment", "development")
 	viper.SetDefault("server.port", 8000)
 	viper.SetDefault("server.host", "0.0.0.0")
 	viper.SetDefault("db.dsn", "app.db")
@@ -73,4 +103,5 @@ func setDefaults() {
 	viper.SetDefault("db.log_level", "silent")
 	viper.SetDefault("log.level", "info")
 	viper.SetDefault("log.format", "json")
+	viper.SetDefault("log.use_color", true)
 }

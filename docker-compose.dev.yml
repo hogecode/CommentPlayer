@@ -31,6 +31,13 @@ services:
     volumes:
       - ./server:/app
       - go-modules:/go/pkg/mod
+      # Windows ドライブのマウント
+      - type: bind
+        source: 'C:\'
+        target: '/mnt/c/'
+      - type: bind
+        source: 'D:\'
+        target: '/mnt/d/'
     working_dir: /app
     networks:
       - commeplayer-network

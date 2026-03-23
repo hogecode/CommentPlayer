@@ -1,5 +1,8 @@
 # CommentVideo サーバー設定
 
+# 環境の種類 (development, staging, production, testing)
+environment: "development"
+
 # サーバー設定
 server:
   host: "0.0.0.0"
@@ -14,5 +17,6 @@ db:
 
 # ログ設定
 log:
-  level: "info"
+  level: "debug"
   format: "json"
+  use_color: true

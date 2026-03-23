@@ -1,0 +1,69 @@
+@baseUrl = http://localhost:8000/api/v1
+
+### キャプチャAPI テスト
+
+## 1. キャプチャ一覧を取得
+GET {{baseUrl}}/captures?page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 2. 特定のビデオのキャプチャを取得
+GET {{baseUrl}}/captures?video_id=1&page=1&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 3. キャプチャを作成（form-data）
+POST {{baseUrl}}/captures
+Accept: application/json
+Accept-Language: ja
+
+<file C:\Users\user\Desktop\sample_capture.png>
+video_id: 1
+
+###
+
+## 4. キャプチャ一覧を取得（英語）
+GET {{baseUrl}}/captures?page=1&limit=10
+Accept: application/json
+Accept-Language: en
+
+###
+
+## 5. 複数ページのキャプチャを取得
+GET {{baseUrl}}/captures?video_id=1&page=2&limit=20
+Accept: application/json
+Accept-Language: ja
+
+###
+
+## 6. キャプチャを作成（存在しないビデオID）
+POST {{baseUrl}}/captures
+Accept: application/json
+Accept-Language: ja
+
+<file C:\Users\user\Desktop\sample_capture.png>
+video_id: 99999
+
+###
+
+## 7. キャプチャを作成（ファイル未指定）
+POST {{baseUrl}}/captures
+Accept: application/json
+Accept-Language: ja
+
+video_id: 1
+
+###
+
+## 8. キャプチャを作成（video_id未指定）
+POST {{baseUrl}}/captures
+Accept: application/json
+Accept-Language: ja
+
+<file C:\Users\user\Desktop\sample_capture.png>
+
+###

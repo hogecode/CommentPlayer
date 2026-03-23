@@ -37,3 +37,4 @@ bin/
 /server/.env.*.local
 
 tmp
+server/public/screenshots/
