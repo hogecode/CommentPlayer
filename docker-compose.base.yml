@@ -1,0 +1,10 @@
+version: '3.9'
+
+networks:
+  commeplayer-network:
+    driver: bridge
+
+volumes:
+  go-modules:
+  caddy_data:
+  caddy_config:

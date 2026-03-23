@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  frontend:
+    image: node:20-alpine
+    container_name: commeplayer-frontend
+    ports:
+      - "3000:3000"
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    working_dir: /app
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
+    command: sh -c "yarn install && yarn dev"
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: commeplayer-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - CGO_ENABLED=1
+    volumes:
+      - ./server:/app
+      - go-modules:/go/pkg/mod
+    working_dir: /app
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
+    command: sh -c "go mod download && go install github.com/air-verse/air@latest && air"

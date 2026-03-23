@@ -20,19 +20,19 @@ setup-dev: ## 開発環境をセットアップ（DevContainer用）
 ## ========================
 
 up: ## ホットリロード開発環境を起動（Vite + air + Caddy）
-	docker compose up
+	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml up
 
 down: ## 開発環境を停止
-	docker compose down
+	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml down
 
 build: ## 開発環境をビルド
-	docker compose build
+	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml build
 
 logs: ## 開発環境のログを表示
-	docker compose logs -f
+	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml logs -f
 
 ps: ## 開発環境のコンテナ状態を表示
-	docker compose ps
+	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml ps
 
 ## ========================
 ## Docker Compose - 本番環境

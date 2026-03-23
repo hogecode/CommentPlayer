@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  dns:
+    image: jpillora/dnsmasq:latest
+    container_name: commeplayer-dns
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./dns/dnsmasq.conf:/etc/dnsmasq.conf:ro
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+
+  frontend:
+    image: node:20-alpine
+    container_name: commeplayer-frontend
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./apps/web:/app
+    working_dir: /app
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
+    command: sh -c "yarn install && yarn build && yarn preview"
+
+  backend:
+    build:
+      context: ./server
+    container_name: commeplayer-backend
+    environment:
+      - PORT=8000
+    volumes:
+      - ./server:/app
+    working_dir: /app
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    container_name: commeplayer-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./xxx/mkcert/ssl:/certs/mkcert/ssl:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file:
+      - ./caddy/env/.env.caddy
+    environment:
+      - ACME_AGREE=true
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - commeplayer-network
+    restart: unless-stopped
