@@ -19,4 +19,11 @@ func (a *App) RegisterRoutes(engine *gin.Engine) {
 	// フォルダ関連ルートを登録
 	foldersGroup := v1.Group("/folders")
 	a.RegisterFolderRoutes(foldersGroup)
+
+	// 静的ファイルダウンロード API ルートを登録
+	filesGroup := v1.Group("/files")
+	a.GetFileFromFolder(filesGroup)
+
+	// 静的ファイル配信と SPA フォールバック処理を登録
+	a.RegisterStaticRoutes(engine)
 }

@@ -1,6 +1,6 @@
 # VideosApi
 
-All URIs are relative to *http://localhost:8000*
+All URIs are relative to *http://localhost:8000/api/v1*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
@@ -11,7 +11,7 @@ All URIs are relative to *http://localhost:8000*
 |[**apiV1VideosSearchGet**](#apiv1videossearchget) | **GET** /api/v1/videos/search | ビデオを検索|
 
 # **apiV1VideosGet**
-> VideoListResponse apiV1VideosGet()
+> DtoVideoListResponse apiV1VideosGet()
 
 ページネーション対応のビデオ一覧を取得します
 
@@ -30,8 +30,8 @@ let ids: Array<number>; //ビデオID（複数指定可能） (optional) (defaul
 let filterBy: string; //フィルター (optional) (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
 let limit: number; //1ページあたりのアイテム数 (optional) (default to 20)
-let sort: 'created_at' | 'views' | 'file_name' | 'duration'; //ソート対象フィールド (optional) (default to 'created_at')
-let order: 'asc' | 'desc'; //ソート順序 (optional) (default to 'desc')
+let sort: string; //ソート対象フィールド (optional) (default to 'created_at')
+let order: string; //ソート順序 (optional) (default to 'desc')
 
 const { status, data } = await apiInstance.apiV1VideosGet(
     ids,
@@ -51,13 +51,13 @@ const { status, data } = await apiInstance.apiV1VideosGet(
 | **filterBy** | [**string**] | フィルター | (optional) defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|
 | **limit** | [**number**] | 1ページあたりのアイテム数 | (optional) defaults to 20|
-| **sort** | [**&#39;created_at&#39; | &#39;views&#39; | &#39;file_name&#39; | &#39;duration&#39;**]**Array<&#39;created_at&#39; &#124; &#39;views&#39; &#124; &#39;file_name&#39; &#124; &#39;duration&#39;>** | ソート対象フィールド | (optional) defaults to 'created_at'|
-| **order** | [**&#39;asc&#39; | &#39;desc&#39;**]**Array<&#39;asc&#39; &#124; &#39;desc&#39;>** | ソート順序 | (optional) defaults to 'desc'|
+| **sort** | [**string**] | ソート対象フィールド | (optional) defaults to 'created_at'|
+| **order** | [**string**] | ソート順序 | (optional) defaults to 'desc'|
 
 
 ### Return type
 
-**VideoListResponse**
+**DtoVideoListResponse**
 
 ### Authorization
 
@@ -66,15 +66,15 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**422** | バリデーションエラー |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**422** | Unprocessable Entity |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -119,20 +119,20 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/octet-stream
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**404** | ビデオが見つかりません |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiV1VideosIdGet**
-> VideoResponse apiV1VideosIdGet()
+> EntityVideo apiV1VideosIdGet()
 
 特定のビデオの詳細情報を取得します
 
@@ -163,7 +163,7 @@ const { status, data } = await apiInstance.apiV1VideosIdGet(
 
 ### Return type
 
-**VideoResponse**
+**EntityVideo**
 
 ### Authorization
 
@@ -172,20 +172,20 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**404** | ビデオが見つかりません |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiV1VideosIdThumbnailRegeneratePost**
-> ThumbnailRegenerateResponse apiV1VideosIdThumbnailRegeneratePost()
+> DtoThumbnailRegenerateResponse apiV1VideosIdThumbnailRegeneratePost()
 
 ビデオのサムネイルを再生成します
 
@@ -195,14 +195,14 @@ No authorization required
 import {
     VideosApi,
     Configuration,
-    ThumbnailRegenerateRequest
+    DtoThumbnailRegenerateRequest
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new VideosApi(configuration);
 
 let id: number; //ビデオID (default to undefined)
-let body: ThumbnailRegenerateRequest; // (optional)
+let body: DtoThumbnailRegenerateRequest; //リクエストボディ (optional)
 
 const { status, data } = await apiInstance.apiV1VideosIdThumbnailRegeneratePost(
     id,
@@ -214,13 +214,13 @@ const { status, data } = await apiInstance.apiV1VideosIdThumbnailRegeneratePost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **body** | **ThumbnailRegenerateRequest**|  | |
+| **body** | **DtoThumbnailRegenerateRequest**| リクエストボディ | |
 | **id** | [**number**] | ビデオID | defaults to undefined|
 
 
 ### Return type
 
-**ThumbnailRegenerateResponse**
+**DtoThumbnailRegenerateResponse**
 
 ### Authorization
 
@@ -229,20 +229,20 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**404** | ビデオが見つかりません |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiV1VideosSearchGet**
-> VideoListResponse apiV1VideosSearchGet()
+> DtoVideoListResponse apiV1VideosSearchGet()
 
 キーワードでビデオを検索します
 
@@ -260,7 +260,7 @@ const apiInstance = new VideosApi(configuration);
 let q: string; //検索キーワード (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
 let limit: number; //1ページあたりのアイテム数 (optional) (default to 20)
-let order: 'asc' | 'desc'; //ソート順序 (optional) (default to 'desc')
+let order: string; //ソート順序 (optional) (default to 'desc')
 let filterBy: string; //フィルター (optional) (default to undefined)
 
 const { status, data } = await apiInstance.apiV1VideosSearchGet(
@@ -279,13 +279,13 @@ const { status, data } = await apiInstance.apiV1VideosSearchGet(
 | **q** | [**string**] | 検索キーワード | defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|
 | **limit** | [**number**] | 1ページあたりのアイテム数 | (optional) defaults to 20|
-| **order** | [**&#39;asc&#39; | &#39;desc&#39;**]**Array<&#39;asc&#39; &#124; &#39;desc&#39;>** | ソート順序 | (optional) defaults to 'desc'|
+| **order** | [**string**] | ソート順序 | (optional) defaults to 'desc'|
 | **filterBy** | [**string**] | フィルター | (optional) defaults to undefined|
 
 
 ### Return type
 
-**VideoListResponse**
+**DtoVideoListResponse**
 
 ### Authorization
 
@@ -294,15 +294,15 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**400** | リクエストエラー |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

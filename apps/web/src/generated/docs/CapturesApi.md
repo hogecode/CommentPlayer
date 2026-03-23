@@ -1,6 +1,6 @@
 # CapturesApi
 
-All URIs are relative to *http://localhost:8000*
+All URIs are relative to *http://localhost:8000/api/v1*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
@@ -8,7 +8,7 @@ All URIs are relative to *http://localhost:8000*
 |[**apiV1CapturesPost**](#apiv1capturespost) | **POST** /api/v1/captures | キャプチャを作成|
 
 # **apiV1CapturesGet**
-> CaptureListResponse apiV1CapturesGet()
+> DtoCaptureListResponse apiV1CapturesGet()
 
 キャプチャ一覧をページネーション付きで取得します
 
@@ -45,7 +45,7 @@ const { status, data } = await apiInstance.apiV1CapturesGet(
 
 ### Return type
 
-**CaptureListResponse**
+**DtoCaptureListResponse**
 
 ### Authorization
 
@@ -54,19 +54,19 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | 成功 |  -  |
-|**500** | サーバーエラー |  -  |
+|**200** | OK |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiV1CapturesPost**
-> Capture apiV1CapturesPost()
+> EntityCapture apiV1CapturesPost()
 
 新しいキャプチャを作成します
 
@@ -100,7 +100,7 @@ const { status, data } = await apiInstance.apiV1CapturesPost(
 
 ### Return type
 
-**Capture**
+**EntityCapture**
 
 ### Authorization
 
@@ -109,16 +109,16 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: multipart/form-data
- - **Accept**: */*
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | 作成成功 |  -  |
-|**400** | リクエストエラー |  -  |
-|**404** | ビデオが見つかりません |  -  |
-|**500** | サーバーエラー |  -  |
+|**201** | Created |  -  |
+|**400** | Bad Request |  -  |
+|**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -23,4 +23,1175 @@ import type { RequestArgs } from './base';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
+export interface DtoCaptureListResponse {
+    'data'?: Array<EntityCapture>;
+    'pagination'?: DtoPagination;
+}
+export interface DtoErrorResponse {
+    'code'?: string;
+    'error'?: string;
+}
+export interface DtoFolderActionResponse {
+    'data'?: DtoFolderResponse;
+    'message'?: string;
+    'success'?: boolean;
+}
+export interface DtoFolderListResponse {
+    'data'?: Array<DtoFolderResponse>;
+}
+export interface DtoFolderRequest {
+    'path': string;
+}
+export interface DtoFolderResponse {
+    'created_at'?: string;
+    'id'?: number;
+    'is_watched'?: boolean;
+    'path'?: string;
+    'updated_at'?: string;
+}
+export interface DtoPagination {
+    'limit'?: number;
+    'page'?: number;
+    'total'?: number;
+    'total_pages'?: number;
+}
+export interface DtoThumbnailRegenerateRequest {
+    'height'?: number;
+    'timestamp'?: number;
+    'width'?: number;
+}
+export interface DtoThumbnailRegenerateResponse {
+    'id'?: number;
+    'message'?: string;
+    'thumbnail_info'?: EntityThumbnailInfo;
+}
+export interface DtoVideoListResponse {
+    'data'?: Array<EntityVideo>;
+    'pagination'?: DtoPagination;
+}
+export interface EntityCapture {
+    'created_at'?: string;
+    'filename'?: string;
+    'id'?: number;
+    'video_id'?: number;
+}
+export interface EntityThumbnailInfo {
+    'generated_at'?: string;
+    'height'?: number;
+    'width'?: number;
+}
+export interface EntityVideo {
+    'created_at'?: string;
+    'description'?: string;
+    'duration'?: number;
+    'file_name'?: string;
+    'file_size'?: number;
+    /**
+     * Folderテーブルへの外部キー
+     */
+    'folder_id'?: number;
+    'id'?: number;
+    'is_deleted'?: boolean;
+    'jikkyo_comment_count'?: number;
+    'jikkyo_date'?: string;
+    'liked'?: boolean;
+    'screenshot_file_path'?: string;
+    /**
+     * ready, processing, error
+     */
+    'status'?: string;
+    'thumbnail_info'?: EntityThumbnailInfo;
+    'updated_at'?: string;
+    'views'?: number;
+}
+
+/**
+ * CapturesApi - axios parameter creator
+ */
+export const CapturesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * キャプチャ一覧をページネーション付きで取得します
+         * @summary キャプチャ一覧を取得
+         * @param {number} [videoId] ビデオID（フィルタリング用）
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesGet: async (videoId?: number, page?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/captures`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (videoId !== undefined) {
+                localVarQueryParameter['video_id'] = videoId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 新しいキャプチャを作成します
+         * @summary キャプチャを作成
+         * @param {File} file キャプチャファイル
+         * @param {number} videoId ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesPost: async (file: File, videoId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('apiV1CapturesPost', 'file', file)
+            // verify required parameter 'videoId' is not null or undefined
+            assertParamExists('apiV1CapturesPost', 'videoId', videoId)
+            const localVarPath = `/api/v1/captures`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+
+            if (videoId !== undefined) { 
+                localVarFormParams.append('video_id', videoId as any);
+            }
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CapturesApi - functional programming interface
+ */
+export const CapturesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CapturesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * キャプチャ一覧をページネーション付きで取得します
+         * @summary キャプチャ一覧を取得
+         * @param {number} [videoId] ビデオID（フィルタリング用）
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoCaptureListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesGet(videoId, page, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 新しいキャプチャを作成します
+         * @summary キャプチャを作成
+         * @param {File} file キャプチャファイル
+         * @param {number} videoId ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesPost(file, videoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CapturesApi - factory interface
+ */
+export const CapturesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CapturesApiFp(configuration)
+    return {
+        /**
+         * キャプチャ一覧をページネーション付きで取得します
+         * @summary キャプチャ一覧を取得
+         * @param {number} [videoId] ビデオID（フィルタリング用）
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoCaptureListResponse> {
+            return localVarFp.apiV1CapturesGet(videoId, page, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 新しいキャプチャを作成します
+         * @summary キャプチャを作成
+         * @param {File} file キャプチャファイル
+         * @param {number} videoId ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
+            return localVarFp.apiV1CapturesPost(file, videoId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CapturesApi - object-oriented interface
+ */
+export class CapturesApi extends BaseAPI {
+    /**
+     * キャプチャ一覧をページネーション付きで取得します
+     * @summary キャプチャ一覧を取得
+     * @param {number} [videoId] ビデオID（フィルタリング用）
+     * @param {number} [page] ページ番号
+     * @param {number} [limit] 1ページあたりのアイテム数
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesGet(videoId, page, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 新しいキャプチャを作成します
+     * @summary キャプチャを作成
+     * @param {File} file キャプチャファイル
+     * @param {number} videoId ビデオID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesPost(file, videoId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * DebugApi - axios parameter creator
+ */
+export const DebugApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDocs: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/swagger.json`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DebugApi - functional programming interface
+ */
+export const DebugApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DebugApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDocs(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: object; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDocs(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DebugApi.getDocs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * DebugApi - factory interface
+ */
+export const DebugApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DebugApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDocs(options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: object; }> {
+            return localVarFp.getDocs(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DebugApi - object-oriented interface
+ */
+export class DebugApi extends BaseAPI {
+    /**
+     * 
+     * @summary 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getDocs(options?: RawAxiosRequestConfig) {
+        return DebugApiFp(this.configuration).getDocs(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * FoldersApi - axios parameter creator
+ */
+export const FoldersApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 監視対象フォルダの一覧を取得します
+         * @summary 監視対象フォルダ一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/folders`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * フォルダを監視対象から削除します（ソフトデリート）
+         * @summary 監視対象フォルダを削除
+         * @param {number} id フォルダID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersIdDelete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1FoldersIdDelete', 'id', id)
+            const localVarPath = `/api/v1/folders/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 新しいフォルダを監視対象に追加します
+         * @summary 監視対象フォルダを追加
+         * @param {DtoFolderRequest} body フォルダパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersPost: async (body: DtoFolderRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            assertParamExists('apiV1FoldersPost', 'body', body)
+            const localVarPath = `/api/v1/folders`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * FoldersApi - functional programming interface
+ */
+export const FoldersApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FoldersApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 監視対象フォルダの一覧を取得します
+         * @summary 監視対象フォルダ一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1FoldersGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoFolderListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1FoldersGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['FoldersApi.apiV1FoldersGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * フォルダを監視対象から削除します（ソフトデリート）
+         * @summary 監視対象フォルダを削除
+         * @param {number} id フォルダID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1FoldersIdDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoFolderActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1FoldersIdDelete(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['FoldersApi.apiV1FoldersIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 新しいフォルダを監視対象に追加します
+         * @summary 監視対象フォルダを追加
+         * @param {DtoFolderRequest} body フォルダパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1FoldersPost(body: DtoFolderRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoFolderActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1FoldersPost(body, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['FoldersApi.apiV1FoldersPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * FoldersApi - factory interface
+ */
+export const FoldersApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FoldersApiFp(configuration)
+    return {
+        /**
+         * 監視対象フォルダの一覧を取得します
+         * @summary 監視対象フォルダ一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersGet(options?: RawAxiosRequestConfig): AxiosPromise<DtoFolderListResponse> {
+            return localVarFp.apiV1FoldersGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * フォルダを監視対象から削除します（ソフトデリート）
+         * @summary 監視対象フォルダを削除
+         * @param {number} id フォルダID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersIdDelete(id: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoFolderActionResponse> {
+            return localVarFp.apiV1FoldersIdDelete(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 新しいフォルダを監視対象に追加します
+         * @summary 監視対象フォルダを追加
+         * @param {DtoFolderRequest} body フォルダパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FoldersPost(body: DtoFolderRequest, options?: RawAxiosRequestConfig): AxiosPromise<DtoFolderActionResponse> {
+            return localVarFp.apiV1FoldersPost(body, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * FoldersApi - object-oriented interface
+ */
+export class FoldersApi extends BaseAPI {
+    /**
+     * 監視対象フォルダの一覧を取得します
+     * @summary 監視対象フォルダ一覧を取得
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1FoldersGet(options?: RawAxiosRequestConfig) {
+        return FoldersApiFp(this.configuration).apiV1FoldersGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * フォルダを監視対象から削除します（ソフトデリート）
+     * @summary 監視対象フォルダを削除
+     * @param {number} id フォルダID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1FoldersIdDelete(id: number, options?: RawAxiosRequestConfig) {
+        return FoldersApiFp(this.configuration).apiV1FoldersIdDelete(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 新しいフォルダを監視対象に追加します
+     * @summary 監視対象フォルダを追加
+     * @param {DtoFolderRequest} body フォルダパス
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1FoldersPost(body: DtoFolderRequest, options?: RawAxiosRequestConfig) {
+        return FoldersApiFp(this.configuration).apiV1FoldersPost(body, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * StaticFilesApi - axios parameter creator
+ */
+export const StaticFilesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 指定されたフォルダ内のファイルを取得します
+         * @summary フォルダ内のファイルを取得
+         * @param {number} folderID フォルダID
+         * @param {string} filepath ファイルパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FilesFolderIDFilepathGet: async (folderID: number, filepath: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'folderID' is not null or undefined
+            assertParamExists('apiV1FilesFolderIDFilepathGet', 'folderID', folderID)
+            // verify required parameter 'filepath' is not null or undefined
+            assertParamExists('apiV1FilesFolderIDFilepathGet', 'filepath', filepath)
+            const localVarPath = `/api/v1/files/{folderID}/{filepath}`
+                .replace(`{${"folderID"}}`, encodeURIComponent(String(folderID)))
+                .replace(`{${"filepath"}}`, encodeURIComponent(String(filepath)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/octet-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * StaticFilesApi - functional programming interface
+ */
+export const StaticFilesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = StaticFilesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 指定されたフォルダ内のファイルを取得します
+         * @summary フォルダ内のファイルを取得
+         * @param {number} folderID フォルダID
+         * @param {string} filepath ファイルパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1FilesFolderIDFilepathGet(folderID: number, filepath: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1FilesFolderIDFilepathGet(folderID, filepath, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StaticFilesApi.apiV1FilesFolderIDFilepathGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * StaticFilesApi - factory interface
+ */
+export const StaticFilesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = StaticFilesApiFp(configuration)
+    return {
+        /**
+         * 指定されたフォルダ内のファイルを取得します
+         * @summary フォルダ内のファイルを取得
+         * @param {number} folderID フォルダID
+         * @param {string} filepath ファイルパス
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1FilesFolderIDFilepathGet(folderID: number, filepath: string, options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.apiV1FilesFolderIDFilepathGet(folderID, filepath, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * StaticFilesApi - object-oriented interface
+ */
+export class StaticFilesApi extends BaseAPI {
+    /**
+     * 指定されたフォルダ内のファイルを取得します
+     * @summary フォルダ内のファイルを取得
+     * @param {number} folderID フォルダID
+     * @param {string} filepath ファイルパス
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1FilesFolderIDFilepathGet(folderID: number, filepath: string, options?: RawAxiosRequestConfig) {
+        return StaticFilesApiFp(this.configuration).apiV1FilesFolderIDFilepathGet(folderID, filepath, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * VideosApi - axios parameter creator
+ */
+export const VideosApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * ページネーション対応のビデオ一覧を取得します
+         * @summary ビデオ一覧を取得
+         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [filterBy] フィルター
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [sort] ソート対象フィールド
+         * @param {string} [order] ソート順序
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosGet: async (ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/videos`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (ids) {
+                localVarQueryParameter['ids'] = ids.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (filterBy !== undefined) {
+                localVarQueryParameter['filterBy'] = filterBy;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (sort !== undefined) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+            if (order !== undefined) {
+                localVarQueryParameter['order'] = order;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ビデオファイルをダウンロードします
+         * @summary ビデオをダウンロード
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdDownloadGet: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1VideosIdDownloadGet', 'id', id)
+            const localVarPath = `/api/v1/videos/{id}/download`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/octet-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 特定のビデオの詳細情報を取得します
+         * @summary ビデオ詳細を取得
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdGet: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1VideosIdGet', 'id', id)
+            const localVarPath = `/api/v1/videos/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ビデオのサムネイルを再生成します
+         * @summary サムネイルを再生成
+         * @param {number} id ビデオID
+         * @param {DtoThumbnailRegenerateRequest} [body] リクエストボディ
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdThumbnailRegeneratePost: async (id: number, body?: DtoThumbnailRegenerateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1VideosIdThumbnailRegeneratePost', 'id', id)
+            const localVarPath = `/api/v1/videos/{id}/thumbnail/regenerate`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * キーワードでビデオを検索します
+         * @summary ビデオを検索
+         * @param {string} q 検索キーワード
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [order] ソート順序
+         * @param {string} [filterBy] フィルター
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosSearchGet: async (q: string, page?: number, limit?: number, order?: string, filterBy?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('apiV1VideosSearchGet', 'q', q)
+            const localVarPath = `/api/v1/videos/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (order !== undefined) {
+                localVarQueryParameter['order'] = order;
+            }
+
+            if (filterBy !== undefined) {
+                localVarQueryParameter['filterBy'] = filterBy;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * VideosApi - functional programming interface
+ */
+export const VideosApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = VideosApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * ページネーション対応のビデオ一覧を取得します
+         * @summary ビデオ一覧を取得
+         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [filterBy] フィルター
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [sort] ソート対象フィールド
+         * @param {string} [order] ソート順序
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosGet(ids, filterBy, page, limit, sort, order, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ビデオファイルをダウンロードします
+         * @summary ビデオをダウンロード
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosIdDownloadGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosIdDownloadGet(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosIdDownloadGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 特定のビデオの詳細情報を取得します
+         * @summary ビデオ詳細を取得
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityVideo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosIdGet(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ビデオのサムネイルを再生成します
+         * @summary サムネイルを再生成
+         * @param {number} id ビデオID
+         * @param {DtoThumbnailRegenerateRequest} [body] リクエストボディ
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosIdThumbnailRegeneratePost(id: number, body?: DtoThumbnailRegenerateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoThumbnailRegenerateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosIdThumbnailRegeneratePost(id, body, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosIdThumbnailRegeneratePost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * キーワードでビデオを検索します
+         * @summary ビデオを検索
+         * @param {string} q 検索キーワード
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [order] ソート順序
+         * @param {string} [filterBy] フィルター
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosSearchGet(q: string, page?: number, limit?: number, order?: string, filterBy?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosSearchGet(q, page, limit, order, filterBy, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosSearchGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * VideosApi - factory interface
+ */
+export const VideosApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = VideosApiFp(configuration)
+    return {
+        /**
+         * ページネーション対応のビデオ一覧を取得します
+         * @summary ビデオ一覧を取得
+         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [filterBy] フィルター
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [sort] ソート対象フィールド
+         * @param {string} [order] ソート順序
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
+            return localVarFp.apiV1VideosGet(ids, filterBy, page, limit, sort, order, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ビデオファイルをダウンロードします
+         * @summary ビデオをダウンロード
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdDownloadGet(id: number, options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.apiV1VideosIdDownloadGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 特定のビデオの詳細情報を取得します
+         * @summary ビデオ詳細を取得
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdGet(id: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityVideo> {
+            return localVarFp.apiV1VideosIdGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ビデオのサムネイルを再生成します
+         * @summary サムネイルを再生成
+         * @param {number} id ビデオID
+         * @param {DtoThumbnailRegenerateRequest} [body] リクエストボディ
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdThumbnailRegeneratePost(id: number, body?: DtoThumbnailRegenerateRequest, options?: RawAxiosRequestConfig): AxiosPromise<DtoThumbnailRegenerateResponse> {
+            return localVarFp.apiV1VideosIdThumbnailRegeneratePost(id, body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * キーワードでビデオを検索します
+         * @summary ビデオを検索
+         * @param {string} q 検索キーワード
+         * @param {number} [page] ページ番号
+         * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {string} [order] ソート順序
+         * @param {string} [filterBy] フィルター
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosSearchGet(q: string, page?: number, limit?: number, order?: string, filterBy?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
+            return localVarFp.apiV1VideosSearchGet(q, page, limit, order, filterBy, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * VideosApi - object-oriented interface
+ */
+export class VideosApi extends BaseAPI {
+    /**
+     * ページネーション対応のビデオ一覧を取得します
+     * @summary ビデオ一覧を取得
+     * @param {Array<number>} [ids] ビデオID（複数指定可能）
+     * @param {string} [filterBy] フィルター
+     * @param {number} [page] ページ番号
+     * @param {number} [limit] 1ページあたりのアイテム数
+     * @param {string} [sort] ソート対象フィールド
+     * @param {string} [order] ソート順序
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosGet(ids, filterBy, page, limit, sort, order, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ビデオファイルをダウンロードします
+     * @summary ビデオをダウンロード
+     * @param {number} id ビデオID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosIdDownloadGet(id: number, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosIdDownloadGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 特定のビデオの詳細情報を取得します
+     * @summary ビデオ詳細を取得
+     * @param {number} id ビデオID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosIdGet(id: number, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosIdGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ビデオのサムネイルを再生成します
+     * @summary サムネイルを再生成
+     * @param {number} id ビデオID
+     * @param {DtoThumbnailRegenerateRequest} [body] リクエストボディ
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosIdThumbnailRegeneratePost(id: number, body?: DtoThumbnailRegenerateRequest, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosIdThumbnailRegeneratePost(id, body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * キーワードでビデオを検索します
+     * @summary ビデオを検索
+     * @param {string} q 検索キーワード
+     * @param {number} [page] ページ番号
+     * @param {number} [limit] 1ページあたりのアイテム数
+     * @param {string} [order] ソート順序
+     * @param {string} [filterBy] フィルター
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosSearchGet(q: string, page?: number, limit?: number, order?: string, filterBy?: string, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosSearchGet(q, page, limit, order, filterBy, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
 

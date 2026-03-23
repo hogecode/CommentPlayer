@@ -15,9 +15,6 @@ import (
 // @description ビデオ管理アプリケーションのREST API
 // @host localhost:8000
 // @BasePath /api/v1
-// @openapi_url '/api/openapi.json'
-// @docs_url '/api/docs'
-// @redoc_url '/api/redoc'
 type App struct {
 	DB           *gorm.DB
 	VideoQuery   *query.VideoQuery

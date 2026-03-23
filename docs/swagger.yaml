@@ -16,6 +16,42 @@ definitions:
       error:
         type: string
     type: object
+  dto.FolderActionResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.FolderResponse'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.FolderListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.FolderResponse'
+        type: array
+    type: object
+  dto.FolderRequest:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  dto.FolderResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_watched:
+        type: boolean
+      path:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.Pagination:
     properties:
       limit:
@@ -114,6 +150,9 @@ definitions:
       views:
         type: integer
     type: object
+  gin.H:
+    additionalProperties: {}
+    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -188,6 +227,105 @@ paths:
       summary: キャプチャを作成
       tags:
       - Captures
+  /api/v1/files/{folderID}/{filepath}:
+    get:
+      description: 指定されたフォルダ内のファイルを取得します
+      parameters:
+      - description: フォルダID
+        in: path
+        name: folderID
+        required: true
+        type: integer
+      - description: ファイルパス
+        in: path
+        name: filepath
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: フォルダ内のファイルを取得
+      tags:
+      - Static Files
+  /api/v1/folders:
+    get:
+      description: 監視対象フォルダの一覧を取得します
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FolderListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: 監視対象フォルダ一覧を取得
+      tags:
+      - Folders
+    post:
+      description: 新しいフォルダを監視対象に追加します
+      parameters:
+      - description: フォルダパス
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FolderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.FolderActionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: 監視対象フォルダを追加
+      tags:
+      - Folders
+  /api/v1/folders/{id}:
+    delete:
+      description: フォルダを監視対象から削除します（ソフトデリート）
+      parameters:
+      - description: フォルダID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FolderActionResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: 監視対象フォルダを削除
+      tags:
+      - Folders
   /api/v1/videos:
     get:
       description: ページネーション対応のビデオ一覧を取得します
@@ -373,4 +511,17 @@ paths:
       summary: ビデオを検索
       tags:
       - Videos
+  /swagger.json:
+    get:
+      operationId: GetDocs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Swagger JSON
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
+      tags:
+      - Debug
 swagger: "2.0"

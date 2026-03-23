@@ -18,6 +18,9 @@ export default function VideoPage() {
 
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);
 
+  //const videoSrc = ((videoData as any)?.src) || '/blank30.mp4';
+const videoSrc =  '/blank30.mp4';
+
   // コメントを変換
   const commentList: Comment[] = (() => {
     if (!videoData) return sampleDanmaku;
@@ -36,7 +39,7 @@ export default function VideoPage() {
     }));
   })();
 
-  const videoSrc = ((videoData as any)?.src) || '/blank30.mp4';
+
   const videoTitle = ((videoData as any)?.title) || `弾幕プレイヤー - ${videoId}`;
 
   if (isLoading) {
