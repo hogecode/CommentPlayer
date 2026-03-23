@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/hogecode/commentPlayer/internal/query"
+	"github.com/hogecode/commentPlayer/internal/service"
 	"gorm.io/gorm"
 
 	_ "github.com/gin-gonic/gin" // Swagger用のインポート
@@ -19,6 +20,7 @@ type App struct {
 	VideoQuery   *query.VideoQuery
 	CaptureQuery *query.CaptureQuery
 	Validator    *validator.Validate
+	FileWatcher  *service.FileWatcher
 }
 
 // NewApp - App を初期化
@@ -28,5 +30,6 @@ func NewApp(db *gorm.DB) *App {
 		VideoQuery:   query.NewVideoQuery(db),
 		CaptureQuery: query.NewCaptureQuery(db),
 		Validator:    validator.New(),
+		FileWatcher:  nil,
 	}
 }

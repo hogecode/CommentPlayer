@@ -35,3 +35,5 @@ bin/
 /server/.env
 /server/.env.local
 /server/.env.*.local
+
+tmp

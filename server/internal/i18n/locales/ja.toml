@@ -17,6 +17,12 @@ failed_fetch_videos = "ビデオの取得に失敗しました"
 failed_search_videos = "ビデオの検索に失敗しました"
 failed_fetch_captures = "キャプチャの取得に失敗しました"
 failed_create_capture = "キャプチャの作成に失敗しました"
+failed_fetch_folders = "フォルダの取得に失敗しました"
+failed_update_folder = "フォルダの更新に失敗しました"
+failed_create_folder = "フォルダの作成に失敗しました"
+failed_delete_folder = "フォルダの削除に失敗しました"
+invalid_folder_id = "無効なフォルダIDです"
+folder_not_found = "フォルダが見つかりません"
 internal_error = "内部サーバーエラーが発生しました"
 password_strength_min_length = "パスワードは8文字以上である必要があります"
 password_strength_max_length = "パスワードは128文字以下である必要があります"
@@ -27,3 +33,5 @@ password_strength_invalid_chars = "パスワードに無効な文字が含まれ
 # =========================
 [success]
 thumbnail_regenerated = "サムネイルが正常に再生成されました"
+folder_added = "フォルダが正常に追加されました"
+folder_removed = "フォルダが正常に削除されました"

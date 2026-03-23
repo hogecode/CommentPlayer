@@ -15,4 +15,8 @@ func (a *App) RegisterRoutes(engine *gin.Engine) {
 	// キャプチャ関連ルートを登録
 	capturesGroup := v1.Group("/captures")
 	a.RegisterCaptureRoutes(capturesGroup)
+
+	// フォルダ関連ルートを登録
+	foldersGroup := v1.Group("/folders")
+	a.RegisterFolderRoutes(foldersGroup)
 }

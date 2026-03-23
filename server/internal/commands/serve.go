@@ -69,9 +69,6 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	// API アプリケーションを初期化
 	app := handler.NewApp(db)
 
-	// ルートを登録
-	app.RegisterRoutes(engine)
-
 	// ファイルウォッチャーを初期化・開始
 	// TODO: Configに値を設定するようにする
 	screenshotDir := filepath.Join(".", "public", "screenshots")
@@ -79,6 +76,9 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Printf("Warning: Failed to initialize file watcher: %v\n", err)
 	} else {
+		// AppにFileWatcherを設定
+		app.FileWatcher = watcher
+
 		// DBの監視対象フォルダをロードして同期
 		if err := watcher.SyncFoldersWithDB(); err != nil {
 			log.Printf("Warning: Failed to sync folders: %v\n", err)
@@ -87,6 +87,9 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 		watcher.Start()
 		log.Println("File watcher started")
 	}
+
+	// ルートを登録
+	app.RegisterRoutes(engine)
 
 	// サーバーを起動（グレースフルシャットダウン対応）
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
