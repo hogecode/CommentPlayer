@@ -102,9 +102,26 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 // @Failure 404 {object} dto.ErrorResponse
 // @Router /api/v1/files/{folderID}/{filepath} [get]
 func (a *App) GetFileFromFolder(filesGroup *gin.RouterGroup) {
+	// 静的ファイルはCORS制限が厳しいので、CORSプリフライトリクエスト（OPTIONS）に対応するルートも追加
+	// CORSプリフライトリクエスト（OPTIONS）に対応
+	filesGroup.OPTIONS("/:folderID/*filepath", func(ctx *gin.Context) {
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		ctx.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+		ctx.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+		ctx.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
+		ctx.Header("Access-Control-Max-Age", "86400")
+		ctx.Status(http.StatusNoContent)
+	})
+
 	filesGroup.GET("/:folderID/*filepath", func(ctx *gin.Context) {
 		folderIDStr := ctx.Param("folderID")
 		requestedFilePath := ctx.Param("filepath")
+
+		// CORSヘッダーを設定（すべてのオリジンを許可）
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		ctx.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+		ctx.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+		ctx.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
 
 		slog.Debug("GetFileFromFolder: File requested",
 			"folder_id", folderIDStr,

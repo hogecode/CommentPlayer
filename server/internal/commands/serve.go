@@ -75,11 +75,11 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 
 	// CORS ミドルウェアを登録
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},                                       // すべてのオリジンを許可
-		AllowMethods:     []string{"*"},                                       // すべての HTTP メソッドを許可
-		AllowHeaders:     []string{"*"},                                       // すべてのヘッダーを許可
-		AllowCredentials: true,                                               // クレデンシャルを許可
-		MaxAge:           12 * 60 * 60,                                        // キャッシュ時間（12時間）
+		AllowOrigins:     []string{"*"},      
+		AllowMethods:     []string{"*"},      
+		AllowHeaders:     []string{"*"},   
+		AllowCredentials: true,    
+		MaxAge:           12 * 60 * 60,    
 	}))
 
 	// ミドルウェアを登録

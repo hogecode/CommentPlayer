@@ -46,7 +46,7 @@
 
 **API**
 **ビデオ一覧**
-- [ ] GET /api/v1/videos
+- [x] GET /api/v1/videos
 - [ ] GET /api/v1/videos/search
 - [ ] GET /api/v1/videos/:id/download
 
@@ -55,13 +55,13 @@
 - [ ] POST /api/v1/videos/:id/thumbnail/regenerate
 
 **ビデオ視聴(実況)**
-- [ ] GET /api/v1/videos/:id
+- [x] GET /api/v1/videos/:id
 
 **キャプチャ**
 - [ ] GET /api/v1/captures
 - [ ] POST /api/v1/captures
 
 **DB**
-- [ ] SQLite初期化
+- [x] SQLite初期化
 
 

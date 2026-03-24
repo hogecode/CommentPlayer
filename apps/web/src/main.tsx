@@ -6,7 +6,7 @@ import { router } from "@/router";
 import { queryClient } from "@/providers/QueryClientProvider";
 import { App } from "@/App";
 import { SnackbarContainer } from "./components/ui/snackbar";
-
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "@/styles/globals.css";
 import "@/styles/mixin.scss";
 import "@/styles/dplayer.scss";
@@ -18,7 +18,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <SnackbarContainer />
-      <App />
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

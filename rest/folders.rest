@@ -1,15 +1,17 @@
 @baseUrl = http://localhost:8000/api/v1
 
-### フォルダAPI テスト
+### 実装済み機能
 
-## 1. 監視対象フォルダ一覧を取得
+###
+## GET /folders
 GET {{baseUrl}}/folders
 Accept: application/json
 Accept-Language: ja
 
+
 ###
 
-## 2. 新しいフォルダを追加（新規作成）
+## POST /folders
 POST {{baseUrl}}/folders
 Content-Type: application/json
 Accept-Language: ja
@@ -20,7 +22,7 @@ Accept-Language: ja
 
 ###
 
-## 3. 既存フォルダを再度追加（既存フォルダの復旧）
+## POST /folders (既存フォルダの復旧)
 POST {{baseUrl}}/folders
 Content-Type: application/json
 Accept-Language: ja
@@ -65,6 +67,7 @@ Accept-Language: ja
 }
 
 ###
+http://localhost:8000/api/v1/files/1/hibi01.mp4
 
 ## 7. Windowsアニメフォルダの例（Docker経由でのマウントパス）
 POST {{baseUrl}}/folders

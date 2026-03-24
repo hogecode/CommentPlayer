@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from '@tanstack/react-router';
+import { RootLayout } from '@/components/common/RootLayout';
 import DPlayerVideo from '@/components/video';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
@@ -19,7 +20,7 @@ export default function VideoPage() {
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);
 
   //const videoSrc = ((videoData as any)?.src) || '/blank30.mp4';
-const videoSrc =  '/blank30.mp4';
+const videoSrc =  'http://localhost:8000/api/v1/files/1/hibi01.mp4';
 
   // コメントを変換
   const commentList: Comment[] = (() => {
@@ -44,21 +45,25 @@ const videoSrc =  '/blank30.mp4';
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8">
-        <div className="text-white text-xl">読み込み中...</div>
-      </main>
+      <RootLayout>
+        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+          <div className="text-white text-xl">読み込み中...</div>
+        </div>
+      </RootLayout>
     );
   }
 
   return (
-    <main className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8">
-      <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
-      {error && (
-        <div className="text-red-500 text-sm mb-4">
-          エラーが発生しました
-        </div>
-      )}
-      <DPlayerVideo src={videoSrc} commentList={commentList} />
-    </main>
+    <RootLayout>
+      <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+        <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
+        {error && (
+          <div className="text-red-500 text-sm mb-4">
+            エラーが発生しました
+          </div>
+        )}
+        <DPlayerVideo src={videoSrc} commentList={commentList} />
+      </div>
+    </RootLayout>
   );
 }

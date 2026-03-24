@@ -15,18 +15,21 @@ import (
 //go:embed swagger.json
 var swaggerJSON []byte
 
-// RegisterDocsRoutes - Swagger API ドキュメント エンドポイントを登録（デバッグビルドのみ）
+// GetSwaggerJSON - Swagger JSON を提供
 // @Summary 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
-// @Id GetDocs
+// @Description デバッグビルドでの埋め込みSwagger JSONドキュメント
 // @Tags Debug
-// @Produce json
-// @Success 200 {object} gin.H "Swagger JSON"
+// @Produce application/json
+// @Success 200 {object} map[string]interface{} "Swagger JSON"
 // @Router /swagger.json [get]
+func (a *App) GetSwaggerJSON(c *gin.Context) {
+	c.Data(http.StatusOK, "application/json", swaggerJSON)
+}
+
+// RegisterDocsRoutes - Swagger API ドキュメント エンドポイントを登録（デバッグビルドのみ）
 func (a *App) RegisterDocsRoutes(router *gin.RouterGroup) {
 	// swagger.json を提供
-	router.GET("swagger.json", func(c *gin.Context) {
-		c.Data(http.StatusOK, "application/json", swaggerJSON)
-	})
+	router.GET("/swagger.json", a.GetSwaggerJSON)
 
 	// Swagger UI を提供
 	if handler := swagger.WrapHandler(files.Handler, swagger.URL("/api/v1/swagger.json")); handler != nil {
