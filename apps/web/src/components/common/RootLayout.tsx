@@ -19,22 +19,22 @@ interface RootLayoutProps {
  */
 export function RootLayout({ children, headerChildren }: RootLayoutProps) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
       {/* ヘッダーコンポーネント */}
       <Header>{headerChildren}</Header>
       {/* メインレイアウト（Sidebar + Content） */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebarコンポーネント */}
         <Sidebar />
 
         {/* メインコンテンツ */}
-        <main className="flex-1">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>
 
       {/* フッター */}
-      <footer className="mt-auto border-t">
+      <footer className="hidden border-t flex-shrink-0">
         <Separator className="m-0" />
         <div className="bg-muted/30 text-muted-foreground py-6 text-center">
           <p className="text-sm">&copy; 2026 CommeVideo. All rights reserved.</p>

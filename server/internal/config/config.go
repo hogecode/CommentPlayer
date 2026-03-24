@@ -32,17 +32,17 @@ type ServerConfig struct {
 
 // DBConfig - データベース設定
 type DBConfig struct {
-	DSN           string `mapstructure:"dsn"`
-	MaxOpenConns  int    `mapstructure:"max_open_conns"`
-	MaxIdleConns  int    `mapstructure:"max_idle_conns"`
-	LogLevel      string `mapstructure:"log_level"`
+	DSN          string `mapstructure:"dsn"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
+	LogLevel     string `mapstructure:"log_level"`
 }
 
 // LogConfig - ログ設定
 type LogConfig struct {
-	Level     string `mapstructure:"level"`
-	Format    string `mapstructure:"format"`
-	UseColor  bool   `mapstructure:"use_color"`
+	Level    string `mapstructure:"level"`
+	Format   string `mapstructure:"format"`
+	UseColor bool   `mapstructure:"use_color"`
 }
 
 // LoadConfig - 設定ファイルから読み込む

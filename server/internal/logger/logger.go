@@ -78,10 +78,10 @@ func (h *ColoredHandler) Handle(ctx context.Context, r slog.Record) error {
 
 	// ANSI色コード
 	const (
-		reset       = "\033[0m"
-		dimGray     = "\033[2;37m"
-		cyan        = "\033[36m"
-		white       = "\033[97m"
+		reset   = "\033[0m"
+		dimGray = "\033[2;37m"
+		cyan    = "\033[36m"
+		white   = "\033[97m"
 	)
 
 	// タイムスタンプ、レベル、メッセージをフォーマット
@@ -128,10 +128,10 @@ func (h *ColoredHandler) Enabled(ctx context.Context, level slog.Level) bool {
 // getLevelColor - ログレベルに対応する色を取得
 func getLevelColor(level slog.Level) string {
 	const (
-		red     = "\033[31m"     // エラー: 赤
-		yellow  = "\033[33m"     // 警告: 黄
-		green   = "\033[32m"     // 情報: 緑
-		blue    = "\033[34m"     // デバッグ: 青
+		red    = "\033[31m" // エラー: 赤
+		yellow = "\033[33m" // 警告: 黄
+		green  = "\033[32m" // 情報: 緑
+		blue   = "\033[34m" // デバッグ: 青
 	)
 
 	switch level {

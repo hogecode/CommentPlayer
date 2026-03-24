@@ -45,7 +45,7 @@ func (fw *FileWatcher) AddFolder(folder *entity.Folder) error {
 	slog.Debug("AddFolder: Adding folder to watch",
 		"folder_id", folder.ID,
 		"path", folder.Path)
-		
+
 	// フォルダの存在確認
 	if _, err := os.Stat(folder.Path); err != nil {
 		return fmt.Errorf("folder does not exist: %s", folder.Path)
@@ -196,43 +196,74 @@ func (fw *FileWatcher) handleVideoFileDeleted(filePath string, folderID int) {
 	log.Printf("Marked video as deleted: %s\n", fileName)
 }
 
-// createVideoRecord - ビデオレコードを作成
+// createVideoRecord - ビデオレコードを作成（リトライロジック付き）
 func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 	fileName := filepath.Base(filePath)
 
-	// ビデオメタデータを抽出
-	metadata, err := ExtractVideoMetadata(filePath, fw.screenshotOutputDir)
-	if err != nil {
-		log.Printf("Error extracting video metadata: %v\n", err)
-		return
+	// ファイルが別プロセスで使用中の可能性があるため、リトライロジックを実装
+	const maxRetries = 3
+	const retryDelay = 1 * time.Second
+
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		// ビデオメタデータを抽出
+		metadata, err := ExtractVideoMetadata(filePath, fw.screenshotOutputDir)
+		if err == nil {
+			// 成功時の処理
+			// コメントファイル情報を取得
+			commentData := fw.getCommentData(filePath)
+
+			// ビデオレコードを作成
+			video := entity.Video{
+				FileName:           fileName,
+				FolderID:           folderID,
+				FilePath:           filePath,
+				FileHash:           metadata.FileHash,
+				FileSize:           metadata.FileSize,
+				Duration:           metadata.Duration,
+				ScreenshotFilePath: metadata.ScreenshotFilePath,
+				JikkyoCommentCount: &commentData.Count,
+				JikkyoDate:         fw.commentTimeToPointer(commentData.OldestDate),
+				Views:              0,
+				Liked:              false,
+				IsDeleted:          false,
+				Status:             "ready",
+			}
+
+			if err := fw.db.Create(&video).Error; err != nil {
+				slog.Error("createVideoRecord: Error creating video record",
+					"file_path", filePath,
+					"file_name", fileName,
+					"error", err.Error())
+				return
+			}
+
+			slog.Info("Created video record",
+				"file_name", fileName,
+				"file_hash", metadata.FileHash)
+			return
+		}
+
+		lastErr = err
+
+		// 最後の試行でない場合はリトライ
+		if attempt < maxRetries-1 {
+			slog.Info("createVideoRecord: Retrying metadata extraction",
+				"file_path", filePath,
+				"file_name", fileName,
+				"attempt", attempt+1,
+				"max_retries", maxRetries,
+				"error", err.Error())
+			time.Sleep(retryDelay)
+		}
 	}
 
-	// コメントファイル情報を取得
-	commentData := fw.getCommentData(filePath)
-
-	// ビデオレコードを作成
-	video := entity.Video{
-		FileName:           fileName,
-		FolderID:           folderID,
-		FilePath:           filePath,
-		FileHash:           metadata.FileHash,
-		FileSize:           metadata.FileSize,
-		Duration:           metadata.Duration,
-		ScreenshotFilePath: metadata.ScreenshotFilePath,
-		JikkyoCommentCount: &commentData.Count,
-		JikkyoDate:         fw.commentTimeToPointer(commentData.OldestDate),
-		Views:              0,
-		Liked:              false,
-		IsDeleted:          false,
-		Status:             "ready",
-	}
-
-	if err := fw.db.Create(&video).Error; err != nil {
-		log.Printf("Error creating video record: %v\n", err)
-		return
-	}
-
-	log.Printf("Created video record: %s\n", fileName)
+	// すべてのリトライが失敗した場合のみエラーログを出力
+	slog.Error("Error extracting video metadata",
+		"file_path", filePath,
+		"file_name", fileName,
+		"attempts", maxRetries,
+		"error", lastErr.Error())
 }
 
 // restoreVideoRecord - 削除済みビデオレコードを復旧

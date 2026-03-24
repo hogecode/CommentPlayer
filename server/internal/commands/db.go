@@ -4,9 +4,10 @@ import (
 	"log"
 
 	"fmt"
+
 	"github.com/spf13/cobra"
-	"gorm.io/gorm"
 	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	"github.com/hogecode/commentPlayer/internal/config"
 	"github.com/hogecode/commentPlayer/internal/entity"

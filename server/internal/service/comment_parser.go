@@ -10,37 +10,37 @@ import (
 
 // ChatXML - XMLコメント形式
 type ChatXML struct {
-	XMLName  xml.Name `xml:"chat"`
-	Thread   string   `xml:"thread,attr"`
-	No       string   `xml:"no,attr"`
-	VPos     string   `xml:"vpos,attr"`
-	Date     string   `xml:"date,attr"`
-	DateUsec string   `xml:"date_usec,attr"`
-	Mail     string   `xml:"mail,attr"`
-	UserID   string   `xml:"user_id,attr"`
-	Premium  string   `xml:"premium,attr"`
-	Anonymity string  `xml:"anonymity,attr"`
-	Content  string   `xml:",chardata"`
+	XMLName   xml.Name `xml:"chat"`
+	Thread    string   `xml:"thread,attr"`
+	No        string   `xml:"no,attr"`
+	VPos      string   `xml:"vpos,attr"`
+	Date      string   `xml:"date,attr"`
+	DateUsec  string   `xml:"date_usec,attr"`
+	Mail      string   `xml:"mail,attr"`
+	UserID    string   `xml:"user_id,attr"`
+	Premium   string   `xml:"premium,attr"`
+	Anonymity string   `xml:"anonymity,attr"`
+	Content   string   `xml:",chardata"`
 }
 
 // PacketXML - XMLファイルのルート要素
 type PacketXML struct {
-	XMLName xml.Name `xml:"packet"`
+	XMLName xml.Name  `xml:"packet"`
 	Chats   []ChatXML `xml:"chat"`
 }
 
 // ChatJSON - JSONコメント形式
 type ChatJSON struct {
-	Thread   string `json:"thread"`
-	No       string `json:"no"`
-	VPos     string `json:"vpos"`
-	Date     string `json:"date"`
-	DateUsec string `json:"date_usec"`
-	Mail     string `json:"mail"`
-	UserID   string `json:"user_id"`
-	Premium  string `json:"premium"`
+	Thread    string `json:"thread"`
+	No        string `json:"no"`
+	VPos      string `json:"vpos"`
+	Date      string `json:"date"`
+	DateUsec  string `json:"date_usec"`
+	Mail      string `json:"mail"`
+	UserID    string `json:"user_id"`
+	Premium   string `json:"premium"`
 	Anonymity string `json:"anonymity"`
-	Content  string `json:"content"`
+	Content   string `json:"content"`
 }
 
 // PacketItemJSON - JSONパケットアイテム
@@ -55,9 +55,9 @@ type PacketJSONRoot struct {
 
 // CommentData - 統一されたコメントデータ
 type CommentData struct {
-	Count       int
-	OldestDate  time.Time
-	NewestDate  time.Time
+	Count      int
+	OldestDate time.Time
+	NewestDate time.Time
 }
 
 // ParseCommentFile - コメントファイルをパースして情報を取得
@@ -106,9 +106,9 @@ func parseXML(data []byte) (*CommentData, error) {
 	}
 
 	return &CommentData{
-		Count:       len(packet.Chats),
-		OldestDate:  oldestDate,
-		NewestDate:  newestDate,
+		Count:      len(packet.Chats),
+		OldestDate: oldestDate,
+		NewestDate: newestDate,
 	}, nil
 }
 
@@ -138,9 +138,9 @@ func parseJSON(data []byte) (*CommentData, error) {
 	}
 
 	return &CommentData{
-		Count:       len(root.Packet),
-		OldestDate:  oldestDate,
-		NewestDate:  newestDate,
+		Count:      len(root.Packet),
+		OldestDate: oldestDate,
+		NewestDate: newestDate,
 	}, nil
 }
 

@@ -75,11 +75,11 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 
 	// CORS ミドルウェアを登録
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},      
-		AllowMethods:     []string{"*"},      
-		AllowHeaders:     []string{"*"},   
-		AllowCredentials: true,    
-		MaxAge:           12 * 60 * 60,    
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"*"},
+		AllowHeaders:     []string{"*"},
+		AllowCredentials: true,
+		MaxAge:           12 * 60 * 60,
 	}))
 
 	// ミドルウェアを登録
@@ -135,7 +135,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 
 	// グレースフルシャットダウン
 	log.Println("\nReceived shutdown signal. Starting graceful shutdown...")
-	
+
 	// ファイルウォッチャーを停止
 	if watcher != nil {
 		if err := watcher.Stop(); err != nil {
@@ -143,7 +143,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 		}
 		log.Println("File watcher stopped")
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

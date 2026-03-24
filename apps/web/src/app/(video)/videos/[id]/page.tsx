@@ -15,7 +15,21 @@ import type { Comment } from '@/types/danmaku';
  */
 export default function VideoPage() {
   const { id: videoIdParam } = useParams({ from: '/videos/$id' });
+  
+  // IDが有効な数値かチェック
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;
+  const isValidId = videoId !== null && !isNaN(videoId) && videoId > 0;
+
+  // 無効なIDの場合はエラー表示
+  if (!isValidId) {
+    return (
+      <RootLayout>
+        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+          <div className="text-red-500 text-xl">ビデオIDが無効です</div>
+        </div>
+      </RootLayout>
+    );
+  }
 
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);
 
@@ -50,16 +64,20 @@ export default function VideoPage() {
     );
   }
 
+  if(error) {
+    return (
+      <RootLayout>
+        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+          <div className="text-red-500 text-xl">ビデオの読み込みに失敗しました</div>
+        </div>
+      </RootLayout>
+    );
+  }
   return (
     <RootLayout>
-      <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
-        <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
-        {error && (
-          <div className="text-red-500 text-sm mb-4">
-            エラーが発生しました
-          </div>
-        )}
+      <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-start p-8 pt-24">
         <DPlayerVideo src={videoSrc} commentList={commentList} />
+        <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
       </div>
     </RootLayout>
   );

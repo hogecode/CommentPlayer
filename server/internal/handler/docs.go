@@ -3,7 +3,6 @@
 package handler
 
 import (
-	"bytes"
 	_ "embed"
 	"net/http"
 

@@ -126,23 +126,37 @@ func (a *App) AddFolder(foldersGroup *gin.RouterGroup) {
 					"folder_id", existingFolder.ID,
 					"path", req.Path)
 				if err := a.FileWatcher.AddFolder(&existingFolder); err != nil {
-					slog.Warn("AddFolder: Failed to add folder to FileWatcher",
+					slog.Error("AddFolder: Failed to add folder to FileWatcher",
 						"folder_id", existingFolder.ID,
 						"path", req.Path,
-						"error", err.Error())
+						"error", err.Error(),
+						"locale", locale)
+					ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+						Error: i18n.GetErrorMessage(locale, "failed_add_folder_watcher"),
+						Code:  "WATCHER_ERROR",
+					})
+					return
 				} else {
 					slog.Debug("AddFolder: Successfully added existing folder to FileWatcher",
 						"folder_id", existingFolder.ID,
 						"path", req.Path)
 				}
 			} else {
-				slog.Warn("AddFolder: FileWatcher is nil, cannot add existing folder")
+				slog.Error("AddFolder: FileWatcher is nil, cannot add existing folder",
+					"folder_id", existingFolder.ID,
+					"path", req.Path,
+					"locale", locale)
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "filewatcher_not_initialized"),
+					Code:  "WATCHER_NOT_INITIALIZED",
+				})
+				return
 			}
-            
+
 			slog.Debug("AddFolder: Existing folder updated successfully",
 				"folder_id", existingFolder.ID,
 				"path", req.Path)
-				
+
 			response := dto.FolderResponse{
 				ID:        existingFolder.ID,
 				Path:      existingFolder.Path,
@@ -193,14 +207,28 @@ func (a *App) AddFolder(foldersGroup *gin.RouterGroup) {
 				slog.Error("AddFolder: Failed to add folder to FileWatcher",
 					"folder_id", newFolder.ID,
 					"path", req.Path,
-					"error", err.Error())
+					"error", err.Error(),
+					"locale", locale)
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_add_folder_watcher"),
+					Code:  "WATCHER_ERROR",
+				})
+				return
 			} else {
 				slog.Debug("AddFolder: Successfully added new folder to FileWatcher",
 					"folder_id", newFolder.ID,
 					"path", req.Path)
 			}
 		} else {
-			slog.Warn("AddFolder: FileWatcher is nil, cannot add new folder")
+			slog.Error("AddFolder: FileWatcher is nil, cannot add new folder",
+				"folder_id", newFolder.ID,
+				"path", req.Path,
+				"locale", locale)
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "filewatcher_not_initialized"),
+				Code:  "WATCHER_NOT_INITIALIZED",
+			})
+			return
 		}
 
 		response := dto.FolderResponse{

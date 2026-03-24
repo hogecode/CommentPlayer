@@ -23,7 +23,7 @@ type FolderListResponse struct {
 
 // FolderActionResponse - フォルダアクション（追加/削除）のレスポンス
 type FolderActionResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success bool            `json:"success"`
+	Message string          `json:"message"`
 	Data    *FolderResponse `json:"data,omitempty"`
 }

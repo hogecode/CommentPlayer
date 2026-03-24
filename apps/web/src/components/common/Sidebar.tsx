@@ -3,10 +3,7 @@
 import { useEffect } from 'react'
 import { useLocation, Link } from '@tanstack/react-router'
 import {
-  Tv,
   Film,
-  Calendar,
-  Clock,
   Image,
   ListMusic,
   History,
@@ -15,7 +12,6 @@ import {
 } from 'lucide-react'
 import { useVersionStore } from '@/stores/version-store'
 import { cn } from '@/lib/utils'
-
 interface SidebarProps {
   /**
    * アイコンのみモード: テキストを非表示にし、幅を縮小する
@@ -28,7 +24,7 @@ interface SidebarProps {
  * ナビゲーションリンクの定義
  */
 const navigationLinks = [
-  { path: '/', label: 'ビデオをみる', Icon: Film },
+  { path: '/videos', label: 'ビデオをみる', Icon: Film },
   { path: '/captures', label: 'キャプチャ', Icon: Image },
   { path: '/mylist', label: 'マイリスト', Icon: ListMusic },
   { path: '/watched-history', label: '視聴履歴', Icon: History },
@@ -48,7 +44,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
 
   return (
     <aside className={cn(
-      'flex flex-col h-full bg-amber-900 border-r border-border transition-all duration-300',
+      'flex flex-col h-full bg-[#2f221f]  border-border transition-all duration-300',
       iconOnly ? 'w-20' : 'w-64'
     )}>
       {/* ヘッダー */}
@@ -71,7 +67,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
                   'hover:bg-accent hover:text-accent-foreground',
-                  isLinkActive(path) && 'bg-accent text-accent-foreground font-medium'
+                  isLinkActive(path) && 'bg-primary text-accent-foreground font-medium'
                 )}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -85,25 +81,29 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
       {/* フッター */}
       <div className="border-t border-border p-4 space-y-2">
         <Link
-          to="#"
+          to="/settings"
           className={cn(
             'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
-            'hover:bg-accent hover:text-accent-foreground'
+            'hover:bg-accent hover:text-accent-foreground',
+            isLinkActive('/settings') && 'bg-accent text-accent-foreground font-medium'
           )}
         >
           <Settings className="w-5 h-5 flex-shrink-0" />
           {!iconOnly && <span className="truncate">設定</span>}
         </Link>
-        <Link
-          to="#"
+        <a
+          href="https://github.com/hogecode/CommentVideo"
+          target="_blank"
+          rel="noopener noreferrer"
           className={cn(
             'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
-            'hover:bg-accent hover:text-accent-foreground'
+            'hover:bg-accent hover:text-accent-foreground',
+            isLinkActive('/information') && 'bg-accent text-accent-foreground font-medium'
           )}
         >
           <Info className="w-5 h-5 flex-shrink-0" />
           {!iconOnly && <span className="truncate">情報</span>}
-        </Link>
+        </a>
       </div>
     </aside>
   )

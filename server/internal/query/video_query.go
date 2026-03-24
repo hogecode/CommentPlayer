@@ -34,9 +34,13 @@ func NewVideoQuery(db *gorm.DB) *VideoQuery {
 	return &VideoQuery{db: db}
 }
 
+// 
 // GetVideoList - ビデオ一覧を取得（任意の互換リクエスト型を受け入れる）
 func (q *VideoQuery) GetVideoList(ids []int, filterBy string, page, limit int, sort, order string) ([]entity.Video, int64, error) {
 	query := q.db
+
+	// is_deletedフラグでフィルター
+	query = query.Where("is_deleted = 0")
 
 	// IDs でフィルター
 	if len(ids) > 0 {
@@ -86,7 +90,7 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 	}
 
 	// ソート
-	query = query.Order("created_at " + order)
+	query = query.Order("jikkyo_date " + order)
 
 	// ページネーション
 	offset := (page - 1) * limit

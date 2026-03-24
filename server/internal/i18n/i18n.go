@@ -71,8 +71,9 @@ func GetLocale() string {
 
 // T - メッセージを取得（キーの先頭を見て error or success を判定）
 // 使用例：
-//   i18n.T("invalid_query_params")  // エラーメッセージ
-//   i18n.T("success.thumbnail_regenerated")  // 成功メッセージ
+//
+//	i18n.T("invalid_query_params")  // エラーメッセージ
+//	i18n.T("success.thumbnail_regenerated")  // 成功メッセージ
 func T(key string) string {
 	mu.RLock()
 	defer mu.RUnlock()

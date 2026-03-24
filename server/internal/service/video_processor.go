@@ -120,91 +120,172 @@ type VideoMetadata struct {
 	ScreenshotFilePath *string
 }
 
-// CalculateFileHash - ファイルのMD5ハッシュを計算
+// CalculateFileHash - ファイルのMD5ハッシュを計算（リトライ付き）
 func CalculateFileHash(filePath string) (string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
+	// ファイルが別プロセスで使用中の可能性があるため、リトライロジックを実装
+	const maxRetries = 5
+	const retryDelay = 500 * time.Millisecond
 
-	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		file, err := os.Open(filePath)
+		if err == nil {
+			defer file.Close()
+
+			hash := md5.New()
+			if _, err := io.Copy(hash, file); err != nil {
+				lastErr = err
+				// コピーエラーの場合はリトライ
+				time.Sleep(retryDelay)
+				continue
+			}
+
+			return fmt.Sprintf("%x", hash.Sum(nil)), nil
+		}
+
+		lastErr = err
+
+		// 最後の試行でない場合はリトライ
+		if attempt < maxRetries-1 {
+			slog.Debug("CalculateFileHash: Retrying file open",
+				"file_path", filePath,
+				"attempt", attempt+1,
+				"max_retries", maxRetries,
+				"error", err.Error())
+			time.Sleep(retryDelay)
+		}
 	}
 
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+	return "", fmt.Errorf("failed to calculate hash after %d attempts: %w", maxRetries, lastErr)
 }
 
-// GetFileSize - ファイルサイズをバイト単位で取得
+// GetFileSize - ファイルサイズをバイト単位で取得（リトライ付き）
 func GetFileSize(filePath string) (int64, error) {
-	info, err := os.Stat(filePath)
-	if err != nil {
-		return 0, err
+	const maxRetries = 3
+	const retryDelay = 200 * time.Millisecond
+
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		info, err := os.Stat(filePath)
+		if err == nil {
+			return info.Size(), nil
+		}
+
+		lastErr = err
+
+		// 最後の試行でない場合はリトライ
+		if attempt < maxRetries-1 {
+			slog.Debug("GetFileSize: Retrying file stat",
+				"file_path", filePath,
+				"attempt", attempt+1,
+				"max_retries", maxRetries)
+			time.Sleep(retryDelay)
+		}
 	}
-	return info.Size(), nil
+
+	return 0, fmt.Errorf("failed to get file size after %d attempts: %w", maxRetries, lastErr)
 }
 
-// GetVideoDuration - ffprobeを使用して動画の長さを取得（秒数）
+// GetVideoDuration - ffprobeを使用して動画の長さを取得（秒数、リトライ付き）
 func GetVideoDuration(filePath string) (float64, error) {
-	cmd := exec.Command(
-		ffprobePath,
-		"-v", "error",
-		"-show_entries", "format=duration",
-		"-of", "default=noprint_wrappers=1:nokey=1:nokey=1",
-		filePath,
-	)
+	const maxRetries = 3
+	const retryDelay = 200 * time.Millisecond
 
-	output, err := cmd.Output()
-	if err != nil {
-		slog.Error("GetVideoDuration: ffprobe command failed",
-			"ffprobe_path", ffprobePath,
-			"video_path", filePath,
-			"error", err.Error())
-		return 0, err
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		cmd := exec.Command(
+			ffprobePath,
+			"-v", "error",
+			"-show_entries", "format=duration",
+			"-of", "default=noprint_wrappers=1:nokey=1:nokey=1",
+			filePath,
+		)
+
+		output, err := cmd.Output()
+		if err == nil {
+			// Windows の改行文字（\r\n）を含む可能性があるため、トリム処理を行う
+			durationStr := strings.TrimSpace(string(output))
+			duration, err := strconv.ParseFloat(durationStr, 64)
+			if err == nil {
+				return duration, nil
+			}
+
+			// Parse エラーの場合はリトライ対象外
+			slog.Error("GetVideoDuration: Failed to parse duration",
+				"ffprobe_output", durationStr,
+				"video_path", filePath,
+				"error", err.Error())
+			return 0, err
+		}
+
+		lastErr = err
+
+		// 最後の試行でない場合はリトライ
+		if attempt < maxRetries-1 {
+			slog.Debug("GetVideoDuration: Retrying ffprobe command",
+				"file_path", filePath,
+				"attempt", attempt+1,
+				"max_retries", maxRetries,
+				"error", err.Error())
+			time.Sleep(retryDelay)
+		}
 	}
 
-	// Windows の改行文字（\r\n）を含む可能性があるため、トリム処理を行う
-	durationStr := strings.TrimSpace(string(output))
-	duration, err := strconv.ParseFloat(durationStr, 64)
-	if err != nil {
-		slog.Error("GetVideoDuration: Failed to parse duration",
-			"ffprobe_output", durationStr,
-			"video_path", filePath,
-			"error", err.Error())
-		return 0, err
-	}
-
-	return duration, nil
+	slog.Error("GetVideoDuration: ffprobe command failed",
+		"ffprobe_path", ffprobePath,
+		"video_path", filePath,
+		"attempts", maxRetries,
+		"error", lastErr.Error())
+	return 0, fmt.Errorf("ffprobe failed after %d attempts: %w", maxRetries, lastErr)
 }
 
-// CaptureScreenshot - ffmpegを使用してスクリーンショットを撮る
+// CaptureScreenshot - ffmpegを使用してスクリーンショットを撮る（リトライ付き）
 func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
+	const maxRetries = 2
+	const retryDelay = 500 * time.Millisecond
+
 	// ランダムなファイル名を生成
 	screenshotFileName := generateRandomString(16) + ".jpg"
 	screenshotPath := filepath.Join(outputDir, screenshotFileName)
 
-	// TODO: 動画の長さに応じてスクリーンショットを撮る位置をランダムで撮るようにする
-	// 動画の中央付近（30%）からスクリーンショットを撮る
-	cmd := exec.Command(
-		ffmpegPath,
-		"-i", videoPath,
-		"-ss", "00:00:15",
-		"-vframes", "1",
-		"-q:v", "5",
-		screenshotPath,
-	)
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		// TODO: 動画の長さに応じてスクリーンショットを撮る位置をランダムで撮るようにする
+		// 動画の中央付近（30%）からスクリーンショットを撮る
+		cmd := exec.Command(
+			ffmpegPath,
+			"-i", videoPath,
+			"-ss", "00:00:15",
+			"-vframes", "1",
+			"-q:v", "5",
+			screenshotPath,
+		)
 
-	if err := cmd.Run(); err != nil {
-		slog.Error("CaptureScreenshot: ffmpeg command failed",
-			"ffmpeg_path", ffmpegPath,
-			"video_path", videoPath,
-			"output_path", screenshotPath,
-			"error", err.Error())
-		return nil, fmt.Errorf("failed to capture screenshot: %w", err)
+		if err := cmd.Run(); err == nil {
+			return &screenshotFileName, nil
+		} else {
+			lastErr = err
+
+			// 最後の試行でない場合はリトライ
+			if attempt < maxRetries-1 {
+				slog.Debug("CaptureScreenshot: Retrying ffmpeg command",
+					"video_path", videoPath,
+					"output_path", screenshotPath,
+					"attempt", attempt+1,
+					"max_retries", maxRetries,
+					"error", err.Error())
+				time.Sleep(retryDelay)
+			}
+		}
 	}
 
-	return &screenshotFileName, nil
+	slog.Error("CaptureScreenshot: ffmpeg command failed",
+		"ffmpeg_path", ffmpegPath,
+		"video_path", videoPath,
+		"output_path", screenshotPath,
+		"attempts", maxRetries,
+		"error", lastErr.Error())
+	return nil, fmt.Errorf("failed to capture screenshot after %d attempts: %w", maxRetries, lastErr)
 }
 
 // ExtractVideoMetadata - ビデオメタデータを抽出

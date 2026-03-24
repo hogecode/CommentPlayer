@@ -193,21 +193,21 @@ func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 			return
 		}
 
-	// コメントファイルを取得してApiComment[]に変換
-	comments := a.getCommentsFromFile(video.FilePath)
-        
-	// FilePath を URL に変換
-	// http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式
-	videoURL := a.buildVideoURL(video.FolderID, video.FileName)
-	
-	response := dto.VideoResponse{
-		IsSuccess:   true,
-		Src:         videoURL, 
-		Title:       &video.FileName,
-		Description: video.Description,
-		Comments:    comments,
-	}
-	ctx.JSON(http.StatusOK, response)
+		// コメントファイルを取得してApiComment[]に変換
+		comments := a.getCommentsFromFile(video.FilePath)
+
+		// FilePath を URL に変換
+		// http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式
+		videoURL := a.buildVideoURL(video.FolderID, video.FileName)
+
+		response := dto.VideoResponse{
+			IsSuccess:   true,
+			Src:         videoURL,
+			Title:       &video.FileName,
+			Description: video.Description,
+			Comments:    comments,
+		}
+		ctx.JSON(http.StatusOK, response)
 	})
 }
 

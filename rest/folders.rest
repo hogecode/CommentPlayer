@@ -14,7 +14,17 @@ Accept: application/json
 Accept-Language: ja
 
 
-### Windowsフォルダの例（Docker経由でのマウントパス）
+### Windows経由
+POST {{baseUrl}}/folders
+Content-Type: application/json
+Accept-Language: ja
+
+{
+  "path": "D:\\デスクトップ\\アニメ\\年別\\3\\15"
+}
+
+
+### Docker経由
 POST {{baseUrl}}/folders
 Content-Type: application/json
 Accept-Language: ja

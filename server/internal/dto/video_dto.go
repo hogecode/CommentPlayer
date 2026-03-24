@@ -12,7 +12,6 @@ type ApiComment struct {
 	Text   string  `json:"text" validate:"required"`
 }
 
-
 // ---VideoList---
 // VideoListRequest - ビデオ一覧取得リクエスト
 type VideoListRequest struct {
@@ -69,7 +68,6 @@ func (v *VideoSearchRequest) SetDefaults() {
 	}
 }
 
-
 // ---Video---
 // VideoResponse - ビデオ詳細レスポンス
 type VideoResponse struct {
@@ -79,7 +77,6 @@ type VideoResponse struct {
 	Description *string      `json:"description"`
 	Comments    []ApiComment `json:"comments"`
 }
-
 
 // ---ThumbnailRegenerate---
 // ThumbnailRegenerateRequest - サムネイル再生成リクエスト

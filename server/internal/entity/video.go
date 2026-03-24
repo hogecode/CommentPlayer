@@ -18,25 +18,25 @@ type ThumbnailInfo struct {
 
 // Video - ビデオエンティティ
 type Video struct {
-	ID                  int            `gorm:"primaryKey" json:"id"`
-	FileName            string         `json:"file_name"`
-	FolderID            int            `json:"folder_id"` // Folderテーブルへの外部キー
-	FilePath            string         `json:"-"`
-	Description         *string        `json:"description"`
-	Status              string         `json:"status"` // ready, processing, error
-	FileHash            string         `json:"-"`      // 非公開
-	FileSize            int64          `json:"file_size"`
-	JikkyoCommentCount  *int           `json:"jikkyo_comment_count"`
-	JikkyoDate          *time.Time     `json:"jikkyo_date"`
-	Views               int            `json:"views"`
-	Liked               bool           `json:"liked"`
-	ScreenshotFilePath  *string        `json:"screenshot_file_path"`
-	Duration            float64        `json:"duration"`
-	ThumbnailInfoJSON   json.RawMessage `gorm:"type:json" json:"-"`
-	ThumbnailInfo       *ThumbnailInfo `gorm:"-" json:"thumbnail_info"`
-	IsDeleted           bool           `json:"is_deleted"`
-	CreatedAt           time.Time      `json:"created_at"`
-	UpdatedAt           time.Time      `json:"updated_at"`
+	ID                 int             `gorm:"primaryKey" json:"id"`
+	FileName           string          `json:"file_name"`
+	FolderID           int             `json:"folder_id"` // Folderテーブルへの外部キー
+	FilePath           string          `json:"-"`
+	Description        *string         `json:"description"`
+	Status             string          `json:"status"` // ready, processing, error
+	FileHash           string          `json:"-"`      // 非公開
+	FileSize           int64           `json:"file_size"`
+	JikkyoCommentCount *int            `json:"jikkyo_comment_count"`
+	JikkyoDate         *time.Time      `json:"jikkyo_date"`
+	Views              int             `json:"views"`
+	Liked              bool            `json:"liked"`
+	ScreenshotFilePath *string         `json:"screenshot_file_path"`
+	Duration           float64         `json:"duration"`
+	ThumbnailInfoJSON  json.RawMessage `gorm:"type:json" json:"-"`
+	ThumbnailInfo      *ThumbnailInfo  `gorm:"-" json:"thumbnail_info"`
+	IsDeleted          bool            `json:"is_deleted"`
+	CreatedAt          time.Time       `json:"created_at"`
+	UpdatedAt          time.Time       `json:"updated_at"`
 }
 
 // Scan - JSON フィールドの読み込み

@@ -24,10 +24,10 @@ func NewSeedWorker(db *gorm.DB) *SeedWorker {
 
 // SeedData - シードデータの構造体
 type SeedData struct {
-	Folders []entity.Folder
-	Videos  []entity.Video
+	Folders  []entity.Folder
+	Videos   []entity.Video
 	Captures []entity.Capture
-	Users   []entity.User
+	Users    []entity.User
 }
 
 // InsertSeedData - シードデータを挿入
@@ -284,9 +284,9 @@ func (sw *SeedWorker) insertCaptures(tx *gorm.DB, captures []entity.Capture) err
 // GetDefaultSeedData - デフォルトのシードデータを取得
 func GetDefaultSeedData() *SeedData {
 	return &SeedData{
-		Folders: getDefaultFolders(),
-		Users:   getDefaultUsers(),
-		Videos:  getDefaultVideos(),
+		Folders:  getDefaultFolders(),
+		Users:    getDefaultUsers(),
+		Videos:   getDefaultVideos(),
 		Captures: getDefaultCaptures(),
 	}
 }
@@ -325,33 +325,33 @@ func getDefaultUsers() []entity.User {
 func getDefaultVideos() []entity.Video {
 	views := 100
 	count := 5
-	
+
 	return []entity.Video{
 		{
-			FileName:          "sample_video_1.mp4",
-			FolderID:          1,
-			FilePath:          "./videos/sample1/sample_video_1.mp4",
-			FileHash:          "hash_001",
-			FileSize:          1024000,
+			FileName:           "sample_video_1.mp4",
+			FolderID:           1,
+			FilePath:           "./videos/sample1/sample_video_1.mp4",
+			FileHash:           "hash_001",
+			FileSize:           1024000,
 			JikkyoCommentCount: &count,
-			Views:             views,
-			Liked:             false,
-			Duration:          60.5,
-			IsDeleted:         false,
-			Status:            "ready",
+			Views:              views,
+			Liked:              false,
+			Duration:           60.5,
+			IsDeleted:          false,
+			Status:             "ready",
 		},
 		{
-			FileName:          "sample_video_2.mp4",
-			FolderID:          2,
-			FilePath:          "./videos/sample2/sample_video_2.mp4",
-			FileHash:          "hash_002",
-			FileSize:          2048000,
+			FileName:           "sample_video_2.mp4",
+			FolderID:           2,
+			FilePath:           "./videos/sample2/sample_video_2.mp4",
+			FileHash:           "hash_002",
+			FileSize:           2048000,
 			JikkyoCommentCount: &count,
-			Views:             views,
-			Liked:             false,
-			Duration:          120.5,
-			IsDeleted:         false,
-			Status:            "ready",
+			Views:              views,
+			Liked:              false,
+			Duration:           120.5,
+			IsDeleted:          false,
+			Status:             "ready",
 		},
 	}
 }
