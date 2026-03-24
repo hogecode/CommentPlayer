@@ -6,6 +6,7 @@ import DPlayerVideo from '@/components/video';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
 import type { Comment } from '@/types/danmaku';
+import Message from '@/message';
 
 /**
  * ビデオページコンポーネント
@@ -57,7 +58,7 @@ export default function VideoPage() {
   if (isLoading) {
     return (
       <RootLayout>
-        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+        <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-center p-8 pt-24">
           <div className="text-white text-xl">読み込み中...</div>
         </div>
       </RootLayout>
@@ -67,7 +68,7 @@ export default function VideoPage() {
   if(error) {
     return (
       <RootLayout>
-        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+        <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-center p-8 pt-24">
           <div className="text-red-500 text-xl">ビデオの読み込みに失敗しました</div>
         </div>
       </RootLayout>
@@ -75,7 +76,7 @@ export default function VideoPage() {
   }
   return (
     <RootLayout>
-      <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-start p-8 pt-24">
+      <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-start p-8 pt-24">
         <DPlayerVideo src={videoSrc} commentList={commentList} />
         <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
       </div>

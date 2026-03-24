@@ -27,8 +27,8 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: 'auto',
       manifest: {
-        name: 'CommePlayer',
-        short_name: 'CommePlayer',
+        name: 'CommentPlayer',
+        short_name: 'CommentPlayer',
         description: '弾幕コメント機能付きビデオプレイヤー',
         theme_color: '#0D0807',
         background_color: '#1E1310',
