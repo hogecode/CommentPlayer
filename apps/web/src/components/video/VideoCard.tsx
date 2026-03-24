@@ -1,7 +1,7 @@
 'use client'
 
-import { Video } from '@/generated/models/entity-video'
-import { MoreVertical, Heart, Download, Trash2 } from 'lucide-react'
+import { EntityVideo } from '@/generated'
+import { MoreVertical, Heart, Download, Trash2, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { formatFileSize, formatDuration, formatDateTimeJP } from '@/lib/format'
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader } from '@/components/ui/item'
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface VideoCardProps {
-  video: Video
+  video: EntityVideo
   onDelete?: (id: number) => void
 }
 
@@ -24,7 +24,7 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
-  const thumbnailUrl = `http://localhost:8000/screenshots/${video.screenshot_file}/thumbnail`
+  const thumbnailUrl = `http://localhost:8000/screenshots/${video.screenshot_file_path}`
 
   const handleDownload = () => {
     const url = `/api/v1/videos/${video.id}/download`
@@ -35,36 +35,26 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
     <a href={`/videos/${video.id}`} >
     <Item variant="default">
       {/* サムネイル */}
-      <ItemMedia variant="image">
-        <a href={`/videos/${video.id}`} className="relative w-full h-full">
+      <ItemMedia variant="image" className="h-27 w-48">
           <img
             src={thumbnailUrl}
-            alt={video.fileName}
+            alt={video.file_name}
             loading="lazy"
-            className="w-full h-full object-cover hover:opacity-80 transition-opacity"
+            className="w-full h-full object-contain hover:opacity-80 transition-opacity"
           />
-        </a>
       </ItemMedia>
 
       {/* メインコンテンツ */}
       <ItemContent>
         <ItemHeader>
           <ItemTitle>
-            <a
-              href={`/videos/${video.id}`}
-              className="hover:text-primary transition-colors truncate"
-            >
-              {video.fileName}
-            </a>
+              {video.file_name}
           </ItemTitle>
         </ItemHeader>
 
         <ItemDescription>
           <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-            <div>作成: {formatDateTimeJP(video.createdAt)}</div>
-            <div>サイズ: {formatFileSize(video.fileSize)}</div>
-            <div>再生数: {video.views}</div>
-            <div>更新: {formatDateTimeJP(video.updatedAt)}</div>
+            <div>{formatDateTimeJP(video.jikkyo_date as string)}</div>
           </div>
         </ItemDescription>
       </ItemContent>
@@ -79,7 +69,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
           className={video.liked ? 'text-red-500' : 'text-muted-foreground'}
           aria-label="お気に入り"
         >
-          <Heart size={18} fill={video.liked ? 'currentColor' : 'none'} />
+          <Plus size={18} fill={video.liked ? 'currentColor' : 'none'} />
         </Button>
 
         {/* メニュー */}
@@ -93,7 +83,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleDownload}>
               <Download size={16} className="mr-2" />
-              ダウンロード ({formatFileSize(video.fileSize)})
+              ダウンロード ({formatFileSize(video.file_size as number)})
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>

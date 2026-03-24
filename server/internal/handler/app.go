@@ -14,7 +14,6 @@ import (
 // @version 1.0.0
 // @description ビデオ管理アプリケーションのREST API
 // @host localhost:8000
-// @BasePath /api/v1
 type App struct {
 	DB           *gorm.DB
 	VideoQuery   *query.VideoQuery

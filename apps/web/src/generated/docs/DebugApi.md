@@ -1,6 +1,6 @@
 # DebugApi
 
-All URIs are relative to *http://localhost:8000/api/v1*
+All URIs are relative to *http://localhost:8000*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|

@@ -1,6 +1,6 @@
 'use client'
 
-import { Video } from '@/generated/models/Video'
+import { EntityVideo } from '@/generated'
 import { VideoCard } from './VideoCard'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -17,12 +17,12 @@ import { Empty, EmptyContent, EmptyDescription, EmptyMedia } from '@/components/
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ChevronLeft } from 'lucide-react'
-import { useState } from 'react'
 
 interface VideoListProps {
   title: string
-  videos: Video[]
+  videos: EntityVideo[]
   total: number
+  totalPages?: number
   page?: number
   sortOrder?: 'asc' | 'desc'
   isLoading?: boolean
@@ -44,6 +44,7 @@ export function VideoList({
   title,
   videos,
   total,
+  totalPages: totalPagesProp,
   page = 1,
   sortOrder = 'desc',
   isLoading = false,
@@ -57,7 +58,7 @@ export function VideoList({
   onDelete,
 }: VideoListProps) {
   const itemsPerPage = 30
-  const totalPages = Math.ceil(total / itemsPerPage)
+  const totalPages = totalPagesProp || Math.ceil(total / itemsPerPage)
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -75,12 +76,12 @@ export function VideoList({
                   <ChevronLeft size={24} />
                 </Button>
               )}
-              <div>
+              <div className="flex justify-between items-end gap-3">
                 <h2 className="text-2xl font-bold">{title}</h2>
                 {isLoading ? (
                   <p className="text-sm text-muted-foreground">読み込み中...</p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">{total}件</p>
+                  <p className="text-xs text-muted-foreground ">{total}件</p>
                 )}
               </div>
             </div>
@@ -89,7 +90,9 @@ export function VideoList({
             {!hideSort && (
               <NativeSelect
                 value={sortOrder}
-                onChange={(e) => onSortChange?.(e.target.value as 'asc' | 'desc')}
+                onChange={(e) =>
+                  onSortChange?.(e.target.value as "asc" | "desc")
+                }
               >
                 <option value="desc">新しい順</option>
                 <option value="asc">古い順</option>
@@ -101,7 +104,7 @@ export function VideoList({
       )}
 
       {/* コンテンツ */}
-      <div className="flex-1">
+      <div className="flex-1 bg-yellow-900">
         {isLoading ? (
           <div className="flex flex-col gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -133,7 +136,10 @@ export function VideoList({
         ) : (
           <div className="border border-border rounded-lg overflow-hidden divide-y">
             {videos.map((video) => (
-              <VideoCard key={video.id} video={video} onDelete={onDelete} />
+              <>
+                <VideoCard key={video.id} video={video} onDelete={onDelete} />
+                <Separator />
+              </>
             ))}
           </div>
         )}
@@ -147,60 +153,68 @@ export function VideoList({
               <PaginationPrevious
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault()
-                  if (page > 1) onPageChange?.(page - 1)
+                  e.preventDefault();
+                  if (page > 1) onPageChange?.(page - 1);
                 }}
-                className={page <= 1 ? 'pointer-events-none opacity-50' : ''}
+                className={page <= 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-              // 最初と最後のページと、現在のページの前後を表示
-              if (
-                p === 1 ||
-                p === totalPages ||
-                (p >= page - 1 && p <= page + 1)
-              ) {
-                return (
-                  <PaginationItem key={p}>
+            {(() => {
+              // 表示するページ番号を計算
+              const visiblePages = new Set<number>();
+              visiblePages.add(1);
+              visiblePages.add(totalPages);
+              for (let i = Math.max(1, page - 1); i <= Math.min(totalPages, page + 1); i++) {
+                visiblePages.add(i);
+              }
+              
+              const sortedPages = Array.from(visiblePages).sort((a, b) => a - b);
+              
+              return sortedPages.flatMap((p, idx) => {
+                const nextPage = sortedPages[idx + 1];
+                const items = [
+                  <PaginationItem key={`page-${p}`}>
                     <PaginationLink
                       href="#"
                       onClick={(e) => {
-                        e.preventDefault()
-                        onPageChange?.(p)
+                        e.preventDefault();
+                        onPageChange?.(p);
                       }}
                       isActive={p === page}
                     >
                       {p}
                     </PaginationLink>
-                  </PaginationItem>
-                )
-              } else if (
-                (p === 2 && page > 3) ||
-                (p === totalPages - 1 && page < totalPages - 2)
-              ) {
-                return (
-                  <PaginationItem key={p}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )
-              }
-              return null
-            })}
+                  </PaginationItem>,
+                ];
+                
+                if (nextPage && nextPage - p > 1) {
+                  items.push(
+                    <PaginationItem key={`ellipsis-${p}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+                
+                return items;
+              });
+            })()}
 
             <PaginationItem>
               <PaginationNext
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault()
-                  if (page < totalPages) onPageChange?.(page + 1)
+                  e.preventDefault();
+                  if (page < totalPages) onPageChange?.(page + 1);
                 }}
-                className={page >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                className={
+                  page >= totalPages ? "pointer-events-none opacity-50" : ""
+                }
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       )}
     </div>
-  )
+  );
 }

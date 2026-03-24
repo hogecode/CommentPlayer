@@ -220,7 +220,7 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 		Duration:           metadata.Duration,
 		ScreenshotFilePath: metadata.ScreenshotFilePath,
 		JikkyoCommentCount: &commentData.Count,
-		JikkyoDate:         fw.commentTimeToPointer(commentData.NewestDate),
+		JikkyoDate:         fw.commentTimeToPointer(commentData.OldestDate),
 		Views:              0,
 		Liked:              false,
 		IsDeleted:          false,

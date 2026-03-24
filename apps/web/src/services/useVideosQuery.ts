@@ -14,7 +14,7 @@ export function useVideosQuery(
     filterBy?: string;
     page?: number;
     limit?: number;
-    sort?: "created_at" | "views" | "file_name" | "duration";
+    sort?: "created_at" | "views" | "file_name" | "duration" | "jikkyo_date";
     order?: "asc" | "desc";
   },
   options?: any,

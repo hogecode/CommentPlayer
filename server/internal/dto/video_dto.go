@@ -20,7 +20,7 @@ type VideoListRequest struct {
 	FilterBy string `form:"filterBy"`
 	Page     int    `form:"page" validate:"min=1"`
 	Limit    int    `form:"limit" validate:"min=1,max=100"`
-	Sort     string `form:"sort" validate:"oneof=created_at views file_name duration"`
+	Sort     string `form:"sort" validate:"oneof=created_at views file_name duration jikkyo_date"`
 	Order    string `form:"order" validate:"oneof=asc desc"`
 }
 
