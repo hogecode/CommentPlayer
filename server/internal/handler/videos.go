@@ -193,17 +193,21 @@ func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 			return
 		}
 
-		// コメントファイルを取得してApiComment[]に変換
-		comments := a.getCommentsFromFile(video.FilePath)
-
-		response := dto.VideoResponse{
-			IsSuccess:   true,
-			Src:         video.FilePath,
-			Title:       &video.FileName,
-			Description: video.Description,
-			Comments:    comments,
-		}
-		ctx.JSON(http.StatusOK, response)
+	// コメントファイルを取得してApiComment[]に変換
+	comments := a.getCommentsFromFile(video.FilePath)
+        
+	// FilePath を URL に変換
+	// http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式
+	videoURL := a.buildVideoURL(video.FolderID, video.FileName)
+	
+	response := dto.VideoResponse{
+		IsSuccess:   true,
+		Src:         videoURL, 
+		Title:       &video.FileName,
+		Description: video.Description,
+		Comments:    comments,
+	}
+	ctx.JSON(http.StatusOK, response)
 	})
 }
 
@@ -291,7 +295,7 @@ func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
 		}
 
 		// サムネイル再生成ロジック（ここでは省略）
-		// 実装例: FFmpeg を使用してサムネイルを生成
+		// TODO:FFmpeg を使用してサムネイルを生成
 
 		ctx.JSON(http.StatusOK, dto.ThumbnailRegenerateResponse{
 			ID:            video.ID,
@@ -476,4 +480,10 @@ func (a *App) parseMailAttribute(mail string) (commentType, commentSize, comment
 	}
 
 	return
+}
+
+// buildVideoURL - ファイルパスをURL に変換
+// フォルダID とファイル名から、http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式の URL を構築
+func (a *App) buildVideoURL(folderID int, fileName string) string {
+	return "/api/v1/files/" + strconv.Itoa(folderID) + "/" + fileName
 }

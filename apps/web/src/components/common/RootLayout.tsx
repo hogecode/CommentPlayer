@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { Header } from '@/components/common/Header'
+import { Separator } from '@/components/ui/separator'
 
 interface RootLayoutProps {
   children: ReactNode
@@ -27,8 +28,11 @@ export function RootLayout({ children, headerChildren }: RootLayoutProps) {
       </main>
 
       {/* フッター */}
-      <footer className="bg-muted text-muted-foreground py-6 text-center mt-16">
-        <p className="text-sm">&copy; 2026 CommeVideo. All rights reserved.</p>
+      <footer className="mt-auto border-t">
+        <Separator className="m-0" />
+        <div className="bg-muted/30 text-muted-foreground py-6 text-center">
+          <p className="text-sm">&copy; 2026 CommeVideo. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   )

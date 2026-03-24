@@ -14,9 +14,11 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/static-files-api';
-export * from './apis/videos-api';
+export interface DtoFolderResponse {
+    'created_at'?: string;
+    'id'?: number;
+    'is_watched'?: boolean;
+    'path'?: string;
+    'updated_at'?: string;
+}
 

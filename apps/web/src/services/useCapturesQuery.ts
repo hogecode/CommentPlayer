@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CapturesApi } from '@/generated/apis';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CapturesApi } from "@/generated";
 
 // APIクライアントのセットアップ
 const capturesApi = new CapturesApi();
@@ -12,16 +12,17 @@ export function useCapturesQuery(
     page?: number;
     limit?: number;
   },
-  options?: any
+  options?: any,
 ) {
   return useQuery({
-    queryKey: ['captures', params],
+    queryKey: ["captures", params],
     queryFn: async () => {
-      return capturesApi.apiV1CapturesGet({
-        videoId: params?.video_id,
-        page: params?.page,
-        limit: params?.limit,
-      });
+      const response = await capturesApi.apiV1CapturesGet(
+        params?.video_id,
+        params?.page,
+        params?.limit,
+      );
+      return response.data;
     },
     staleTime: 1000 * 60 * 5,
     ...options,
@@ -36,14 +37,12 @@ export function useCreateCaptureMutation() {
 
   return useMutation({
     mutationFn: async (data: { file: File; video_id: number }) => {
-      return capturesApi.apiV1CapturesPost({
-        file: data.file,
-        videoId: data.video_id,
-      });
+      const response = await capturesApi.apiV1CapturesPost(data.file, data.video_id);
+      return response.data;
     },
     onSuccess: () => {
       // キャプチャリスト情報を無効化して再フェッチ
-      queryClient.invalidateQueries({ queryKey: ['captures'] });
+      queryClient.invalidateQueries({ queryKey: ["captures"] });
     },
   });
 }

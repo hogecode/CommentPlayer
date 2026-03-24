@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { VideosApi } from "@/generated/apis";
+import { VideosApi } from "@/generated";
 import Message from "@/message";
 
 // APIクライアントのセットアップ
@@ -22,14 +22,15 @@ export function useVideosQuery(
   return useQuery({
     queryKey: ["videos", params],
     queryFn: async () => {
-      return videosApi.apiV1VideosGet({
-        ids: params?.ids,
-        filterBy: params?.filterBy,
-        page: params?.page,
-        limit: params?.limit,
-        sort: params?.sort as any,
-        order: params?.order as any,
-      });
+      const response = await videosApi.apiV1VideosGet(
+        params?.ids,
+        params?.filterBy,
+        params?.page,
+        params?.limit,
+        params?.sort as any,
+        params?.order as any,
+      );
+      return response.data;
     },
     staleTime: 1000 * 60 * 5, // 5分
     ...options,
@@ -52,13 +53,14 @@ export function useSearchVideosQuery(
   return useQuery({
     queryKey: ["videos-search", q, params],
     queryFn: async () => {
-      return videosApi.apiV1VideosSearchGet({
+      const response = await videosApi.apiV1VideosSearchGet(
         q,
-        page: params?.page,
-        limit: params?.limit,
-        order: params?.order as any,
-        filterBy: params?.filterBy,
-      });
+        params?.page,
+        params?.limit,
+        params?.order as any,
+        params?.filterBy,
+      );
+      return response.data;
     },
     enabled: !!q, // qが指定された時のみ実行
     staleTime: 1000 * 60 * 5,
@@ -77,7 +79,8 @@ export function useVideoQuery(id: number | null, options?: any) {
         Message.error("ビデオIDが必要です");
         throw new Error("Video ID is required");
       }
-      return videosApi.apiV1VideosIdGet({ id });
+      const response = await videosApi.apiV1VideosIdGet(id);
+      return response.data;
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
@@ -98,16 +101,17 @@ export function useRegenerateThumbnailMutation() {
       height?: number;
       timestamp?: number;
     }) => {
-      return videosApi.apiV1VideosIdThumbnailRegeneratePost({
-        id: data.id,
-        body: {
+      const response = await videosApi.apiV1VideosIdThumbnailRegeneratePost(
+        data.id,
+        {
           width: data.width,
           height: data.height,
           timestamp: data.timestamp,
         },
-      });
+      );
+      return response.data;
     },
-    onSuccess: (response: any, variables) => {
+    onSuccess: (_response: any, variables: { id: number; width?: number; height?: number; timestamp?: number }) => {
       // ビデオの詳細情報を無効化して再フェッチ
       queryClient.invalidateQueries({ queryKey: ["video", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["videos"] });
@@ -122,10 +126,10 @@ export function useRegenerateThumbnailMutation() {
 export function useVideoDownload() {
   return async (id: number, filename?: string) => {
     try {
-      const response = await videosApi.apiV1VideosIdDownloadGet({ id });
+      const response = await videosApi.apiV1VideosIdDownloadGet(id);
 
       // ブラウザでダウンロード処理
-      const url = window.URL.createObjectURL(response as Blob);
+      const url = window.URL.createObjectURL(response.data as unknown as Blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename || `video_${id}.mp4`;

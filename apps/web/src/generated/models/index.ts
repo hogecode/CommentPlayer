@@ -1,13 +1,13 @@
-/* tslint:disable */
-/* eslint-disable */
-export * from './ApiComment';
-export * from './Capture';
-export * from './CaptureListResponse';
-export * from './ModelError';
-export * from './Pagination';
-export * from './ThumbnailInfo';
-export * from './ThumbnailRegenerateRequest';
-export * from './ThumbnailRegenerateResponse';
-export * from './Video';
-export * from './VideoListResponse';
-export * from './VideoResponse';
+export * from './dto-capture-list-response';
+export * from './dto-error-response';
+export * from './dto-folder-action-response';
+export * from './dto-folder-list-response';
+export * from './dto-folder-request';
+export * from './dto-folder-response';
+export * from './dto-pagination';
+export * from './dto-thumbnail-regenerate-request';
+export * from './dto-thumbnail-regenerate-response';
+export * from './dto-video-list-response';
+export * from './entity-capture';
+export * from './entity-thumbnail-info';
+export * from './entity-video';

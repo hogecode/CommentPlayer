@@ -13,10 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DtoFolderResponse } from './dto-folder-response';
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/static-files-api';
-export * from './apis/videos-api';
+export interface DtoFolderActionResponse {
+    'data'?: DtoFolderResponse;
+    'message'?: string;
+    'success'?: boolean;
+}
 

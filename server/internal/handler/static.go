@@ -62,6 +62,9 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 	// public ディレクトリをルートで配信
 	engine.Static("/assets", "./public/assets")
 
+	// スクリーンショットの配信
+	engine.Static("/screenshots", "./public/screenshots")
+
 	// SPA のフォールバック処理
 	// 存在しないパスにアクセスされた場合、index.html を返す
 	engine.NoRoute(func(c *gin.Context) {

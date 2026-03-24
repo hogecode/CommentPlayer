@@ -14,9 +14,10 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/static-files-api';
-export * from './apis/videos-api';
+export interface EntityCapture {
+    'created_at'?: string;
+    'filename'?: string;
+    'id'?: number;
+    'video_id'?: number;
+}
 

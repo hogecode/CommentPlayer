@@ -3,6 +3,8 @@
 import { useRef, useState, useEffect, ReactNode } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupButton } from '@/components/ui/input-group'
 import { Search } from 'lucide-react'
 
 interface HeaderProps {
@@ -61,7 +63,7 @@ export function Header({ children }: HeaderProps) {
     <header className="fixed top-0 left-0 right-0 flex items-center w-full h-16 px-4 bg-blue-300 z-40">
       {/* ロゴ */}
       <a
-        href="/videos"
+        href="/"
         className="flex items-center py-3 px-2 rounded-lg hover:bg-accent transition-colors"
       >
         <img
@@ -80,25 +82,27 @@ export function Header({ children }: HeaderProps) {
 
       {/* 検索ボックス */}
       {showSearchInput && (
-        <div className="relative flex items-center ml-4">
-          <input
+        <InputGroup className="w-56 ml-4">
+          <Input
             ref={searchInputRef}
             type="search"
-            placeholder={"録画番組を検索..."}
+            placeholder="録画番組を検索..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-56 h-11 px-3 pr-10 rounded-md border border-input bg-background text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             enterKeyHint="search"
           />
-          <button
-            onClick={doSearch}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center p-1 rounded hover:bg-muted transition-colors cursor-pointer text-muted-foreground"
-            aria-label="検索実行"
-          >
-            <Search size={20} />
-          </button>
-        </div>
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              onClick={doSearch}
+              variant="ghost"
+              size="icon-xs"
+              aria-label="検索実行"
+            >
+              <Search size={18} />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
       )}
     </header>
   )

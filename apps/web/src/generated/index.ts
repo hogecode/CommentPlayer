@@ -13,6 +13,6 @@
  */
 
 
-export * from "./api";
+export * from "./apis";
 export * from "./configuration";
-
+export * from "./models";

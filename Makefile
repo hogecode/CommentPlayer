@@ -168,7 +168,7 @@ swagger-gen-win: ## Ginコメントから swagger.yaml を生成
 	powershell -ExecutionPolicy Bypass -File scripts/gen-swagger.ps1
 
 generate-client-win: ## React Query TypeScriptクライアント生成
-	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g typescript-axios -o /local/apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,modelPackage=models,apiPackage=apis"
+	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g typescript-axios -o /local/apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=apis"
 
 generate-all-win: swagger-gen-win generate-client-win ## swagger.yaml から全コード生成
 	@echo "✅ Swagger とクライアントコードを生成しました"

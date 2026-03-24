@@ -544,6 +544,7 @@ const docTemplate = `{
         },
         "/swagger.json": {
             "get": {
+                "description": "デバッグビルドでの埋め込みSwagger JSONドキュメント",
                 "produces": [
                     "application/json"
                 ],
@@ -551,12 +552,12 @@ const docTemplate = `{
                     "Debug"
                 ],
                 "summary": "埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）",
-                "operationId": "GetDocs",
                 "responses": {
                     "200": {
                         "description": "Swagger JSON",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -792,10 +793,6 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "gin.H": {
-            "type": "object",
-            "additionalProperties": {}
         }
     }
 }`

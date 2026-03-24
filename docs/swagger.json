@@ -538,6 +538,7 @@
         },
         "/swagger.json": {
             "get": {
+                "description": "デバッグビルドでの埋め込みSwagger JSONドキュメント",
                 "produces": [
                     "application/json"
                 ],
@@ -545,12 +546,12 @@
                     "Debug"
                 ],
                 "summary": "埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）",
-                "operationId": "GetDocs",
                 "responses": {
                     "200": {
                         "description": "Swagger JSON",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -786,10 +787,6 @@
                     "type": "integer"
                 }
             }
-        },
-        "gin.H": {
-            "type": "object",
-            "additionalProperties": {}
         }
     }
 }

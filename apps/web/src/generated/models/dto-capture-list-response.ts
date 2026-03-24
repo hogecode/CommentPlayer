@@ -13,10 +13,15 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DtoPagination } from './dto-pagination';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { EntityCapture } from './entity-capture';
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/static-files-api';
-export * from './apis/videos-api';
+export interface DtoCaptureListResponse {
+    'data'?: Array<EntityCapture>;
+    'pagination'?: DtoPagination;
+}
 

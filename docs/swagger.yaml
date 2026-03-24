@@ -150,9 +150,6 @@ definitions:
       views:
         type: integer
     type: object
-  gin.H:
-    additionalProperties: {}
-    type: object
 host: localhost:8000
 info:
   contact: {}
@@ -513,14 +510,15 @@ paths:
       - Videos
   /swagger.json:
     get:
-      operationId: GetDocs
+      description: デバッグビルドでの埋め込みSwagger JSONドキュメント
       produces:
       - application/json
       responses:
         "200":
           description: Swagger JSON
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
       tags:
       - Debug

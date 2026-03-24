@@ -19,11 +19,9 @@ export default function VideoPage() {
 
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);
 
-  //const videoSrc = ((videoData as any)?.src) || '/blank30.mp4';
-const videoSrc =  'http://localhost:8000/api/v1/files/1/hibi01.mp4';
-
   // コメントを変換
   const commentList: Comment[] = (() => {
+
     if (!videoData) return sampleDanmaku;
     
     const comments = (videoData as any)?.comments;
@@ -40,9 +38,8 @@ const videoSrc =  'http://localhost:8000/api/v1/files/1/hibi01.mp4';
     }));
   })();
 
-
   const videoTitle = ((videoData as any)?.title) || `弾幕プレイヤー - ${videoId}`;
-
+    const videoSrc = (`http://localhost:8000${(videoData as any)?.src}`) || '/blank30.mp4';
   if (isLoading) {
     return (
       <RootLayout>

@@ -1,9 +1,18 @@
 'use client'
 
-import { Video } from '@/generated/models/Video'
-import { MoreVertical, Heart } from 'lucide-react'
+import { Video } from '@/generated/models/entity-video'
+import { MoreVertical, Heart, Download, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { formatFileSize, formatDuration, formatDateTimeJP } from '@/lib/format'
+import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader } from '@/components/ui/item'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 
 interface VideoCardProps {
   video: Video
@@ -15,102 +24,82 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
-  const [showMenu, setShowMenu] = useState(false)
+  const thumbnailUrl = `http://localhost:8000/screenshots/${video.screenshot_file}/thumbnail`
 
-  const thumbnailUrl = `/api/v1/videos/${video.id}/thumbnail`
+  const handleDownload = () => {
+    const url = `/api/v1/videos/${video.id}/download`
+    window.location.href = url
+  }
 
   return (
-    <div className="flex items-center gap-4 p-4 border-b border-border hover:bg-muted/50 transition-colors">
+    <a href={`/videos/${video.id}`} >
+    <Item variant="default">
       {/* サムネイル */}
-      <a href={`/videos/${video.id}`} className="flex-shrink-0 relative group">
-        <div className="w-32 h-20 rounded-md overflow-hidden bg-muted">
+      <ItemMedia variant="image">
+        <a href={`/videos/${video.id}`} className="relative w-full h-full">
           <img
             src={thumbnailUrl}
             alt={video.fileName}
-            className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+            loading="lazy"
+            className="w-full h-full object-cover hover:opacity-80 transition-opacity"
           />
-        </div>
-        {/* 再生時間 */}
-        <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-          {formatDuration(video.duration)}
-        </div>
-      </a>
+        </a>
+      </ItemMedia>
 
       {/* メインコンテンツ */}
-      <div className="flex-1 min-w-0">
-        <a
-          href={`/videos/${video.id}`}
-          className="block text-base font-semibold truncate hover:text-primary transition-colors"
-        >
-          {video.fileName}
-        </a>
-        
-        <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-          <div>作成: {formatDateTimeJP(video.createdAt)}</div>
-          <div>サイズ: {formatFileSize(video.fileSize)}</div>
-          <div>再生数: {video.views}</div>
-          <div>更新: {formatDateTimeJP(video.updatedAt)}</div>
-        </div>
-      </div>
+      <ItemContent>
+        <ItemHeader>
+          <ItemTitle>
+            <a
+              href={`/videos/${video.id}`}
+              className="hover:text-primary transition-colors truncate"
+            >
+              {video.fileName}
+            </a>
+          </ItemTitle>
+        </ItemHeader>
+
+        <ItemDescription>
+          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+            <div>作成: {formatDateTimeJP(video.createdAt)}</div>
+            <div>サイズ: {formatFileSize(video.fileSize)}</div>
+            <div>再生数: {video.views}</div>
+            <div>更新: {formatDateTimeJP(video.updatedAt)}</div>
+          </div>
+        </ItemDescription>
+      </ItemContent>
 
       {/* アクション */}
-      <div className="flex items-center gap-2 flex-shrink-0 relative">
+      <ItemActions>
         {/* お気に入りボタン */}
-        <button
-          className={`p-2 rounded hover:bg-muted transition-colors ${
-            video.liked ? 'text-red-500' : 'text-muted-foreground'
-          }`}
+        {/* TODO: ロジック追加 */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className={video.liked ? 'text-red-500' : 'text-muted-foreground'}
           aria-label="お気に入り"
         >
-          <Heart size={20} fill={video.liked ? 'currentColor' : 'none'} />
-        </button>
-
-        {/* メニューボタン */}
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="p-2 rounded hover:bg-muted transition-colors text-muted-foreground"
-        >
-          <MoreVertical size={20} />
-        </button>
+          <Heart size={18} fill={video.liked ? 'currentColor' : 'none'} />
+        </Button>
 
         {/* メニュー */}
-        {showMenu && (
-          <div className="absolute right-0 top-full mt-1 bg-popover border border-border rounded-md shadow-md z-50 min-w-48">
-            <button
-              onClick={() => {
-                window.location.href = `/videos/${video.id}`
-                setShowMenu(false)
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-muted text-sm"
-            >
-              再生
-            </button>
-            <hr className="border-border" />
-            <button
-              onClick={() => {
-                const url = `/api/v1/videos/${video.id}/download`
-                window.location.href = url
-                setShowMenu(false)
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-muted text-sm"
-            >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-sm">
+              <MoreVertical size={18} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDownload}>
+              <Download size={16} className="mr-2" />
               ダウンロード ({formatFileSize(video.fileSize)})
-            </button>
-            <hr className="border-border" />
-            <button
-              onClick={() => {
-                if (confirm('このビデオを削除しますか？')) {
-                  onDelete?.(video.id)
-                }
-                setShowMenu(false)
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-destructive/10 text-sm text-destructive"
-            >
-              削除
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </ItemActions>
+    </Item>
+    </a>
   )
 }

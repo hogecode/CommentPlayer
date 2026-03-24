@@ -4,11 +4,12 @@ All URIs are relative to *http://localhost:8000/api/v1*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**getDocs**](#getdocs) | **GET** /swagger.json | 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）|
+|[**swaggerJsonGet**](#swaggerjsonget) | **GET** /swagger.json | 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）|
 
-# **getDocs**
-> { [key: string]: object; } getDocs()
+# **swaggerJsonGet**
+> { [key: string]: any; } swaggerJsonGet()
 
+デバッグビルドでの埋め込みSwagger JSONドキュメント
 
 ### Example
 
@@ -21,7 +22,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new DebugApi(configuration);
 
-const { status, data } = await apiInstance.getDocs();
+const { status, data } = await apiInstance.swaggerJsonGet();
 ```
 
 ### Parameters
@@ -30,7 +31,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**{ [key: string]: object; }**
+**{ [key: string]: any; }**
 
 ### Authorization
 
