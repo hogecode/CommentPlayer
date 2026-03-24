@@ -104,7 +104,7 @@ export function VideoList({
       )}
 
       {/* コンテンツ */}
-      <div className="flex-1 bg-yellow-900">
+      <div className="flex-1 bg-[#2f221f] rounded-sm p-4">
         {isLoading ? (
           <div className="flex flex-col gap-2">
             {Array.from({ length: 5 }).map((_, i) => (

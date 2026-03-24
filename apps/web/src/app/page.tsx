@@ -61,7 +61,7 @@ export default function HomePage() {
   }
 
   return (
-    <RootLayout headerChildren={<Button variant="outline">ログイン</Button>}>
+    <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
         <VideoList
           title="動画一覧"

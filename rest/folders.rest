@@ -2,74 +2,19 @@
 
 ### 実装済み機能
 
-###
-## GET /folders
+### GET /folders
 GET {{baseUrl}}/folders
 Accept: application/json
 Accept-Language: ja
 
 
-###
-
-## POST /folders
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
-
-{
-  "path": "D:\\ビデオ"
-}
-
-###
-
-## POST /folders (既存フォルダの復旧)
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
-
-{
-  "path": "C:\\Users\\user\\Videos"
-}
-
-###
-
-## 4. フォルダを削除（ソフトデリート）
+### DELETE /folders/{id}
 DELETE {{baseUrl}}/folders/1
 Accept: application/json
 Accept-Language: ja
 
-###
 
-## 5. フォルダ一覧を確認（削除後）
-GET {{baseUrl}}/folders
-Accept: application/json
-Accept-Language: ja
-
-###
-
-## 6. 複数フォルダを追加
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
-
-{
-  "path": "D:\\Movies"
-}
-
-###
-
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
-
-{
-  "path": "E:\\Downloads"
-}
-
-###
-http://localhost:8000/api/v1/files/1/hibi01.mp4
-
-## 7. Windowsアニメフォルダの例（Docker経由でのマウントパス）
+### Windowsフォルダの例（Docker経由でのマウントパス）
 POST {{baseUrl}}/folders
 Content-Type: application/json
 Accept-Language: ja
@@ -78,40 +23,13 @@ Accept-Language: ja
   "path": "/mnt/d/デスクトップ/アニメ/年別/3/15"
 }
 
-###
 
-## 8. ネットワークパスの例
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
+### mp4
+http://localhost:8000/api/v1/files/1/hibi01.mp4
 
-{
-  "path": "\\\\SERVER\\share\\folder"
-}
 
-###
+### jpg
+localhost:8000/screenshots/zsBPJrEqtKbF3jM9.jpg
 
-## 7. 英語でのテスト
-GET {{baseUrl}}/folders
-Accept: application/json
-Accept-Language: en
+----------------------------------------------------
 
-###
-
-## 8. 無効なフォルダIDで削除を試みる
-DELETE {{baseUrl}}/folders/99999
-Accept: application/json
-Accept-Language: ja
-
-###
-
-## 9. 不正なリクエストボディで追加を試みる
-POST {{baseUrl}}/folders
-Content-Type: application/json
-Accept-Language: ja
-
-{
-  "invalid_key": "some_value"
-}
-
-###

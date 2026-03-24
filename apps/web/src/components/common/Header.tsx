@@ -90,7 +90,7 @@ export function Header({ children }: HeaderProps) {
   })();
 
   return (
-    <header className="fixed top-0 left-0 right-0 flex items-center w-full h-16 px-4 bg-blue-300 z-40">
+    <header className="fixed top-0 left-0 right-0 flex items-center w-full h-16 px-4 bg-[#1e1310] z-40">
       {/* ロゴ */}
       <a
         href="/"
@@ -119,6 +119,7 @@ export function Header({ children }: HeaderProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             enterKeyHint="search"
+            className="text-xs"
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
@@ -132,7 +133,7 @@ export function Header({ children }: HeaderProps) {
           </InputGroupAddon>
         </InputGroup>
       )}{" "}
-      
+
       {/* PWAインストールボタン */}
       {isButtonDisplay && !isTimeTablePage && (
         <Button

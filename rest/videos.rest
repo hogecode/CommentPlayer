@@ -2,54 +2,49 @@
 
 ##実装済み機能
 
-##  /videos
+###  /videos
 GET {{baseUrl}}/videos?page=1&limit=20
 Accept: application/json
 Accept-Language: ja
 
 
-###
-##  /videos
+### /videos
 GET {{baseUrl}}/videos?page=1&limit=10&sort=created_at&order=desc
 Accept: application/json
 Accept-Language: en
 
 
-###
-##  /videos?filterBy=liked
+### /videos?filterBy=liked
 GET {{baseUrl}}/videos?filterBy=liked&page=1&limit=20
 Accept: application/json
 Accept-Language: ja
 
 
-###
-##  /videos?ids=1&ids=2&ids=3
+### /videos?ids=1&ids=2&ids=3
 GET {{baseUrl}}/videos?ids=1&ids=2&ids=3&page=1&limit=20
 Accept: application/json
 Accept-Language: ja
 
 
-###
-##  /videos/{id}
+### /videos/{id}
 GET {{baseUrl}}/videos/1
 Accept: application/json
 Accept-Language: ja
 
-----------------------------------------------------
 
 ### 
 ##  /videos/search
-GET {{baseUrl}}/videos/search?q=test&page=1&limit=20
+GET {{baseUrl}}/videos/search?q=hibi&page=1&limit=20
 Accept: application/json
 Accept-Language: ja
 
 
 ### 
 ## /videos/search
-GET {{baseUrl}}/videos/search?q=test%20video&page=1&limit=20&order=desc
+GET {{baseUrl}}/videos/search?q=hibi%20video&page=1&limit=20&order=desc
 Accept: application/json
 Accept-Language: ja
-
+----------------------------------------------------
 
 ###
 ##  /videos/{id}/download

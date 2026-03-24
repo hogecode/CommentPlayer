@@ -16,9 +16,11 @@ import "@/styles/index.scss";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <SnackbarContainer />
+      {" "}
       <TooltipProvider>
+        <RouterProvider router={router} />
+        <SnackbarContainer />
+
         <App />
       </TooltipProvider>
     </QueryClientProvider>

@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { Header } from '@/components/common/Header'
 import { Separator } from '@/components/ui/separator'
+import Sidebar from './Sidebar'
 
 interface RootLayoutProps {
   children: ReactNode
@@ -12,7 +13,7 @@ interface RootLayoutProps {
 /**
  * 共通レイアウトコンポーネント
  * 
- * Header とそれ以降に追加されるサイドバーなどの共通レイアウトを管理
+ * Header、Sidebar、メインコンテンツ、フッターの共通レイアウトを管理
  * children: ページのメインコンテンツ
  * headerChildren: ヘッダーに挿入する要素（ボタンなど）
  */
@@ -21,11 +22,16 @@ export function RootLayout({ children, headerChildren }: RootLayoutProps) {
     <div className="flex flex-col min-h-screen">
       {/* ヘッダーコンポーネント */}
       <Header>{headerChildren}</Header>
+      {/* メインレイアウト（Sidebar + Content） */}
+      <div className="flex flex-1">
+        {/* Sidebarコンポーネント */}
+        <Sidebar />
 
-      {/* メインコンテンツ */}
-      <main className="flex-1">
-        {children}
-      </main>
+        {/* メインコンテンツ */}
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
 
       {/* フッター */}
       <footer className="mt-auto border-t">
