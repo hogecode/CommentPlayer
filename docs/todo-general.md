@@ -19,22 +19,20 @@
 - [ ]
 
 **コンポーネント**
-- [ ] ヘッダー
-- [ ] サイドバー
 - [ ]
 - [ ]
 - [ ]
  
 **画面**
-- [ ] /videos: 動画
-- [ ] /videos/:id
+- [ ] /videos: 動画一覧
+- [ ] /videos/:id　視聴画面
 - [ ] /watched-history: 視聴履歴
 - [ ] /captures: キャプチャ
-- [ ] /captures/:id
-- [ ] /settings
+- [ ] /captures/:id　特定の画像
+- [ ] /settings　設定
 
 **追加処理**
-- [ ] NG機能
+- [ ] NG機能　設定から追加
 
 
 ### サーバー側
@@ -47,7 +45,7 @@
 **API**
 **ビデオ一覧**
 - [x] GET /api/v1/videos
-- [ ] GET /api/v1/videos/search
+- [x] GET /api/v1/videos/search
 - [ ] GET /api/v1/videos/:id/download
 
 **サムネ**
@@ -63,5 +61,3 @@
 
 **DB**
 - [x] SQLite初期化
-
-
