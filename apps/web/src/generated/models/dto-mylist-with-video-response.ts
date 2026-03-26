@@ -13,12 +13,15 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { EntityVideo } from './entity-video';
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/mylist-api';
-export * from './apis/static-files-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface DtoMylistWithVideoResponse {
+    'created_at'?: string;
+    'id'?: number;
+    'updated_at'?: string;
+    'video'?: EntityVideo;
+    'video_id'?: number;
+}
 

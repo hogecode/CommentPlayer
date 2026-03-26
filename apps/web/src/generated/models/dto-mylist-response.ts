@@ -14,11 +14,10 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/mylist-api';
-export * from './apis/static-files-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface DtoMylistResponse {
+    'created_at'?: string;
+    'id'?: number;
+    'updated_at'?: string;
+    'video_id'?: number;
+}
 

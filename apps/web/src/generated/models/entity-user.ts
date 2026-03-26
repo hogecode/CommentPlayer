@@ -14,11 +14,15 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/mylist-api';
-export * from './apis/static-files-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface EntityUser {
+    'client_settings'?: { [key: string]: any; };
+    'created_at'?: string;
+    'id'?: number;
+    'is_admin'?: number;
+    'name'?: string;
+    'niconico_user_id'?: number;
+    'niconico_user_name'?: string;
+    'niconico_user_premium'?: number;
+    'updated_at'?: string;
+}
 

@@ -51,6 +51,46 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.MylistListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.MylistWithVideoResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/dto.Pagination'
+    type: object
+  dto.MylistRequest:
+    properties:
+      video_id:
+        type: integer
+    required:
+    - video_id
+    type: object
+  dto.MylistResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      video_id:
+        type: integer
+    type: object
+  dto.MylistWithVideoResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      video:
+        $ref: '#/definitions/entity.Video'
+      video_id:
+        type: integer
+    type: object
   dto.Pagination:
     properties:
       limit:
@@ -61,6 +101,11 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  dto.SuccessResponse:
+    properties:
+      message:
+        type: string
     type: object
   dto.ThumbnailRegenerateRequest:
     properties:
@@ -82,6 +127,35 @@ definitions:
         type: string
       thumbnail_info:
         $ref: '#/definitions/entity.ThumbnailInfo'
+    type: object
+  dto.UserAccessToken:
+    properties:
+      access_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  dto.UserAccessTokenRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.UserCreateRequest:
+    properties:
+      password:
+        minLength: 1
+        type: string
+      username:
+        minLength: 1
+        type: string
+    required:
+    - password
+    - username
     type: object
   dto.VideoListResponse:
     properties:
@@ -111,6 +185,28 @@ definitions:
         type: integer
       width:
         type: integer
+    type: object
+  entity.User:
+    properties:
+      client_settings:
+        additionalProperties: true
+        type: object
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_admin:
+        type: integer
+      name:
+        type: string
+      niconico_user_id:
+        type: integer
+      niconico_user_name:
+        type: string
+      niconico_user_premium:
+        type: integer
+      updated_at:
+        type: string
     type: object
   entity.Video:
     properties:
@@ -322,6 +418,165 @@ paths:
       summary: 監視対象フォルダを削除
       tags:
       - Folders
+  /api/v1/mylist:
+    get:
+      description: ユーザーのマイリスト一覧を取得します
+      parameters:
+      - default: 1
+        description: ページ番号
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 1ページあたりのアイテム数
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MylistListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: マイリスト一覧を取得
+      tags:
+      - Mylist
+    post:
+      description: 動画をマイリストに追加します
+      parameters:
+      - description: リクエストボディ
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MylistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MylistResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: マイリストに追加
+      tags:
+      - Mylist
+  /api/v1/mylist/:videoID:
+    delete:
+      description: 動画をマイリストから削除します
+      parameters:
+      - description: ビデオID
+        in: path
+        name: videoID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: マイリストから削除
+      tags:
+      - Mylist
+  /api/v1/mylist/:videoID/check:
+    get:
+      description: 動画がマイリストに入っているかチェックします
+      parameters:
+      - description: ビデオID
+        in: path
+        name: videoID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: マイリスト登録済みかチェック
+      tags:
+      - Mylist
+  /api/v1/users:
+    post:
+      description: 新しいユーザーアカウントを作成します
+      parameters:
+      - description: ユーザー作成リクエスト
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.User'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ユーザーアカウント作成
+      tags:
+      - Users
+  /api/v1/users/token:
+    post:
+      description: ユーザーの認証情報を検証し、JWT トークンを発行します
+      parameters:
+      - description: ユーザー名とパスワード
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAccessTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserAccessToken'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: アクセストークン発行 API (OAuth2 準拠)
+      tags:
+      - Users
   /api/v1/videos:
     get:
       description: ページネーション対応のビデオ一覧を取得します

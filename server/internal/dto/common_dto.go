@@ -13,3 +13,8 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 	Code  string `json:"code"`
 }
+
+// SuccessResponse - 成功レスポンス
+type SuccessResponse struct {
+	Message string `json:"message"`
+}
