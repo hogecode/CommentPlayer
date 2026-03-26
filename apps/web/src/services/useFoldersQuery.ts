@@ -10,13 +10,19 @@ const foldersApi = new FoldersApi();
  * 監視対象フォルダ一覧を取得
  */
 export function useFoldersQuery(options?: any) {
-  return useQuery<DtoFolderListResponse>({
+  return useQuery<DtoFolderListResponse, Error>({
     queryKey: ["folders"],
     queryFn: async () => {
-      const response = await foldersApi.apiV1FoldersGet();
-      return response.data;
+      try {
+        const response = await foldersApi.apiV1FoldersGet();
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching folders:', error);
+        throw error;
+      }
     },
     staleTime: 1000 * 60 * 5,
+    retry: 1,
     ...options,
   });
 }

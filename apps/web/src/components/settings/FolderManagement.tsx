@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { DtoFolderResponse } from '@/generated'
 import { useFoldersQuery, useAddFolderMutation, useDeleteFolderMutation } from '@/services/useFoldersQuery'
 import { Button } from '@/components/ui/button'
@@ -10,59 +10,86 @@ import { Spinner } from '@/components/ui/spinner'
 
 export function FolderManagement() {
   const [folderPath, setFolderPath] = useState('')
-  const { data: foldersData, isLoading, error } = useFoldersQuery()
+  const [mounted, setMounted] = useState(false)
+  
+  // マウント後のみクエリを実行
+  const { data: foldersData, isLoading, error, isError } = useFoldersQuery({
+    enabled: mounted
+  })
+  
   const addFolderMutation = useAddFolderMutation()
   const deleteFolderMutation = useDeleteFolderMutation()
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const folders: DtoFolderResponse[] = foldersData?.data ?? []
+
+  // エラーをログに出力
+  if (error) {
+    console.error('Failed to fetch folders:', error)
+  }
 
   const handleAddFolder = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!folderPath.trim()) {
       return
     }
-    await addFolderMutation.mutateAsync(folderPath)
-    setFolderPath('')
+    try {
+      await addFolderMutation.mutateAsync(folderPath)
+      setFolderPath('')
+    } catch (error) {
+      console.error('Failed to add folder:', error)
+    }
   }
 
   const handleDeleteFolder = async (id: number) => {
     if (confirm('このフォルダを削除してもよろしいですか？')) {
-      await deleteFolderMutation.mutateAsync(id)
+      try {
+        await deleteFolderMutation.mutateAsync(id)
+      } catch (error) {
+        console.error('Failed to delete folder:', error)
+      }
     }
   }
 
   return (
     <div className="space-y-6">
-        <h3 className="font-semibold mb-4">新規フォルダを追加</h3>
-        <form onSubmit={handleAddFolder} className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="フォルダパスを入力してください（例：/path/to/folder）"
-            value={folderPath}
-            onChange={(e) => setFolderPath(e.target.value)}
-            disabled={addFolderMutation.isPending}
-            className='text-xs'
-          />
-          <Button
-            type="submit"
-            disabled={!folderPath.trim() || addFolderMutation.isPending}
-            className="whitespace-nowrap bg-primary"
-          >
-            {addFolderMutation.isPending ? (
-              <>
-                <Spinner className="mr-2 size-4" />
-                追加中...
-              </>
-            ) : (
-              '追加'
-            )}
-          </Button>
-        </form>
+      <h3 className="font-semibold mb-4">新規フォルダを追加</h3>
+      <form onSubmit={handleAddFolder} className="flex gap-2">
+        <Input
+          type="text"
+          placeholder="フォルダパスを入力してください（例：/path/to/folder）"
+          value={folderPath}
+          onChange={(e) => setFolderPath(e.target.value)}
+          disabled={addFolderMutation.isPending}
+          className="text-xs"
+        />
+        <Button
+          type="submit"
+          disabled={!folderPath.trim() || addFolderMutation.isPending}
+          className="whitespace-nowrap bg-primary"
+        >
+          {addFolderMutation.isPending ? (
+            <>
+              <Spinner className="mr-2 size-4" />
+              追加中...
+            </>
+          ) : (
+            '追加'
+          )}
+        </Button>
+      </form>
 
       {/* フォルダ一覧 */}
       <div>
         <h3 className="font-semibold mb-4">監視対象フォルダ</h3>
-        {isLoading ? (
+        {!mounted ? (
+          <div className="flex items-center justify-center py-8">
+            <Spinner className="size-6" />
+          </div>
+        ) : isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Spinner className="size-6" />
           </div>

@@ -2,7 +2,7 @@
  * クライアント設定管理ユーティリティ
  */
 
-import { ClientSettings, createDefaultSettings, WatchedHistory } from '@/types/settings'
+import { ClientSettings, createDefaultSettings } from '@/types/settings'
 import crypto from 'crypto'
 
 const SETTINGS_STORAGE_KEY = 'client_settings'
@@ -34,16 +34,12 @@ export function setLocalStorageSettings(settings: ClientSettings): void {
 }
 
 /**
- * 設定データの正規化（無効なフィールドを削除）
+ * 設定データの正規化（無効なフィールドを削除、不足分を補充）
  */
 export function getNormalizedLocalClientSettings(settings: ClientSettings): ClientSettings {
-  const normalized = { ...settings }
   const defaults = createDefaultSettings()
-
-  // watched_history が配列であることを確認
-  if (!Array.isArray(normalized.watched_history)) {
-    normalized.watched_history = []
-  }
+  // デフォルト値を基に、入力された値でマージする
+  const normalized = { ...defaults, ...settings }
 
   // video_watched_history_max_count が数値であることを確認
   if (!Number.isFinite(normalized.video_watched_history_max_count)) {
@@ -52,12 +48,12 @@ export function getNormalizedLocalClientSettings(settings: ClientSettings): Clie
 
   // sync_settings がブール値であることを確認
   if (typeof normalized.sync_settings !== 'boolean') {
-    normalized.sync_settings = true
+    normalized.sync_settings = defaults.sync_settings
   }
 
   // last_synced_at が数値であることを確認
   if (!Number.isFinite(normalized.last_synced_at)) {
-    normalized.last_synced_at = 0
+    normalized.last_synced_at = defaults.last_synced_at
   }
 
   // comment_speed_rate が数値であることを確認
@@ -73,6 +69,16 @@ export function getNormalizedLocalClientSettings(settings: ClientSettings): Clie
   // close_comment_form_after_sending がブール値であることを確認
   if (typeof normalized.close_comment_form_after_sending !== 'boolean') {
     normalized.close_comment_form_after_sending = defaults.close_comment_form_after_sending
+  }
+
+  // max_comments_display_count が数値であることを確認
+  if (!Number.isFinite(normalized.max_comments_display_count)) {
+    normalized.max_comments_display_count = defaults.max_comments_display_count
+  }
+
+  // default_comment_color が文字列であることを確認
+  if (typeof normalized.default_comment_color !== 'string' || !normalized.default_comment_color.startsWith('#')) {
+    normalized.default_comment_color = defaults.default_comment_color
   }
 
   // NG設定のバリデーション
@@ -101,17 +107,18 @@ export function getNormalizedLocalClientSettings(settings: ClientSettings): Clie
   }
 
   if (!Array.isArray(normalized.muted_comment_keywords)) {
-    normalized.muted_comment_keywords = []
+    normalized.muted_comment_keywords = defaults.muted_comment_keywords
   }
 
   if (!Array.isArray(normalized.muted_niconico_user_ids)) {
-    normalized.muted_niconico_user_ids = []
+    normalized.muted_niconico_user_ids = defaults.muted_niconico_user_ids
   }
 
   if (typeof normalized.mute_comment_keywords_normalize_alphanumeric_width_case !== 'boolean') {
     normalized.mute_comment_keywords_normalize_alphanumeric_width_case = defaults.mute_comment_keywords_normalize_alphanumeric_width_case
   }
 
+  console.log('Normalized settings:', normalized)
   return normalized
 }
 

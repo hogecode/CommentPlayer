@@ -37,7 +37,12 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => ({
         ...updates,
       }
       // LocalStorageに保存
-      setLocalStorageSettings(newSettings)
+      try {
+        setLocalStorageSettings(newSettings)
+        console.log('Settings saved to localStorage:', newSettings)
+      } catch (error) {
+        console.error('Failed to save settings to localStorage:', error)
+      }
       return { settings: newSettings }
     })
   },

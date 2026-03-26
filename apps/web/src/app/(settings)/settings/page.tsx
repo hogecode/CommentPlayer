@@ -1,10 +1,24 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useSettingsStore } from '@/stores/settings-store'
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { FolderManagement } from '@/components/settings/FolderManagement'
+import { MutedKeywordsSettings } from '@/components/settings/MutedKeywordsSettings'
+import { CommentDisplaySettings } from '@/components/settings/CommentDisplaySettings'
 
 export default function SettingsPage() {
+  // 設定の初期化（マウント時にのみ実行）
+  useEffect(() => {
+    try {
+      const { initializeSettings } = useSettingsStore.getState()
+      initializeSettings()
+    } catch (error) {
+      console.error('Failed to initialize settings:', error)
+    }
+  }, [])
+
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
@@ -19,6 +33,18 @@ export default function SettingsPage() {
           <section className="border rounded-lg p-6">
             <h2 className="text-2xl font-bold mb-4">監視対象フォルダ管理</h2>
             <FolderManagement />
+          </section>
+
+          {/* コメント表示設定セクション */}
+          <section className="border rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">コメント表示設定</h2>
+            <CommentDisplaySettings />
+          </section>
+
+          {/* NGワード設定セクション */}
+          <section className="border rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">コメントフィルタリング設定</h2>
+            <MutedKeywordsSettings />
           </section>
         </div>
       </div>

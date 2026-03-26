@@ -2,19 +2,12 @@
  * クライアント設定の型定義
  */
 
-export interface WatchedHistory {
-  video_id: string
-  updated_at: number
-}
-
 export interface MutedCommentKeyword {
   pattern: string
   match: 'partial' | 'forward' | 'backward' | 'exact' | 'regex'
 }
 
 export interface ClientSettings {
-  // ビデオ視聴履歴
-  watched_history: WatchedHistory[]
   video_watched_history_max_count: number
 
   // 設定の同期
@@ -25,6 +18,8 @@ export interface ClientSettings {
   comment_speed_rate: number // コメントの流れる速度（倍率）
   comment_font_size: number // コメントのフォントサイズ（ピクセル）
   close_comment_form_after_sending: boolean // コメント送信後にフォームを閉じるか
+  max_comments_display_count: number // 表示するコメントの最大数（フィルタリング）
+  default_comment_color: string // デフォルトのコメント色（16進数カラーコード）
 
   // コメントNG設定
   mute_fixed_comments: boolean // 上下固定コメントをミュート
@@ -46,13 +41,14 @@ export interface ClientSettings {
  */
 export function createDefaultSettings(): ClientSettings {
   return {
-    watched_history: [],
     video_watched_history_max_count: 100,
     sync_settings: true,
     last_synced_at: 0,
     comment_speed_rate: 1,
     comment_font_size: 25,
     close_comment_form_after_sending: true,
+    max_comments_display_count: 5000,
+    default_comment_color: '#ffffff',
     mute_fixed_comments: false,
     mute_colored_comments: false,
     mute_big_size_comments: false,

@@ -69,7 +69,9 @@ export function App() {
     )
       ? Math.max(1, Math.floor(settings.video_watched_history_max_count))
       : 1;
-    const watchedHistory = settings.watched_history;
+    const watchedHistory = Array.isArray(settings.watched_history)
+      ? settings.watched_history
+      : [];
 
     if (
       !isUpdatingWatchedHistoryRef.current &&
@@ -78,12 +80,16 @@ export function App() {
       const removeCount = watchedHistory.length - watchedHistoryMaxCount;
       const removeTargets = new Set(
         [...watchedHistory]
-          .sort((a, b) => a.updated_at - b.updated_at)
+          .sort(
+            (a, b) =>
+              (a as Record<string, number>).updated_at -
+              (b as Record<string, number>).updated_at,
+          )
           .slice(0, removeCount),
       );
 
       const watchedHistoryTrimmed = watchedHistory.filter(
-        (history) => !removeTargets.has(history),
+        (history: unknown) => !removeTargets.has(history),
       );
 
       isUpdatingWatchedHistoryRef.current = true;
