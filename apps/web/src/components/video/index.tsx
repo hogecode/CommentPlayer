@@ -68,13 +68,6 @@ export default function DPlayerVideo({ src = '', videoId, commentList = [] }: Pr
         delayOffset={delay}
       />
 
-      {/* コメント遅延コントロール */}
-      <CommentDelay
-        currentTime={currentTime}
-        comments={commentList}
-        commentDelay={delay}
-        handleCommentDelay={setDelay}
-      />
     </div>
   );
 }

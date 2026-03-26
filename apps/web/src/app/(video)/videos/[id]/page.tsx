@@ -4,13 +4,14 @@ import { useParams } from '@tanstack/react-router';
 import { RootLayout } from '@/components/common/RootLayout';
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
+import CommentPanel from '@/components/video/CommentPanel';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
 import type { Comment } from '@/types/danmaku';
 import Message from '@/message';
 import { CommentUtils } from '@/lib/comment-utils';
 import { useSettingsStore } from '@/stores/settings-store';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 /**
  * ビデオページコンポーネント
@@ -23,6 +24,8 @@ import { useMemo } from 'react';
 export default function VideoPage() {
   const { id: videoIdParam } = useParams({ from: '/videos/$id' });
   const { settings } = useSettingsStore();
+  const [currentTime, setCurrentTime] = useState(0);
+  const [commentDelay, setCommentDelay] = useState(0);
   
   // IDが有効な数値かチェック
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;
@@ -97,15 +100,30 @@ export default function VideoPage() {
 
   return (
     <RootLayout>
-      <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-start p-8 pt-24">
-        <div className="w-full">
+      <div className="h-screen bg-[#0D0807] flex flex-col pt-24">
+        <div className="px-8 pt-8">
           <PageBreadcrumb items={[
             { label: '動画', href: '/videos' },
             { label: videoTitle }
           ]} />
         </div>
-        <DPlayerVideo src={videoSrc} commentList={commentList} videoId={videoId} />
-        <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
+        
+        {/* ビデオプレイヤーとタイトル */}
+        <div className="flex-1 flex flex-col overflow-hidden px-8 py-4">
+          <DPlayerVideo src={videoSrc} commentList={commentList} videoId={videoId} />
+          <h1 className="text-white text-2xl font-bold mt-6">{videoTitle}</h1>
+        </div>
+
+        {/* コメントパネル（固定高さ） */}
+        <div className="h-64 border-t border-gray-700 bg-[#0D0807] overflow-hidden">
+          <CommentPanel
+            comments={commentList}
+            playbackMode="Video"
+            currentTime={currentTime}
+            commentDelay={commentDelay}
+            onCommentDelayChange={setCommentDelay}
+          />
+        </div>
       </div>
     </RootLayout>
   );
