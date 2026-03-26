@@ -4,9 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (a *App) RegisterRoutes(engine *gin.Engine) {
+func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 	// API v1 グループ
 	v1 := engine.Group("/api/v1")
+
+	// ユーザー関連ルートを登録
+	usersGroup := v1.Group("/users")
+	a.RegisterUserRoutes(usersGroup, jwtSecret)
 
 	// ビデオ関連ルートを登録
 	videosGroup := v1.Group("/videos")
@@ -15,6 +19,10 @@ func (a *App) RegisterRoutes(engine *gin.Engine) {
 	// キャプチャ関連ルートを登録
 	capturesGroup := v1.Group("/captures")
 	a.RegisterCaptureRoutes(capturesGroup)
+
+	// マイリスト関連ルートを登録
+	mylistGroup := v1.Group("/mylist")
+	a.RegisterMylistRoutes(mylistGroup)
 
 	// フォルダ関連ルートを登録
 	foldersGroup := v1.Group("/folders")

@@ -26,8 +26,9 @@ type Config struct {
 
 // ServerConfig - サーバー設定
 type ServerConfig struct {
-	Port int    `mapstructure:"port"`
-	Host string `mapstructure:"host"`
+	Port      int    `mapstructure:"port"`
+	Host      string `mapstructure:"host"`
+	JWTSecret string `mapstructure:"jwt_secret"`
 }
 
 // DBConfig - データベース設定

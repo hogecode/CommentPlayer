@@ -46,10 +46,15 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 		// TODO: errorCode: 1 を返すようにする
 		cfg = &config.Config{
 			Environment: config.Development,
-			Server:      config.ServerConfig{Host: "0.0.0.0", Port: 8000},
+			Server:      config.ServerConfig{Host: "0.0.0.0", Port: 8000, JWTSecret: "your-secret-key"},
 			DB:          config.DBConfig{DSN: "app.db", MaxOpenConns: 10, MaxIdleConns: 5},
 			Log:         config.LogConfig{Level: "info", UseColor: true},
 		}
+	}
+
+	// JWT_SECRET をデフォルト値から上書き
+	if cfg.Server.JWTSecret == "" {
+		cfg.Server.JWTSecret = "your-secret-key"
 	}
 
 	// ロガーを初期化
@@ -109,7 +114,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// ルートを登録
-	app.RegisterRoutes(engine)
+	app.RegisterRoutes(engine, cfg.Server.JWTSecret)
 
 	// サーバーを起動（グレースフルシャットダウン対応）
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
