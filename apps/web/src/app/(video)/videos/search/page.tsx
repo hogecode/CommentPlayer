@@ -1,6 +1,7 @@
 'use client'
 
 import { RootLayout } from '@/components/common/RootLayout'
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { VideoList } from '@/components/video/VideoList'
 import { useSearchVideosQuery } from '@/services/useVideosQuery'
 import { useLocation } from '@tanstack/react-router'
@@ -68,6 +69,10 @@ export default function SearchPage() {
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
+        <PageBreadcrumb items={[
+          { label: '動画', href: '/videos' },
+          { label: '検索' }
+        ]} />
         <VideoList
           title={searchQuery ? `「${searchQuery}」の検索結果` : '検索'}
           videos={videos}

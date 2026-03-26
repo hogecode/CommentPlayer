@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { RootLayout } from '@/components/common/RootLayout'
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { VideoList } from '@/components/video/VideoList'
 import { useVideosQuery } from '@/services/useVideosQuery'
 import { useLocation } from '@tanstack/react-router'
@@ -63,6 +63,7 @@ export default function HomePage() {
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
+        <PageBreadcrumb items={[{ label: '動画一覧' }]} />
         <VideoList
           title="動画一覧"
           videos={videos}

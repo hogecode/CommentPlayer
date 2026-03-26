@@ -2,6 +2,7 @@
 
 import { useParams } from '@tanstack/react-router';
 import { RootLayout } from '@/components/common/RootLayout';
+import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
@@ -97,6 +98,12 @@ export default function VideoPage() {
   return (
     <RootLayout>
       <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-start p-8 pt-24">
+        <div className="w-full">
+          <PageBreadcrumb items={[
+            { label: '動画', href: '/videos' },
+            { label: videoTitle }
+          ]} />
+        </div>
         <DPlayerVideo src={videoSrc} commentList={commentList} />
         <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
       </div>
