@@ -31,6 +31,7 @@ docs/DtoUserAccessToken.md
 docs/DtoUserAccessTokenRequest.md
 docs/DtoUserCreateRequest.md
 docs/DtoVideoListResponse.md
+docs/DtoVideoYearsResponse.md
 docs/EntityCapture.md
 docs/EntityThumbnailInfo.md
 docs/EntityUser.md
@@ -60,6 +61,7 @@ models/dto-user-access-token-request.ts
 models/dto-user-access-token.ts
 models/dto-user-create-request.ts
 models/dto-video-list-response.ts
+models/dto-video-years-response.ts
 models/entity-capture.ts
 models/entity-thumbnail-info.ts
 models/entity-user.ts

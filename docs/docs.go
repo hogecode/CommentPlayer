@@ -536,6 +536,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "年フィルター（例：2023）",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "default": 1,
                         "description": "ページ番号",
                         "name": "page",
@@ -642,6 +648,32 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/years": {
+            "get": {
+                "description": "jikkyo_dateから抽出した年の一覧を降順で返します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオの年一覧を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VideoYearsResponse"
                         }
                     },
                     "500": {
@@ -1060,6 +1092,17 @@ const docTemplate = `{
                 },
                 "pagination": {
                     "$ref": "#/definitions/dto.Pagination"
+                }
+            }
+        },
+        "dto.VideoYearsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

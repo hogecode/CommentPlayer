@@ -25,6 +25,8 @@ interface VideoListProps {
   totalPages?: number
   page?: number
   sortOrder?: 'asc' | 'desc'
+  year?: number | null
+  yearList?: number[]
   isLoading?: boolean
   hideHeader?: boolean
   hideSort?: boolean
@@ -33,6 +35,7 @@ interface VideoListProps {
   showEmptyMessage?: boolean
   onPageChange?: (page: number) => void
   onSortChange?: (order: 'asc' | 'desc') => void
+  onYearChange?: (year: number | null) => void
   onDelete?: (id: number) => void
 }
 
@@ -47,6 +50,8 @@ export function VideoList({
   totalPages: totalPagesProp,
   page = 1,
   sortOrder = 'desc',
+  year,
+  yearList = [],
   isLoading = false,
   hideHeader = false,
   hideSort = false,
@@ -55,6 +60,7 @@ export function VideoList({
   showEmptyMessage = true,
   onPageChange,
   onSortChange,
+  onYearChange,
   onDelete,
 }: VideoListProps) {
   const itemsPerPage = 30
@@ -86,18 +92,38 @@ export function VideoList({
               </div>
             </div>
 
-            {/* ソート */}
-            {!hideSort && (
-              <NativeSelect
-                value={sortOrder}
-                onChange={(e) =>
-                  onSortChange?.(e.target.value as "asc" | "desc")
-                }
-              >
-                <option value="desc">新しい順</option>
-                <option value="asc">古い順</option>
-              </NativeSelect>
-            )}
+            {/* 年フィルタとソート */}
+            <div className="flex gap-2">
+              {/* 年フィルタ */}
+              {yearList.length > 0 && (
+                <NativeSelect
+                  value={year ?? ''}
+                  onChange={(e) =>
+                    onYearChange?.(e.target.value ? parseInt(e.target.value, 10) : null)
+                  }
+                >
+                  <option value="">全年度</option>
+                  {yearList.map((y) => (
+                    <option key={y} value={y}>
+                      {y}年
+                    </option>
+                  ))}
+                </NativeSelect>
+              )}
+              
+              {/* ソート */}
+              {!hideSort && (
+                <NativeSelect
+                  value={sortOrder}
+                  onChange={(e) =>
+                    onSortChange?.(e.target.value as "asc" | "desc")
+                  }
+                >
+                  <option value="desc">新しい順</option>
+                  <option value="asc">古い順</option>
+                </NativeSelect>
+              )}
+            </div>
           </div>
           <Separator />
         </>

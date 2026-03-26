@@ -24,8 +24,9 @@ import (
 // @basePath /
 func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 	a.GetVideos(videosGroup)
-	a.SearchVideos(videosGroup)
-	a.GetVideoByID(videosGroup)
+	a.GetVideoYears(videosGroup)     // /:idより前に登録して、/yearsが/:idに引っかからないようにする
+	a.SearchVideos(videosGroup)      // /searchも/:idより前に登録
+	a.GetVideoByID(videosGroup)      // 可変パラメータは最後に登録
 	a.DownloadVideo(videosGroup)
 	a.RegenerateThumbnail(videosGroup)
 }
@@ -36,6 +37,7 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 // @Tags Videos
 // @Param ids query []int false "ビデオID（複数指定可能）"
 // @Param filterBy query string false "フィルター"
+// @Param year query int false "年フィルター（例：2023）"
 // @Param page query int false "ページ番号" default(1)
 // @Param limit query int false "1ページあたりのアイテム数" default(20)
 // @Param sort query string false "ソート対象フィールド" default(created_at)
@@ -71,7 +73,12 @@ func (a *App) GetVideos(videosGroup *gin.RouterGroup) {
 		}
 
 		// DB処理をqueryパッケージに委譲
-		videos, total, err := a.VideoQuery.GetVideoList(req.IDs, req.FilterBy, req.Page, req.Limit, req.Sort, req.Order)
+		// req.Yearはポインタなので、値がある場合だけ渡す
+		year := 0
+		if req.Year != nil {
+			year = *req.Year
+		}
+		videos, total, err := a.VideoQuery.GetVideoList(req.IDs, req.FilterBy, year, req.Page, req.Limit, req.Sort, req.Order)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 				Error: i18n.GetErrorMessage(locale, "failed_fetch_videos"),
@@ -90,6 +97,35 @@ func (a *App) GetVideos(videosGroup *gin.RouterGroup) {
 				Total:      int(total),
 				TotalPages: totalPages,
 			},
+		})
+	})
+}
+
+// GetVideoYears - ビデオの年一覧を取得
+// @Summary ビデオの年一覧を取得
+// @Description jikkyo_dateから抽出した年の一覧を降順で返します
+// @Tags Videos
+// @Produce json
+// @Success 200 {object} dto.VideoYearsResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/years [get]
+func (a *App) GetVideoYears(videosGroup *gin.RouterGroup) {
+	videosGroup.GET("/years", func(ctx *gin.Context) {
+		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+
+		// DB処理をqueryパッケージに委譲
+		years, err := a.VideoQuery.GetVideoYears()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_fetch_videos"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// レスポンス
+		ctx.JSON(http.StatusOK, dto.VideoYearsResponse{
+			Data: years,
 		})
 	})
 }

@@ -16,6 +16,7 @@ export * from './dto-user-access-token';
 export * from './dto-user-access-token-request';
 export * from './dto-user-create-request';
 export * from './dto-video-list-response';
+export * from './dto-video-years-response';
 export * from './entity-capture';
 export * from './entity-thumbnail-info';
 export * from './entity-user';

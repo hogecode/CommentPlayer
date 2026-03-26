@@ -13,6 +13,7 @@ export function useVideosQuery(
     ids?: number[];
     filterBy?: string;
     page?: number;
+    year?: number | null;
     limit?: number;
     sort?: "created_at" | "views" | "file_name" | "duration" | "jikkyo_date";
     order?: "asc" | "desc";
@@ -25,6 +26,7 @@ export function useVideosQuery(
       const response = await videosApi.apiV1VideosGet(
         params?.ids,
         params?.filterBy,
+        params?.year ?? undefined,
         params?.page,
         params?.limit,
         params?.sort as any,
@@ -116,6 +118,21 @@ export function useRegenerateThumbnailMutation() {
       queryClient.invalidateQueries({ queryKey: ["video", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["videos"] });
     },
+  });
+}
+
+/**
+ * ビデオの年一覧を取得
+ */
+export function useVideoYearsQuery(options?: any) {
+  return useQuery({
+    queryKey: ["video-years"],
+    queryFn: async () => {
+      const response = await videosApi.apiV1VideosYearsGet();
+      return response.data.data;
+    },
+    staleTime: 1000 * 60 * 60, // 1時間
+    ...options,
   });
 }
 

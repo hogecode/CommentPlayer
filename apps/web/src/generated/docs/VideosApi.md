@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost:8000*
 |[**apiV1VideosIdGet**](#apiv1videosidget) | **GET** /api/v1/videos/{id} | ビデオ詳細を取得|
 |[**apiV1VideosIdThumbnailRegeneratePost**](#apiv1videosidthumbnailregeneratepost) | **POST** /api/v1/videos/{id}/thumbnail/regenerate | サムネイルを再生成|
 |[**apiV1VideosSearchGet**](#apiv1videossearchget) | **GET** /api/v1/videos/search | ビデオを検索|
+|[**apiV1VideosYearsGet**](#apiv1videosyearsget) | **GET** /api/v1/videos/years | ビデオの年一覧を取得|
 
 # **apiV1VideosGet**
 > DtoVideoListResponse apiV1VideosGet()
@@ -28,6 +29,7 @@ const apiInstance = new VideosApi(configuration);
 
 let ids: Array<number>; //ビデオID（複数指定可能） (optional) (default to undefined)
 let filterBy: string; //フィルター (optional) (default to undefined)
+let year: number; //年フィルター（例：2023） (optional) (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
 let limit: number; //1ページあたりのアイテム数 (optional) (default to 20)
 let sort: string; //ソート対象フィールド (optional) (default to 'created_at')
@@ -36,6 +38,7 @@ let order: string; //ソート順序 (optional) (default to 'desc')
 const { status, data } = await apiInstance.apiV1VideosGet(
     ids,
     filterBy,
+    year,
     page,
     limit,
     sort,
@@ -49,6 +52,7 @@ const { status, data } = await apiInstance.apiV1VideosGet(
 |------------- | ------------- | ------------- | -------------|
 | **ids** | **Array&lt;number&gt;** | ビデオID（複数指定可能） | (optional) defaults to undefined|
 | **filterBy** | [**string**] | フィルター | (optional) defaults to undefined|
+| **year** | [**number**] | 年フィルター（例：2023） | (optional) defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|
 | **limit** | [**number**] | 1ページあたりのアイテム数 | (optional) defaults to 20|
 | **sort** | [**string**] | ソート対象フィールド | (optional) defaults to 'created_at'|
@@ -302,6 +306,51 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiV1VideosYearsGet**
+> DtoVideoYearsResponse apiV1VideosYearsGet()
+
+jikkyo_dateから抽出した年の一覧を降順で返します
+
+### Example
+
+```typescript
+import {
+    VideosApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideosApi(configuration);
+
+const { status, data } = await apiInstance.apiV1VideosYearsGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**DtoVideoYearsResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
 |**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

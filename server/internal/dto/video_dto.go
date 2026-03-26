@@ -18,6 +18,7 @@ type ApiComment struct {
 type VideoListRequest struct {
 	IDs      []int  `form:"ids" validate:"dive,min=1"`
 	FilterBy string `form:"filterBy"`
+	Year     *int   `form:"year"`  // 年フィルター（例：2023）
 	Page     int    `form:"page" validate:"min=1"`
 	Limit    int    `form:"limit" validate:"min=1,max=100"`
 	Sort     string `form:"sort" validate:"oneof=created_at views file_name duration jikkyo_date"`
@@ -92,4 +93,10 @@ type ThumbnailRegenerateResponse struct {
 	ID            int                   `json:"id"`
 	ThumbnailInfo *entity.ThumbnailInfo `json:"thumbnail_info"`
 	Message       string                `json:"message"`
+}
+
+// ---VideoYears---
+// VideoYearsResponse - ビデオの年一覧レスポンス
+type VideoYearsResponse struct {
+	Data []int `json:"data"`
 }

@@ -30,6 +30,8 @@ import type { DtoThumbnailRegenerateResponse } from '../models';
 // @ts-ignore
 import type { DtoVideoListResponse } from '../models';
 // @ts-ignore
+import type { DtoVideoYearsResponse } from '../models';
+// @ts-ignore
 import type { EntityVideo } from '../models';
 /**
  * VideosApi - axios parameter creator
@@ -41,6 +43,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary ビデオ一覧を取得
          * @param {Array<number>} [ids] ビデオID（複数指定可能）
          * @param {string} [filterBy] フィルター
+         * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
          * @param {string} [sort] ソート対象フィールド
@@ -48,7 +51,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1VideosGet: async (ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1VideosGet: async (ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/videos`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -67,6 +70,10 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (filterBy !== undefined) {
                 localVarQueryParameter['filterBy'] = filterBy;
+            }
+
+            if (year !== undefined) {
+                localVarQueryParameter['year'] = year;
             }
 
             if (page !== undefined) {
@@ -258,6 +265,36 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * jikkyo_dateから抽出した年の一覧を降順で返します
+         * @summary ビデオの年一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosYearsGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/videos/years`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -272,6 +309,7 @@ export const VideosApiFp = function(configuration?: Configuration) {
          * @summary ビデオ一覧を取得
          * @param {Array<number>} [ids] ビデオID（複数指定可能）
          * @param {string} [filterBy] フィルター
+         * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
          * @param {string} [sort] ソート対象フィールド
@@ -279,8 +317,8 @@ export const VideosApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosGet(ids, filterBy, page, limit, sort, order, options);
+        async apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -342,6 +380,18 @@ export const VideosApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosSearchGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * jikkyo_dateから抽出した年の一覧を降順で返します
+         * @summary ビデオの年一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosYearsGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoYearsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosYearsGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosYearsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -356,6 +406,7 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
          * @summary ビデオ一覧を取得
          * @param {Array<number>} [ids] ビデオID（複数指定可能）
          * @param {string} [filterBy] フィルター
+         * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
          * @param {string} [sort] ソート対象フィールド
@@ -363,8 +414,8 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
-            return localVarFp.apiV1VideosGet(ids, filterBy, page, limit, sort, order, options).then((request) => request(axios, basePath));
+        apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
+            return localVarFp.apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options).then((request) => request(axios, basePath));
         },
         /**
          * ビデオファイルをダウンロードします
@@ -411,6 +462,15 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
         apiV1VideosSearchGet(q: string, page?: number, limit?: number, order?: string, filterBy?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
             return localVarFp.apiV1VideosSearchGet(q, page, limit, order, filterBy, options).then((request) => request(axios, basePath));
         },
+        /**
+         * jikkyo_dateから抽出した年の一覧を降順で返します
+         * @summary ビデオの年一覧を取得
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosYearsGet(options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoYearsResponse> {
+            return localVarFp.apiV1VideosYearsGet(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -423,6 +483,7 @@ export class VideosApi extends BaseAPI {
      * @summary ビデオ一覧を取得
      * @param {Array<number>} [ids] ビデオID（複数指定可能）
      * @param {string} [filterBy] フィルター
+     * @param {number} [year] 年フィルター（例：2023）
      * @param {number} [page] ページ番号
      * @param {number} [limit] 1ページあたりのアイテム数
      * @param {string} [sort] ソート対象フィールド
@@ -430,8 +491,8 @@ export class VideosApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1VideosGet(ids?: Array<number>, filterBy?: string, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig) {
-        return VideosApiFp(this.configuration).apiV1VideosGet(ids, filterBy, page, limit, sort, order, options).then((request) => request(this.axios, this.basePath));
+    public apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -481,6 +542,16 @@ export class VideosApi extends BaseAPI {
      */
     public apiV1VideosSearchGet(q: string, page?: number, limit?: number, order?: string, filterBy?: string, options?: RawAxiosRequestConfig) {
         return VideosApiFp(this.configuration).apiV1VideosSearchGet(q, page, limit, order, filterBy, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * jikkyo_dateから抽出した年の一覧を降順で返します
+     * @summary ビデオの年一覧を取得
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosYearsGet(options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosYearsGet(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -34,9 +34,8 @@ func NewVideoQuery(db *gorm.DB) *VideoQuery {
 	return &VideoQuery{db: db}
 }
 
-// 
 // GetVideoList - ビデオ一覧を取得（任意の互換リクエスト型を受け入れる）
-func (q *VideoQuery) GetVideoList(ids []int, filterBy string, page, limit int, sort, order string) ([]entity.Video, int64, error) {
+func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit int, sort, order string) ([]entity.Video, int64, error) {
 	query := q.db
 
 	// is_deletedフラグでフィルター
@@ -50,6 +49,11 @@ func (q *VideoQuery) GetVideoList(ids []int, filterBy string, page, limit int, s
 	// FilterBy でフィルター
 	if filterBy != "" {
 		query = query.Where("status = ?", filterBy)
+	}
+
+	// Year でフィルター（年が指定されている場合）
+	if year > 0 {
+		query = query.Where("CAST(STRFTIME('%Y', jikkyo_date) AS INTEGER) = ?", year)
 	}
 
 	// 合計数を取得
@@ -103,6 +107,21 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 	}
 
 	return videos, total, nil
+}
+
+// GetVideoYears - ビデオの年一覧を取得（jikkyo_dateから年を抽出してソート）
+func (q *VideoQuery) GetVideoYears() ([]int, error) {
+	var years []int
+	err := q.db.
+		Model(&entity.Video{}).
+		Where("is_deleted = 0 AND jikkyo_date IS NOT NULL").
+		Select("DISTINCT CAST(STRFTIME('%Y', jikkyo_date) AS INTEGER) as year").
+		Order("year DESC").
+		Scan(&years).Error
+	if err != nil {
+		return nil, err
+	}
+	return years, nil
 }
 
 // GetVideoByID - IDでビデオを取得

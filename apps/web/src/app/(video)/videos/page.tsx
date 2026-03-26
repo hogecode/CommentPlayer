@@ -3,7 +3,7 @@
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { VideoList } from '@/components/video/VideoList'
-import { useVideosQuery } from '@/services/useVideosQuery'
+import { useVideosQuery, useVideoYearsQuery } from '@/services/useVideosQuery'
 import { useLocation } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
@@ -11,6 +11,7 @@ export default function HomePage() {
   const location = useLocation()
   const [page, setPage] = useState(1)
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
   // URLからクエリパラメータを読み取る
   useEffect(() => {
@@ -30,14 +31,28 @@ export default function HomePage() {
     if (orderParam === 'asc' || orderParam === 'desc') {
       setSortOrder(orderParam)
     }
+
+    // yearパラメータを読み取る
+    const yearParam = searchParams.get('year')
+    if (yearParam) {
+      const parsedYear = parseInt(yearParam, 10)
+      if (!isNaN(parsedYear) && parsedYear > 0) {
+        setSelectedYear(parsedYear)
+      }
+    }
   }, [location.search])
 
-  // ビデオ一覧を取得（?page=1&order=ascのようにクエリパラメータを付与してAPIからビデオ一覧を取得）
+  // 年一覧を取得
+  const { data: yearData } = useVideoYearsQuery()
+  const yearList = (yearData as any) || []
+
+  // ビデオ一覧を取得（年フィルタリング対応）
   const { data, isLoading } = useVideosQuery({
     page,
     limit: 20,
     sort: 'jikkyo_date',
     order: sortOrder,
+    year: selectedYear || undefined
   })
 
   const videos = (data as any)?.data || []
@@ -60,6 +75,20 @@ export default function HomePage() {
     window.history.replaceState({}, '', `?${searchParams.toString()}`)
   }
 
+  // 年フィルター変更時にURLを更新
+  const handleYearChange = (newYear: number | null) => {
+    setSelectedYear(newYear)
+    setPage(1) // 年フィルター変更時はページを1にリセット
+    const searchParams = new URLSearchParams(window.location.search)
+    if (newYear) {
+      searchParams.set('year', newYear.toString())
+    } else {
+      searchParams.delete('year')
+    }
+    searchParams.set('page', '1')
+    window.history.replaceState({}, '', `?${searchParams.toString()}`)
+  }
+
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
@@ -71,9 +100,12 @@ export default function HomePage() {
           totalPages={totalPages}
           page={page}
           sortOrder={sortOrder}
+          year={selectedYear}
+          yearList={yearList}
           isLoading={isLoading}
           onPageChange={handlePageChange}
           onSortChange={handleSortChange}
+          onYearChange={handleYearChange}
         />
       </div>
     </RootLayout>
