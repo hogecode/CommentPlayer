@@ -15,6 +15,8 @@ interface Props {
   commentList?: Comment[];
   /** コメント遅延オフセット（秒） */
   delayOffset?: number;
+  /** 再生時間が更新されたときのコールバック */
+  onCurrentTimeChange?: (time: number) => void;
 }
 
 /**
@@ -31,7 +33,7 @@ interface Props {
  *     () => video.currentTime - delayOffset
  *   に差し替えることで、コメントの表示タイミングをずらす。
  */
-export default function DPlayer({ src = '', videoId, commentList: danList = [], delayOffset = 0 }: Props) {
+export default function DPlayer({ src = '', videoId, commentList: danList = [], delayOffset = 0, onCurrentTimeChange }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const DPlayerRef = useRef<any>(null);
   const commentListRef = useRef<Comment[]>(danList);
@@ -185,14 +187,29 @@ export default function DPlayer({ src = '', videoId, commentList: danList = [], 
       }, 100);
 
       DPlayerRef.current = dp;
+
+      // 再生時間更新イベントをリッスン
+      if (onCurrentTimeChange && dp.video) {
+        const handleTimeUpdate = () => {
+          onCurrentTimeChange(dp.video.currentTime);
+        };
+        
+        dp.video.addEventListener('timeupdate', handleTimeUpdate);
+        
+        // クリーンアップ関数を保存
+        DPlayerRef.current._cleanup = () => {
+          dp.video.removeEventListener('timeupdate', handleTimeUpdate);
+        };
+      }
     });
 
     return () => {
       cancelled = true;
+      DPlayerRef.current?._cleanup?.();
       DPlayerRef.current?.destroy();
       DPlayerRef.current = null;
     };
-  }, [src, videoId]);
+  }, [src, videoId, onCurrentTimeChange]);
 
   // delayOffset が変わったらコメント位置を再同期
   useEffect(() => {

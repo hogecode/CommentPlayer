@@ -12,6 +12,8 @@ interface Props {
   videoId?: number;
   /** 初期表示する弾幕データ */
   commentList?: Comment[];
+  /** 現在の再生時間が更新されたときのコールバック */
+  onCurrentTimeChange?: (time: number) => void;
 }
 
 /**
@@ -21,42 +23,8 @@ interface Props {
  * 動画再生とコメント遅延コントロールの機能を提供します。
  * CommentDelayは A、B、C コメント遷移機能を備えています。
  */
-export default function DPlayerVideo({ src = '', videoId, commentList = [] }: Props) {
+export default function DPlayerVideo({ src = '', videoId, commentList = [], onCurrentTimeChange }: Props) {
   const [delay, setDelay] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const dplayerRef = useRef<any>(null);
-  const timeUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // DPlayer インスタンスの参照を設定
-  useEffect(() => {
-    // DPlayer が初期化されるまで待機
-    const timer = setInterval(() => {
-      const dplayerContainer = document.querySelector('.dplayer-container');
-      if (dplayerContainer && (window as any).__dplayerInstance) {
-        dplayerRef.current = (window as any).__dplayerInstance;
-        clearInterval(timer);
-      }
-    }, 100);
-
-    return () => clearInterval(timer);
-  }, [src]);
-
-  // 再生時刻を定期的に取得
-  useEffect(() => {
-    const updateTime = () => {
-      if (dplayerRef.current?.video?.currentTime !== undefined) {
-        setCurrentTime(dplayerRef.current.video.currentTime);
-      }
-    };
-
-    timeUpdateIntervalRef.current = setInterval(updateTime, 100);
-
-    return () => {
-      if (timeUpdateIntervalRef.current) {
-        clearInterval(timeUpdateIntervalRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="dplayer-video-wrapper space-y-4">
@@ -66,8 +34,8 @@ export default function DPlayerVideo({ src = '', videoId, commentList = [] }: Pr
         videoId={videoId}
         commentList={commentList}
         delayOffset={delay}
+        onCurrentTimeChange={onCurrentTimeChange}
       />
-
     </div>
   );
 }

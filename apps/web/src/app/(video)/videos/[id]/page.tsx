@@ -110,8 +110,12 @@ export default function VideoPage() {
         
         {/* ビデオプレイヤーとタイトル */}
         <div className="flex-1 flex flex-col overflow-hidden px-8 py-4">
-          <DPlayerVideo src={videoSrc} commentList={commentList} videoId={videoId} />
-          <h1 className="text-white text-2xl font-bold mt-6">{videoTitle}</h1>
+          <DPlayerVideo
+            src={videoSrc}
+            commentList={commentList}
+            videoId={videoId}
+            onCurrentTimeChange={setCurrentTime}
+          />
         </div>
 
         {/* コメントパネル（固定高さ） */}
