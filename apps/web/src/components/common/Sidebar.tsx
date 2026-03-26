@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useLocation, Link } from '@tanstack/react-router'
 import {
   Film,
@@ -10,7 +9,6 @@ import {
   Settings,
   Info,
 } from 'lucide-react'
-import { useVersionStore } from '@/stores/version-store'
 import { cn } from '@/lib/utils'
 interface SidebarProps {
   /**
@@ -32,11 +30,6 @@ const navigationLinks = [
 
 export default function Sidebar({ iconOnly = true }: SidebarProps) {
   const location = useLocation()
-  const versionStore = useVersionStore()
-
-  useEffect(() => {
-    versionStore.fetchServerVersion()
-  }, [])
 
   const isLinkActive = (linkPath: string): boolean => {
     return location.pathname.startsWith(linkPath)
@@ -45,9 +38,9 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
   return (
     <aside className={cn(
       'flex flex-col h-full bg-[#2f221f]  border-border transition-all duration-300',
-      iconOnly ? 'w-20' : 'w-64'
+      iconOnly ? 'w-16' : 'w-48'
     )}>
-      {/* ヘッダー */}
+      {/* ヘッダーのほうがz-index高いので表示されない、ダミーヘッダー */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold">
@@ -70,7 +63,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
                   isLinkActive(path) && 'bg-primary text-accent-foreground font-medium'
                 )}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <Icon className="w-5 h-5 flex-shrink-0 translate-x-[-6px]" />
                 {!iconOnly && <span className="truncate">{label}</span>}
               </Link>
             </li>
@@ -85,10 +78,10 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
           className={cn(
             'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
             'hover:bg-accent hover:text-accent-foreground',
-            isLinkActive('/settings') && 'bg-accent text-accent-foreground font-medium'
+            isLinkActive('/settings') && 'bg-primary text-accent-foreground font-medium'
           )}
         >
-          <Settings className="w-5 h-5 flex-shrink-0" />
+          <Settings className="w-5 h-5 flex-shrink-0  translate-x-[-6px]" />
           {!iconOnly && <span className="truncate">設定</span>}
         </Link>
         <a
@@ -101,7 +94,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
             isLinkActive('/information') && 'bg-accent text-accent-foreground font-medium'
           )}
         >
-          <Info className="w-5 h-5 flex-shrink-0" />
+          <Info className="w-5 h-5 flex-shrink-0  translate-x-[-6px]" />
           {!iconOnly && <span className="truncate">情報</span>}
         </a>
       </div>
