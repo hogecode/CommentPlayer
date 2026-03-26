@@ -18,6 +18,7 @@ type App struct {
 	DB           *gorm.DB
 	VideoQuery   *query.VideoQuery
 	CaptureQuery *query.CaptureQuery
+	MylistQuery  *query.MylistQuery
 	Validator    *validator.Validate
 	FileWatcher  *service.FileWatcher
 }
