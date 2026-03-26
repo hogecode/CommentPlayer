@@ -28,30 +28,16 @@ down: ## 開発環境を停止
 build: ## 開発環境をビルド
 	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml build
 
-logs: ## 開発環境のログを表示
-	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml logs -f
-
-ps: ## 開発環境のコンテナ状態を表示
-	docker compose -f docker-compose.base.yml -f docker-compose.dev.yml ps
 
 ## ========================
 ## Docker Compose - 本番環境
 ## ========================
 
 up-prod: ## 本番環境を起動（ビルド済みバイナリ + 静的配信）
-	docker compose -f docker-compose.prod.yaml up -d
+	docker compose -f docker-compose.dns.yaml up -d
 
 down-prod: ## 本番環境を停止
-	docker compose -f docker-compose.prod.yaml down
-
-build-prod: ## 本番環境をビルド
-	docker compose -f docker-compose.prod.yaml build
-
-logs-prod: ## 本番環境のログを表示
-	docker compose -f docker-compose.prod.yaml logs -f
-
-ps-prod: ## 本番環境のコンテナ状態を表示
-	docker compose -f docker-compose.prod.yaml ps
+	docker compose -f docker-compose.dns.yaml down
 
 
 ## フロントエンド (apps/web) コマンド
@@ -77,14 +63,15 @@ web-preview: ## ビルド後のプレビュー
 ## バックエンド (server) コマンド
 ## ========================
 
-server-run: ## サーバーを起動
+server-dev: ## サーバーを起動
+	cd server && go run cmd/main.go serve
+
+server-run-hot: ## サーバーをホットリロードで起動
+# 動作しない
 	cd server && air -c .air.toml
 
-server-run-win: ## サーバーを起動
-	cd server && powershell -NoProfile -Command "Start-Process air -NoNewWindow -Wait"
-
 server-build: ## バイナリをビルド
-	cd server && go build -o bin/server cmd/server/main.go
+	cd server && go build -o bin/server cmd/main.go
 
 server-test: db-setup-test ## テストを実行
 	cd server && @which tparse > /dev/null || (echo "Installing tparse from go.mod..." && go install github.com/mfridman/tparse@latest)
@@ -100,40 +87,6 @@ server-lint: ## golangci-lintを実行
 server-clean: ## ビルド成果物をクリーン
 	cd server && rm -rf bin/
 	cd server && find . -name "*_templ.go" -type f -delete
-
-
-## ========================
-## データベースコマンド
-## ========================
-
-db-migrate: ## データベースマイグレーションを実行
-	cd server && APP_ENV=dev op run --env-file=".env" -- dbmate up
-	cd server && @sed -i '/^\\restrict /d;/^\\unrestrict /d' db/schema.sql
-
-db-setup-test: ## テスト用データベースのスキーマをセットアップ
-	@if [ "$$CI" = "true" ]; then \
-		echo "CI環境: テストDBをリセットしてスキーマを適用"; \
-		psql -h localhost -U postgres -d annict_test -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' > /dev/null 2>&1; \
-		psql -h localhost -U postgres -d annict_test -f server/db/schema.sql > /dev/null; \
-	else \
-		echo "ローカル環境: テストDBをリセットしてスキーマを適用"; \
-		psql -h postgresql -U postgres -d annict_test -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' > /dev/null 2>&1; \
-		psql -h postgresql -U postgres -d annict_test -f server/db/schema.sql > /dev/null; \
-	fi
-
-db-rollback: ## 最後のマイグレーションをロールバック
-	cd server && APP_ENV=dev op run --env-file=".env" -- dbmate down
-
-db-new: ## 新しいマイグレーションファイルを作成（使用法: make db-new name=create_users）
-	cd server && dbmate new $(name)
-
-db-dump: ## データベーススキーマをdb/schema.sqlにダンプ
-	cd server && APP_ENV=dev op run --env-file=".env" -- dbmate dump
-	cd server && @sed -i '/^\\restrict /d;/^\\unrestrict /d' db/schema.sql
-
-db-migrate-test: ## テスト環境のマイグレーションを実行（非推奨、db-setup-testを使用）
-	@echo "警告: db-migrate-testは非推奨です。代わりにdb-setup-testを使用してください。"
-	@make db-setup-test
 
 
 ## ========================
