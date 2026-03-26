@@ -6,6 +6,8 @@ import CommentDelayControl from './CommentDelayControl';
 interface Props {
   /** 動画ファイルのURL */
   src?: string;
+  /** ビデオID（スクリーンショットアップロード用） */
+  videoId?: number;
   /** 初期表示する弾幕データ */
   commentList?: Comment[];
 }
@@ -16,13 +18,13 @@ interface Props {
  * DPlayerコンポーネントとCommentDelayControlコンポーネントを組み合わせて
  * 動画再生とコメント遅延コントロールの機能を提供します。
  */
-export default function DPlayerVideo({ src = '', commentList = [] }: Props) {
+export default function DPlayerVideo({ src = '', videoId, commentList = [] }: Props) {
   const [delay, setDelay] = useState(0);
 
   return (
     <div className="dplayer-video-wrapper">
       {/* 動画プレイヤー */}
-      <DPlayer src={src} commentList={commentList} delayOffset={delay} />
+      <DPlayer src={src} videoId={videoId} commentList={commentList} delayOffset={delay} />
 
       {/* コメント遅延コントロール */}
       <CommentDelayControl delay={delay} onChange={setDelay} />

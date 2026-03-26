@@ -104,7 +104,7 @@ export default function VideoPage() {
             { label: videoTitle }
           ]} />
         </div>
-        <DPlayerVideo src={videoSrc} commentList={commentList} />
+        <DPlayerVideo src={videoSrc} commentList={commentList} videoId={videoId} />
         <h1 className="text-white text-2xl font-bold mb-6">{videoTitle}</h1>
       </div>
     </RootLayout>
