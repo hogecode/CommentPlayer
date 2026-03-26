@@ -3,13 +3,14 @@ package dto
 import "github.com/hogecode/commentPlayer/internal/entity"
 
 // ---ApiComment---
+// DPlayer形式のコメント（ニコニコ形式をDPlayer形式に変換）
 type ApiComment struct {
-	Time   float64 `json:"time" validate:"required,min=0"`
-	Type   string  `json:"type" validate:"required,oneof=right top bottom"`
-	Size   string  `json:"size" validate:"required,oneof=big medium small"`
-	Color  string  `json:"color" validate:"required"`
-	Author *string `json:"author"`
-	Text   string  `json:"text" validate:"required"`
+	Time   float64 `json:"time" validate:"required,min=0"`   // コメント表示時刻（秒）
+	Type   string  `json:"type" validate:"required,oneof=right top bottom"` // コメント位置
+	Size   string  `json:"size" validate:"required,oneof=big medium small"` // コメントサイズ
+	Color  string  `json:"color" validate:"required"`         // コメント色（16進数カラーコード）
+	Author *string `json:"author"`                            // コメント投稿者ID（匿名の場合はnil）
+	Text   string  `json:"text" validate:"required"`          // コメント本文
 }
 
 // ---VideoList---

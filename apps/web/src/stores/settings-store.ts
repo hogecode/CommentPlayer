@@ -4,7 +4,7 @@
 
 import { create } from 'zustand'
 import { ClientSettings, createDefaultSettings } from '@/types/settings'
-import { getLocalStorageSettings, getNormalizedLocalClientSettings } from '@/lib/settings'
+import { getLocalStorageSettings, getNormalizedLocalClientSettings, setLocalStorageSettings } from '@/lib/settings'
 import { getAccessToken } from '@/lib/auth'
 
 interface SettingsStoreState {
@@ -31,12 +31,15 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => ({
    * 設定を更新する
    */
   updateSettings: (updates: Partial<ClientSettings>) => {
-    set((state) => ({
-      settings: {
+    set((state) => {
+      const newSettings = {
         ...state.settings,
         ...updates,
-      },
-    }))
+      }
+      // LocalStorageに保存
+      setLocalStorageSettings(newSettings)
+      return { settings: newSettings }
+    })
   },
 
   /**
@@ -64,7 +67,7 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => ({
       // if (!response.ok) {
       //   throw new Error(`Failed to sync settings to server: ${response.statusText}`)
       // }
-      
+
       // Update last_synced_at
       set((state) => ({
         settings: {
@@ -72,7 +75,7 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => ({
           last_synced_at: Date.now(),
         },
       }))
-      
+
       console.log('Settings synced to server successfully')
     } catch (error) {
       console.error('Error syncing settings to server:', error)
@@ -104,7 +107,7 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => ({
       // const serverSettings = await response.json() as ClientSettings
       // const normalized = getNormalizedLocalClientSettings(serverSettings)
       // set({ settings: normalized })
-      
+
       console.log('Settings synced from server successfully')
     } catch (error) {
       console.error('Error syncing settings from server:', error)

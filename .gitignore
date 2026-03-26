@@ -35,6 +35,7 @@ bin/
 /server/.env
 /server/.env.local
 /server/.env.*.local
+config.yaml
 
 tmp
 server/public/screenshots/

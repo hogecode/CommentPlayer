@@ -7,6 +7,11 @@ export interface WatchedHistory {
   updated_at: number
 }
 
+export interface MutedCommentKeyword {
+  pattern: string
+  match: 'partial' | 'forward' | 'backward' | 'exact' | 'regex'
+}
+
 export interface ClientSettings {
   // ビデオ視聴履歴
   watched_history: WatchedHistory[]
@@ -20,6 +25,17 @@ export interface ClientSettings {
   comment_speed_rate: number // コメントの流れる速度（倍率）
   comment_font_size: number // コメントのフォントサイズ（ピクセル）
   close_comment_form_after_sending: boolean // コメント送信後にフォームを閉じるか
+
+  // コメントNG設定
+  mute_fixed_comments: boolean // 上下固定コメントをミュート
+  mute_colored_comments: boolean // 色付きコメントをミュート
+  mute_big_size_comments: boolean // 大きいサイズのコメントをミュート
+  mute_vulgar_comments: boolean // 露骨な表現を含むコメントをミュート
+  mute_abusive_discriminatory_prejudiced_comments: boolean // 差別的・政治的表現をミュート
+  mute_consecutive_same_characters_comments: boolean // 連続同一文字をミュート
+  muted_comment_keywords: MutedCommentKeyword[] // ミュートキーワード
+  muted_niconico_user_ids: string[] // ミュートユーザーID
+  mute_comment_keywords_normalize_alphanumeric_width_case: boolean // キーワード正規化
 
   // その他の設定
   [key: string]: unknown
@@ -37,5 +53,14 @@ export function createDefaultSettings(): ClientSettings {
     comment_speed_rate: 1,
     comment_font_size: 25,
     close_comment_form_after_sending: true,
+    mute_fixed_comments: false,
+    mute_colored_comments: false,
+    mute_big_size_comments: false,
+    mute_vulgar_comments: false,
+    mute_abusive_discriminatory_prejudiced_comments: false,
+    mute_consecutive_same_characters_comments: false,
+    muted_comment_keywords: [],
+    muted_niconico_user_ids: [],
+    mute_comment_keywords_normalize_alphanumeric_width_case: false,
   }
 }

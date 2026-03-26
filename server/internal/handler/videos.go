@@ -444,10 +444,15 @@ func (a *App) chatJSONToApiComment(chat service.ChatJSON) dto.ApiComment {
 }
 
 // parseMailAttribute - mailフィールドからコメント表示スタイルを解析
-// ニコニコ動画形式: "top" "bottom" "right" を含む場合は位置、"small" "medium" "big" を含む場合はサイズ
+// ニコニコ動画形式のmail属性を DPlayer 形式に変換
+// mail="184 naka medium white" のように複数の属性がスペース区切りで指定される
+// 位置指定: ue=top, naka=right, shita=bottom
+// サイズ指定: small, medium, big
+// 色指定: ニコニコ色名（white, red, cyan等）または16進数カラーコード（#xxxxxx形式）
+// ※色名は16進数コードに変換せず、そのままフロントエンドに返す
 func (a *App) parseMailAttribute(mail string) (commentType, commentSize, commentColor string) {
 	// デフォルト値
-	commentType = "right"  // デフォルトは右下
+	commentType = "right"  // デフォルトは右
 	commentSize = "medium" // デフォルトは中
 	commentColor = "white" // デフォルトは白
 
@@ -459,23 +464,24 @@ func (a *App) parseMailAttribute(mail string) (commentType, commentSize, comment
 	parts := strings.Fields(mail)
 	for _, part := range parts {
 		switch part {
-		case "top":
+		// 位置指定
+		case "ue":
 			commentType = "top"
-		case "bottom":
-			commentType = "bottom"
-		case "right", "ue", "naka":
+		case "naka":
 			commentType = "right"
+		case "shita":
+			commentType = "bottom"
+		// サイズ指定
 		case "small":
 			commentSize = "small"
 		case "medium":
 			commentSize = "medium"
 		case "big":
 			commentSize = "big"
+		// 色指定（色名または16進数コード）
 		default:
-			// 16進数カラーコード（#xxxxxx形式）をチェック
-			if strings.HasPrefix(part, "#") && len(part) == 7 {
-				commentColor = part
-			}
+			// 16進数カラーコード（#xxxxxx形式）、またはニコニコ色名をそのまま返す
+			commentColor = part
 		}
 	}
 

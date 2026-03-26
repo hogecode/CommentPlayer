@@ -75,6 +75,43 @@ export function getNormalizedLocalClientSettings(settings: ClientSettings): Clie
     normalized.close_comment_form_after_sending = defaults.close_comment_form_after_sending
   }
 
+  // NG設定のバリデーション
+  if (typeof normalized.mute_fixed_comments !== 'boolean') {
+    normalized.mute_fixed_comments = defaults.mute_fixed_comments
+  }
+
+  if (typeof normalized.mute_colored_comments !== 'boolean') {
+    normalized.mute_colored_comments = defaults.mute_colored_comments
+  }
+
+  if (typeof normalized.mute_big_size_comments !== 'boolean') {
+    normalized.mute_big_size_comments = defaults.mute_big_size_comments
+  }
+
+  if (typeof normalized.mute_vulgar_comments !== 'boolean') {
+    normalized.mute_vulgar_comments = defaults.mute_vulgar_comments
+  }
+
+  if (typeof normalized.mute_abusive_discriminatory_prejudiced_comments !== 'boolean') {
+    normalized.mute_abusive_discriminatory_prejudiced_comments = defaults.mute_abusive_discriminatory_prejudiced_comments
+  }
+
+  if (typeof normalized.mute_consecutive_same_characters_comments !== 'boolean') {
+    normalized.mute_consecutive_same_characters_comments = defaults.mute_consecutive_same_characters_comments
+  }
+
+  if (!Array.isArray(normalized.muted_comment_keywords)) {
+    normalized.muted_comment_keywords = []
+  }
+
+  if (!Array.isArray(normalized.muted_niconico_user_ids)) {
+    normalized.muted_niconico_user_ids = []
+  }
+
+  if (typeof normalized.mute_comment_keywords_normalize_alphanumeric_width_case !== 'boolean') {
+    normalized.mute_comment_keywords_normalize_alphanumeric_width_case = defaults.mute_comment_keywords_normalize_alphanumeric_width_case
+  }
+
   return normalized
 }
 
