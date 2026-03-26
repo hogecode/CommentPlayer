@@ -25,6 +25,7 @@ interface VideoListProps {
   totalPages?: number
   page?: number
   sortOrder?: 'asc' | 'desc'
+  sortField?: 'jikkyo_date' | 'file_name'
   year?: number | null
   yearList?: number[]
   isLoading?: boolean
@@ -35,6 +36,7 @@ interface VideoListProps {
   showEmptyMessage?: boolean
   onPageChange?: (page: number) => void
   onSortChange?: (order: 'asc' | 'desc') => void
+  onSortFieldChange?: (field: 'jikkyo_date' | 'file_name') => void
   onYearChange?: (year: number | null) => void
   onDelete?: (id: number) => void
 }
@@ -50,6 +52,7 @@ export function VideoList({
   totalPages: totalPagesProp,
   page = 1,
   sortOrder = 'desc',
+  sortField = 'jikkyo_date',
   year,
   yearList = [],
   isLoading = false,
@@ -60,6 +63,7 @@ export function VideoList({
   showEmptyMessage = true,
   onPageChange,
   onSortChange,
+  onSortFieldChange,
   onYearChange,
   onDelete,
 }: VideoListProps) {
@@ -111,7 +115,20 @@ export function VideoList({
                 </NativeSelect>
               )}
               
-              {/* ソート */}
+              {/* ソートフィールド */}
+              {!hideSort && (
+                <NativeSelect
+                  value={sortField}
+                  onChange={(e) =>
+                    onSortFieldChange?.(e.target.value as "jikkyo_date" | "file_name")
+                  }
+                >
+                  <option value="jikkyo_date">放映日</option>
+                  <option value="file_name">ファイル名</option>
+                </NativeSelect>
+              )}
+              
+              {/* ソート順序 */}
               {!hideSort && (
                 <NativeSelect
                   value={sortOrder}

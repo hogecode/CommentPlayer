@@ -29,13 +29,13 @@ export function PageBreadcrumb({ items }: PageBreadcrumbProps) {
       <BreadcrumbList>
         {items.map((item, index) => (
           <div key={`breadcrumb-${index}`} className="flex items-center gap-1.5">
-            <BreadcrumbItem>
+            <BreadcrumbItem >
               {item.href ? (
-                <BreadcrumbLink asChild>
+                <BreadcrumbLink asChild className='text-teal-50'>
                   <Link to={item.href}>{item.label}</Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                <BreadcrumbPage className='text-teal-50'>{item.label}</BreadcrumbPage>
               )}
             </BreadcrumbItem>
             {index < items.length - 1 && <BreadcrumbSeparator />}

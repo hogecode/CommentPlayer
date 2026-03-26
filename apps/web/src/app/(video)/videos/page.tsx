@@ -11,6 +11,7 @@ export default function HomePage() {
   const location = useLocation()
   const [page, setPage] = useState(1)
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [sortField, setSortField] = useState<'jikkyo_date' | 'file_name'>('jikkyo_date')
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
   // URLからクエリパラメータを読み取る
@@ -32,6 +33,12 @@ export default function HomePage() {
       setSortOrder(orderParam)
     }
 
+    // sortParamを読み取る
+    const sortParam = searchParams.get('sort')
+    if (sortParam === 'jikkyo_date' || sortParam === 'file_name') {
+      setSortField(sortParam)
+    }
+
     // yearパラメータを読み取る
     const yearParam = searchParams.get('year')
     if (yearParam) {
@@ -50,7 +57,7 @@ export default function HomePage() {
   const { data, isLoading } = useVideosQuery({
     page,
     limit: 20,
-    sort: 'jikkyo_date',
+    sort: sortField,
     order: sortOrder,
     year: selectedYear || undefined
   })
@@ -89,6 +96,16 @@ export default function HomePage() {
     window.history.replaceState({}, '', `?${searchParams.toString()}`)
   }
 
+  // ソートフィールド変更時にURLを更新
+  const handleSortFieldChange = (newField: 'jikkyo_date' | 'file_name') => {
+    setSortField(newField)
+    setPage(1) // ソートフィールド変更時はページを1にリセット
+    const searchParams = new URLSearchParams(window.location.search)
+    searchParams.set('sort', newField)
+    searchParams.set('page', '1')
+    window.history.replaceState({}, '', `?${searchParams.toString()}`)
+  }
+
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
@@ -100,11 +117,13 @@ export default function HomePage() {
           totalPages={totalPages}
           page={page}
           sortOrder={sortOrder}
+          sortField={sortField}
           year={selectedYear}
           yearList={yearList}
           isLoading={isLoading}
           onPageChange={handlePageChange}
           onSortChange={handleSortChange}
+          onSortFieldChange={handleSortFieldChange}
           onYearChange={handleYearChange}
         />
       </div>
