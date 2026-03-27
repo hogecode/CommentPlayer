@@ -9,8 +9,6 @@ import { Spinner } from '@/components/ui/spinner'
 
 export function CommentDisplaySettings() {
   const { settings, updateSettings } = useSettingsStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [savedMessage, setSavedMessage] = useState('')
 
   const handleMaxCommentsChange = (value: string) => {
     const num = parseInt(value, 10)
@@ -40,22 +38,6 @@ export function CommentDisplaySettings() {
       // 入力途中の可能性があるので、エラーはログしない
     } else {
       console.warn('Invalid color format:', value)
-    }
-  }
-
-  const handleSave = async () => {
-    setIsSubmitting(true)
-    setSavedMessage('')
-    try {
-      // 設定は既に自動的に保存されていますが、
-      // サーバーへの同期やその他の処理がある場合はここで実装
-      await new Promise(resolve => setTimeout(resolve, 500))
-      setSavedMessage('設定が保存されました')
-      setTimeout(() => setSavedMessage(''), 3000)
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -111,29 +93,6 @@ export function CommentDisplaySettings() {
             className="max-w-xs"
           />
         </div>
-      </div>
-
-      {/* 保存ボタンとメッセージ */}
-      <div className="flex items-center gap-4 pt-4 border-t">
-        <Button
-          onClick={handleSave}
-          disabled={isSubmitting}
-          className="bg-primary"
-        >
-          {isSubmitting ? (
-            <>
-              <Spinner className="mr-2 size-4" />
-              保存中...
-            </>
-          ) : (
-            '設定を保存'
-          )}
-        </Button>
-        {savedMessage && (
-          <p className="text-sm text-green-600 dark:text-green-400">
-            ✓ {savedMessage}
-          </p>
-        )}
       </div>
     </div>
   )

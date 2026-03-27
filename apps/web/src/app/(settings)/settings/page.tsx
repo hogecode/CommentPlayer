@@ -9,15 +9,6 @@ import { MutedKeywordsSettings } from '@/components/settings/MutedKeywordsSettin
 import { CommentDisplaySettings } from '@/components/settings/CommentDisplaySettings'
 
 export default function SettingsPage() {
-  // 設定の初期化（マウント時にのみ実行）
-  useEffect(() => {
-    try {
-      const { initializeSettings } = useSettingsStore.getState()
-      initializeSettings()
-    } catch (error) {
-      console.error('Failed to initialize settings:', error)
-    }
-  }, [])
 
   return (
     <RootLayout>

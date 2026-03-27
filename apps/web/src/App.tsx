@@ -4,12 +4,7 @@ import { useSettingsStore } from "@/stores/settings-store";
 import Message from "@/message";
 import { sleep } from "@/lib/utils";
 import { getAccessToken } from "@/lib/auth";
-import {
-  getLocalStorageSettings,
-  setLocalStorageSettings,
-  getNormalizedLocalClientSettings,
-  hashClientSettings,
-} from "@/lib/settings";
+import { hashClientSettings } from "@/lib/settings";
 import { initializeApiClient } from "@/lib/api/api-setup";
 
 /**
@@ -98,16 +93,12 @@ export function App() {
       return;
     }
 
-    // 現在 LocalStorage に保存されている設定データを取得
-    const currentSavedSettings = getNormalizedLocalClientSettings(
-      getLocalStorageSettings(),
-    );
-
-    // 設定データが変更されている場合は、LocalStorage に保存とサーバーに同期する
+    // 設定データが変更されている場合は、サーバーに同期する
+    // NOTE: persist ミドルウェアが自動的にローカルストレージに保存するため、
+    // setLocalStorageSettings() の呼び出しは不要
     const currentHash = hashClientSettings(settings);
     if (previousSettingsHashRef.current !== currentHash) {
       console.log("Client Settings Changed");
-      setLocalStorageSettings(settings);
       void syncClientSettingsToServer();
       previousSettingsHashRef.current = currentHash;
     }
