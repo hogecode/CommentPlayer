@@ -109,7 +109,7 @@ export default function HomePage() {
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
-        <PageBreadcrumb items={[{ label: '動画一覧' }]} />
+        <PageBreadcrumb items={[{label: 'ホーム', href: '/'},{ label: '動画一覧' }]} />
         <VideoList
           title="動画一覧"
           videos={videos}

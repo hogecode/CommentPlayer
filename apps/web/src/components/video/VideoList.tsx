@@ -123,7 +123,7 @@ export function VideoList({
                     onSortFieldChange?.(e.target.value as "jikkyo_date" | "file_name")
                   }
                 >
-                  <option value="jikkyo_date">放映日</option>
+                  <option value="jikkyo_date">作成日</option>
                   <option value="file_name">ファイル名</option>
                 </NativeSelect>
               )}
@@ -136,8 +136,8 @@ export function VideoList({
                     onSortChange?.(e.target.value as "asc" | "desc")
                   }
                 >
-                  <option value="desc">新しい順</option>
-                  <option value="asc">古い順</option>
+                  <option value="desc">降順</option>
+                  <option value="asc">昇順</option>
                 </NativeSelect>
               )}
             </div>

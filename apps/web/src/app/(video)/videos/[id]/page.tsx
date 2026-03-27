@@ -114,6 +114,7 @@ export default function VideoPage() {
       <div className="h-screen bg-[#0D0807] flex flex-col pt-24">
         <div className="px-8 pt-8">
           <PageBreadcrumb items={[
+            { label: 'ホーム', href: '/'},
             { label: '動画', href: '/videos' },
             { label: videoTitle }
           ]} />

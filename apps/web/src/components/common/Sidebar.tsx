@@ -51,7 +51,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
       </div>
 
       {/* ナビゲーション */}
-      <nav className="flex-1 overflow-y-auto p-4">
+      <nav className="flex-1 overflow-y-auto p-4 pt-6">
         <ul className="space-y-2">
           {navigationLinks.map(({ path, label, Icon }) => (
             <li key={path}>
@@ -94,7 +94,7 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
             isLinkActive('/information') && 'bg-accent text-accent-foreground font-medium'
           )}
         >
-          <Info className="w-5 h-5 flex-shrink-0  translate-x-[-6px]" />
+          <Info className="w-5 h-5 flex-shrink-0  translate-x-[-6px] mb-4" />
           {!iconOnly && <span className="truncate">情報</span>}
         </a>
       </div>

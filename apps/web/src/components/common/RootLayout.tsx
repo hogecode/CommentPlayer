@@ -32,14 +32,6 @@ export function RootLayout({ children, headerChildren }: RootLayoutProps) {
           {children}
         </main>
       </div>
-
-      {/* フッター */}
-      <footer className="hidden border-t flex-shrink-0">
-        <Separator className="m-0" />
-        <div className="bg-muted/30 text-muted-foreground py-6 text-center">
-          <p className="text-sm">&copy; 2026 CommeVideo. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   )
 }
