@@ -20,10 +20,6 @@ func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 	capturesGroup := v1.Group("/captures")
 	a.RegisterCaptureRoutes(capturesGroup)
 
-	// マイリスト関連ルートを登録
-	mylistGroup := v1.Group("/mylist")
-	a.RegisterMylistRoutes(mylistGroup)
-
 	// フォルダ関連ルートを登録
 	foldersGroup := v1.Group("/folders")
 	a.RegisterFolderRoutes(foldersGroup)

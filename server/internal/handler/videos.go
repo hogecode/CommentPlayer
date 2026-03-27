@@ -282,7 +282,7 @@ func (a *App) DownloadVideo(videosGroup *gin.RouterGroup) {
 		}
 
 		// ファイルをダウンロード（実装は省略 - FilePath から実際のファイルを提供）
-		ctx.File(video.FilePath)
+		ctx.FileAttachment(video.FilePath, "video.mp4")
 	})
 }
 
