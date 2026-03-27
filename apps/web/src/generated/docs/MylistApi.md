@@ -1,6 +1,6 @@
 # MylistApi
 
-All URIs are relative to *http://localhost:8000*
+All URIs are relative to *http://100.72.160.115:8000*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|

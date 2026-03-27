@@ -24,7 +24,7 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
-  const thumbnailUrl = `http://localhost:8000/screenshots/${video.screenshot_file_path}`
+  const thumbnailUrl = `http://100.72.160.115:8000/screenshots/${video.screenshot_file_path}`
 
   const handleDownload = () => {
     const url = `/api/v1/videos/${video.id}/download`

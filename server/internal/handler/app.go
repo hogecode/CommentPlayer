@@ -13,7 +13,7 @@ import (
 // @title commentPlayer API
 // @version 1.0.0
 // @description ビデオ管理アプリケーションのREST API
-// @host localhost:8000
+// @host 100.72.160.115:8000 
 type App struct {
 	DB           *gorm.DB
 	VideoQuery   *query.VideoQuery

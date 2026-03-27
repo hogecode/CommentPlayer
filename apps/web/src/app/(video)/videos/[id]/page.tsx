@@ -76,7 +76,7 @@ export default function VideoPage() {
   }, [videoData, settings]);
 
   const videoTitle = ((videoData as any)?.title) || `弾幕プレイヤー - ${videoId}`;
-  const videoSrc = (`http://localhost:8000${(videoData as any)?.src}`) || '/blank30.mp4';
+  const videoSrc = (`http://100.72.160.115:8000${(videoData as any)?.src}`) || '/blank30.mp4';
   
   if (isLoading) {
     return (

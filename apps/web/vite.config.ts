@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
-    allowedHosts: ['frontend', 'localhost', 'app.local', '127.0.0.1'],
+    allowedHosts: ['frontend', 'localhost', 'app.local', '127.0.0.1', '*'],
     watch: {
       usePolling: true,
     },

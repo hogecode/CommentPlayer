@@ -252,7 +252,7 @@ definitions:
       views:
         type: integer
     type: object
-host: localhost:8000
+host: 100.72.160.115:8000
 info:
   contact: {}
   description: ビデオ管理アプリケーションのREST API
