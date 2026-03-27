@@ -51,14 +51,22 @@ export default function VideoPage() {
     const comments = (videoData as any)?.comments;
     if (!Array.isArray(comments)) return sampleDanmaku;
 
-    return comments
+    // 設定からデフォルトカラーとコメント数制限を取得
+    const defaultColor = settings.default_comment_color || 'white';
+    const maxCommentsCount = settings.max_comments_display_count || 5000;
+
+    // 変換とフィルタリング
+    const filteredComments = comments
       .map((comment: any, index: number) => ({
         id: `${index}`,
         author: comment.author,
         time: comment.time,
         text: comment.text,
         // サーバーから返された色名を16進数カラーコードに変換
-        color: CommentUtils.getCommentColor(comment.color || 'white'),
+        // 無効な色（color: 184など）が来た場合はデフォルト色を使用
+        color: CommentUtils.getCommentColor(
+          (comment.color && CommentUtils.isValidColor(comment.color)) ? comment.color : defaultColor
+        ),
         type: comment.type || 'right',
         size: comment.size || 'medium',
       }))
@@ -73,6 +81,9 @@ export default function VideoPage() {
           settings
         );
       });
+
+    // ランダムに選択して、元の時間順序を保つ
+    return CommentUtils.selectRandomComments(filteredComments, maxCommentsCount);
   }, [videoData, settings]);
 
   const videoTitle = ((videoData as any)?.title) || `弾幕プレイヤー - ${videoId}`;

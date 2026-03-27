@@ -191,4 +191,42 @@ export class CommentUtils {
       muted_niconico_user_ids: [...settings.muted_niconico_user_ids, user_id],
     })
   }
+
+  /**
+   * 色が有効か判定する
+   * 16進数カラーコード（#XXXXXX形式）または有効な色名かチェック
+   * @param color 色指定（色名または16進数コード）
+   * @return 有効な色の場合は true を返す
+   */
+  static isValidColor(color: string): boolean {
+    // 16進数カラーコード（#XXXXXX形式）はそのまま有効
+    if (/^#[0-9A-Fa-f]{6}$/.test(color)) return true;
+    // 色名テーブルに存在する場合は有効
+    const colorTable = ['white', 'red', 'pink', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'black',
+      'white2', 'niconicowhite', 'red2', 'truered', 'pink2', 'orange2', 'passionorange', 'yellow2', 'madyellow',
+      'green2', 'elementalgreen', 'cyan2', 'blue2', 'marineblue', 'purple2', 'nobleviolet', 'black2'];
+    return colorTable.includes(color);
+  }
+
+  /**
+   * 指定された数のランダムな要素を配列から抽出し、元の順序を保つ
+   * @param array 対象の配列
+   * @param count 抽出する要素の数
+   * @return 抽出した要素を元の順序で返す
+   */
+  static selectRandomComments<T>(array: T[], count: number): T[] {
+    if (array.length <= count) {
+      return array;
+    }
+
+    // ランダムに選択するインデックスを取得
+    const indices = new Set<number>();
+    while (indices.size < count) {
+      indices.add(Math.floor(Math.random() * array.length));
+    }
+
+    // 選択されたインデックスをソートして元の順序を保つ
+    const sortedIndices = Array.from(indices).sort((a, b) => a - b);
+    return sortedIndices.map(index => array[index]);
+  }
 }
