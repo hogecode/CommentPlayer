@@ -58,12 +58,20 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 		}
 	}
 
-	// Vite でビルドした SPA の配信
-	// public ディレクトリをルートで配信
-	engine.Static("/assets", "./public/assets")
-
 	// スクリーンショットの配信
 	engine.Static("/screenshots", "./public/screenshots")
+
+	// cd serverで実行していることに注意
+	builtDir := "../apps/web/dist"
+
+	// assets追加
+	// ビルド済みのcssやjs
+	engine.Static("/assets", filepath.Join(builtDir, "assets"))
+
+	// index.html
+	engine.GET("/", func(c *gin.Context) {
+		c.File(filepath.Join(builtDir, "index.html"))
+	})
 
 	// SPA のフォールバック処理
 	// 存在しないパスにアクセスされた場合、index.html を返す
@@ -76,19 +84,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			})
 			return
 		}
-
-		// public/index.html を試す
-		indexPath := filepath.Join("public", "index.html")
-		if _, err := os.Stat(indexPath); err == nil {
-			c.File(indexPath)
-			return
-		}
-
-		// index.html が見つからない場合は 404
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Not found",
-			"code":  "NOT_FOUND",
-		})
+		c.File(filepath.Join(builtDir, "index.html"))
 	})
 
 	slog.Info("RegisterStaticRoutes: Static routes and SPA fallback initialized")
