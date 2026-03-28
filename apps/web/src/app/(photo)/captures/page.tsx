@@ -4,6 +4,7 @@ import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { useCapturesInfiniteQuery } from '@/services/useCaptures'
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { config } from '@/lib/config'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty, EmptyContent, EmptyMedia } from '@/components/ui/empty'
@@ -16,9 +17,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { useCapturesStore } from '@/stores/captures-store'
 
 export default function CapturesPage() {
   const limit = 12
+  const navigate = useNavigate({ from: '/captures' })
+
+  // ストア
+  const { setCaptureList, addCaptures, setPaginationInfo } = useCapturesStore()
 
   // 削除モーダルの状態管理
   const [deleteModalState, setDeleteModalState] = useState<{
@@ -41,6 +47,24 @@ export default function CapturesPage() {
   } = useCapturesInfiniteQuery({
     limit,
   })
+
+  // データをストアに保存
+  useEffect(() => {
+    if (data?.pages) {
+      const allCaptures = data.pages.flatMap((page) => page.data || [])
+      if (allCaptures.length > 0) {
+        // 最初のページの場合は全て置き換え、以降は追加
+        if (data.pages.length === 1) {
+          setCaptureList(allCaptures)
+        } else {
+          addCaptures(allCaptures.slice((data.pages.length - 1) * limit))
+        }
+      }
+      // ページネーション情報を更新
+      const currentPage = data.pages[data.pages.length - 1]?.pagination?.page || 1
+      setPaginationInfo(currentPage, limit)
+    }
+  }, [data, limit, setCaptureList, addCaptures, setPaginationInfo])
 
   const observerTarget = useRef<HTMLDivElement>(null)
 
@@ -129,7 +153,12 @@ export default function CapturesPage() {
                   {allCaptures.map((capture) => (
                     <div
                       key={capture.id}
-                      className="group relative rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                      className="group relative rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                      onClick={() => {
+                        if (capture.id) {
+                          navigate({ to: '/captures/$id', params: { id: capture.id.toString() } })
+                        }
+                      }}
                     >
                       <img
                         src={`${config.apiBaseUrl}/captures/${capture.filename}`}
@@ -140,7 +169,7 @@ export default function CapturesPage() {
 
                       {/* Overlay with info on hover */}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
-                        <div className="flex justify-end items-end">
+                        <div className="flex justify-end items-end" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button

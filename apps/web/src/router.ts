@@ -11,6 +11,7 @@ import NotFoundPage from '@/app/not-found'
 import RedirectToVideos from '@/app/page'
 import LoginPage from '@/app/(auth)/login/page'
 import RegisterPage from '@/app/(auth)/register/page'
+import CapturePage from './app/(photo)/captures/[id]/page'
 /**
  * ルート定義
  * ページ遷移時のスクロール挙動と View Transitions API は
@@ -30,6 +31,7 @@ const pages: { path: string; component: any }[] = [
   { path: '/videos/search', component: SearchPage },
   { path: '/videos/$id', component: VideoPage },
   { path: '/', component: RedirectToVideos }, 
+  { path: '/captures/$id', component: CapturePage },
   { path: '/captures', component: CapturesPage },
   { path: '/mylist', component: MyListPage },
   { path: '/watched-history', component: WatchedHistoryPage },
