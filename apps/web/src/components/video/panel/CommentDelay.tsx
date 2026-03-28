@@ -62,8 +62,23 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
 
     if (commentAfterCurrentTime) {
       const delayInSeconds = commentAfterCurrentTime.time - currentTime;
-      handleCommentDelay(delayInSeconds);
+      handleCommentDelay(- delayInSeconds);
       setSelectedMarker(text);
+    }
+  };
+
+  // 正規表現パターンに基づいてコメントを検索し遅延時間を設定する
+  const handleSetDelayFromPatternComment = (pattern: RegExp) => {
+    const commentAfterCurrentTime = comments.find(
+      (comment) =>
+        pattern.test(comment.text) &&
+        comment.time >= currentTime + commentDelay,
+    );
+
+    if (commentAfterCurrentTime) {
+      const delayInSeconds = commentAfterCurrentTime.time - currentTime;
+      handleCommentDelay(- delayInSeconds);
+      setSelectedMarker(commentAfterCurrentTime.text);
     }
   };
 
@@ -126,6 +141,19 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           title="遅延をリセット"
         >
           <RotateCcw className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => handleSetDelayFromPatternComment(/^キタ/)}
+          title="キタコメントへ遷移"
+          className={
+            selectedMarker && /^キタ/.test(selectedMarker)
+              ? "bg-primary text-primary-foreground"
+              : ""
+          }
+        >
+          K
         </Button>
         <Button
           variant="default"
