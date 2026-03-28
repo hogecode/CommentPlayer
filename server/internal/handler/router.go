@@ -12,6 +12,10 @@ func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 	usersGroup := v1.Group("/users")
 	a.RegisterUserRoutes(usersGroup, jwtSecret)
 
+	// 設定関連ルートを登録
+	settingsGroup := v1.Group("/settings")
+	a.RegisterSettingsRoutes(settingsGroup)
+
 	// ビデオ関連ルートを登録
 	videosGroup := v1.Group("/videos")
 	a.RegisterVideoRoutes(videosGroup)
