@@ -1,7 +1,6 @@
 'use client'
 
 import { create } from 'zustand'
-import { getAccessToken } from '@/lib/auth'
 
 interface VersionStoreState {
   client_version: string
@@ -22,7 +21,7 @@ export const useVersionStore = create<VersionStoreState>((set, get) => ({
    */
   fetchServerVersion: async () => {
     try {
-      const token = getAccessToken()
+      // const token = getAccessToken()
       
       // TODO: サーバーAPIエンドポイント(version)を実装したら呼び出す
       // const response = await fetch('/api/version', {
