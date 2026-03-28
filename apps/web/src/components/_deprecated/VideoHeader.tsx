@@ -58,9 +58,11 @@ export default function VideoHeader({
 
   return (
     <header
-      className="z-5 flex w-full items-center justify-between px-2
+      className={`absolute top-0 left-0 z-5 flex w-full items-center justify-between px-2
     transition-all duration-300 ease-in-out bg-gradient-to-b 
-    from-black/80 to-transparent'opacity-100 visibility-visible"
+    from-black/80 to-transparent
+    ${isVisible ? 'opacity-100 visibility-visible' : 'opacity-0'}
+    group-hover:opacity-100 group-hover:visibility-visible`}
     >
       {/* バック矢印ボタン */}
       <button

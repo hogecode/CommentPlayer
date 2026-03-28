@@ -272,10 +272,10 @@ export default function DPlayer({
   return (
     <div className="dplayer-container-wrapper group relative w-full h-full">
       {/* ビデオヘッダー */}
-      <VideoHeader
+      {/*<VideoHeader
         title={videoTitle}
         programTime={programTime}
-      />
+      />*/}
       {/* DPlayer はこの div に直接マウントされる */}
       <div ref={containerRef} className="dplayer-container" />
     </div>
