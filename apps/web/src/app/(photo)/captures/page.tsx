@@ -3,7 +3,7 @@
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { CaptureList } from '@/components/capture/CaptureList'
-import { useCapturesQuery } from '@/services/useCapturesQuery'
+import { useCapturesQuery } from '@/services/useCaptures'
 import { useEffect, useState } from 'react'
 
 export default function CapturesPage() {

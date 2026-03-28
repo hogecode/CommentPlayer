@@ -19,7 +19,9 @@ import (
 // RegisterCaptureRoutes - キャプチャ関連ルートを登録
 func (a *App) RegisterCaptureRoutes(capturesGroup *gin.RouterGroup) {
 	a.GetCaptures(capturesGroup)
+	a.GetCaptureByID(capturesGroup)
 	a.CreateCapture(capturesGroup)
+	a.DeleteCapture(capturesGroup)
 }
 
 // GetCaptures - キャプチャ一覧を取得
@@ -79,6 +81,46 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 				TotalPages: totalPages,
 			},
 		})
+	})
+}
+
+// GetCaptureByID - キャプチャを取得
+// @Summary キャプチャを取得
+// @Description キャプチャをIDで取得します
+// @Tags Captures
+// @Param id path int true "キャプチャID"
+// @Produce json
+// @Success 200 {object} entity.Capture
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/captures/{id} [get]
+func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
+	capturesGroup.GET("/:id", func(ctx *gin.Context) {
+		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+
+		// IDを取得
+		idStr := ctx.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
+				Code:  "VALIDATION_ERROR",
+			})
+			return
+		}
+
+		// DB処理をqueryパッケージに委譲
+		capture, err := a.CaptureQuery.GetCaptureByID(id)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "capture_not_found"),
+				Code:  "NOT_FOUND",
+			})
+			return
+		}
+
+		// レスポンス
+		ctx.JSON(http.StatusOK, capture)
 	})
 }
 
@@ -176,10 +218,10 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 		}
 
 		// IDを取得した後、ビデオファイル名を含めたキャプチャファイル名を生成
-		// ファイル名形式: {captureID}_{videoID}_{videoFileName}{ext}
+		// ファイル名形式: {videoFileName}_{captureID}_{ext}
 		ext := filepath.Ext(file.Filename)
 		videoFileNameWithoutExt := video.FileName[:len(video.FileName)-len(filepath.Ext(video.FileName))]
-		saveFileName := fmt.Sprintf("%d_%d_%s%s", capture.ID, videoID, videoFileNameWithoutExt, ext)
+		saveFileName := fmt.Sprintf("%s_%d%s",  videoFileNameWithoutExt, capture.ID,  ext)
 		savePath := filepath.Join(capturesDir, saveFileName)
 
 		// ファイルを保存
@@ -205,7 +247,69 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-		// 作成した情報でレスポンスを返す
-		ctx.JSON(http.StatusCreated, capture)
+	// 作成した情報でレスポンスを返す
+	ctx.JSON(http.StatusCreated, capture)
+})
+}
+
+// DeleteCapture - キャプチャを削除
+// @Summary キャプチャを削除
+// @Description キャプチャをファイルシステムとDBから削除します
+// @Tags Captures
+// @Param id path int true "キャプチャID"
+// @Produce json
+// @Success 200 {object} dto.MessageResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/captures/{id} [delete]
+func (a *App) DeleteCapture(capturesGroup *gin.RouterGroup) {
+	capturesGroup.DELETE("/:id", func(ctx *gin.Context) {
+		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+
+		// IDを取得
+		idStr := ctx.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
+				Code:  "VALIDATION_ERROR",
+			})
+			return
+		}
+
+		// キャプチャを取得
+		capture, err := a.CaptureQuery.GetCaptureByID(id)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "capture_not_found"),
+				Code:  "NOT_FOUND",
+			})
+			return
+		}
+
+		// ファイルシステムからファイルを削除
+		if capture.SavePath != "" {
+			if err := os.Remove(capture.SavePath); err != nil && !os.IsNotExist(err) {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_delete_capture_file"),
+					Code:  "INTERNAL_ERROR",
+				})
+				return
+			}
+		}
+
+		// DBから削除
+		if err := a.CaptureQuery.DeleteCapture(id); err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_delete_capture"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// 削除成功レスポンス
+		ctx.JSON(http.StatusOK, dto.SuccessResponse{
+			Message: i18n.GetErrorMessage(locale, "capture_deleted"),
+		})
 	})
 }

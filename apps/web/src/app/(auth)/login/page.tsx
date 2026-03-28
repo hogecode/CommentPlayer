@@ -10,7 +10,7 @@ import {
   loginUserSchema,
   useLoginUserMutation,
   type LoginUserInput,
-} from '@/services/useLoginUserMutation'
+} from '@/services/useLogin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {

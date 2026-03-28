@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { DtoFolderResponse } from '@/generated'
-import { useFoldersQuery, useAddFolderMutation, useDeleteFolderMutation } from '@/services/useFoldersQuery'
+import { useFoldersQuery, useAddFolderMutation, useDeleteFolderMutation } from '@/services/useFolders'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'

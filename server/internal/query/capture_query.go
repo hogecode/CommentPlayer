@@ -61,3 +61,8 @@ func (q *CaptureQuery) GetCaptureByID(id int) (*entity.Capture, error) {
 func (q *CaptureQuery) UpdateCapture(capture *entity.Capture) error {
 	return q.db.Save(capture).Error
 }
+
+// DeleteCapture - キャプチャを削除
+func (q *CaptureQuery) DeleteCapture(id int) error {
+	return q.db.Delete(&entity.Capture{}, id).Error
+}

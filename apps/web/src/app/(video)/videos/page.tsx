@@ -3,7 +3,7 @@
 import { RootLayout } from "@/components/common/RootLayout";
 import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
 import { VideoList } from "@/components/video/VideoList";
-import { useVideosQuery, useVideoYearsQuery } from "@/services/useVideosQuery";
+import { useVideosQuery, useVideoYearsQuery } from "@/services/useVideos";
 import { useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 

@@ -1,4 +1,4 @@
-# CommentVideo English Locale
+おんと# CommentVideo English Locale
 
 # =========================
 # Error Messages
@@ -17,6 +17,9 @@ failed_fetch_videos = "Failed to fetch videos"
 failed_search_videos = "Failed to search videos"
 failed_fetch_captures = "Failed to fetch captures"
 failed_create_capture = "Failed to create capture"
+failed_save_capture_file = "Failed to save capture file"
+failed_delete_capture_file = "Failed to delete capture file"
+failed_delete_capture = "Failed to delete capture"
 failed_fetch_folders = "Failed to fetch folders"
 failed_update_folder = "Failed to update folder"
 failed_create_folder = "Failed to create folder"
@@ -35,3 +38,4 @@ password_strength_invalid_chars = "Password contains invalid characters"
 thumbnail_regenerated = "Thumbnail regenerated successfully"
 folder_added = "Folder added successfully"
 folder_removed = "Folder removed successfully"
+capture_deleted = "Capture deleted successfully"

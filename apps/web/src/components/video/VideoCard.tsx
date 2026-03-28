@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { useVideoDownloadMutation } from '@/services/useVideoDownloadMutation'
+import { useVideoDownloadMutation } from '@/services/useVideoDownload'
 import Message from '@/message'
 
 interface VideoCardProps {

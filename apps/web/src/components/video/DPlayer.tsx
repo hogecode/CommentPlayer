@@ -4,7 +4,7 @@ import { Comment } from '@/types/danmaku';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useEffect, useRef } from 'react';
 import Message from '@/message';
-import { useCreateCaptureMutation } from '@/services/useCapturesQuery';
+import { useCreateCaptureMutation } from '@/services/useCaptures';
 import VideoHeader from '@/components/video/VideoHeader';
 
 interface Props {

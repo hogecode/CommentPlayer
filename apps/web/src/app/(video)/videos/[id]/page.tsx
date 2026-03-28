@@ -6,7 +6,7 @@ import { RootLayout } from '@/components/common/RootLayout';
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
 import VideoPanel from '@/components/video/panel/VideoPanel';
-import { useVideoQuery } from '@/services/useVideosQuery';
+import { useVideoQuery } from '@/services/useVideos';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
 import type { Comment } from '@/types/danmaku';
 import { EntityVideo } from '@/generated';

@@ -10,7 +10,7 @@ import {
   registerUserSchema,
   useRegisterUserMutation,
   type RegisterUserInput,
-} from '@/services/useRegisterUserMutation'
+} from '@/services/useRegister'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
