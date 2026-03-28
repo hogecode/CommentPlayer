@@ -75,7 +75,7 @@ function handleApiError(error: AxiosError<ApiErrorResponse>): void {
       Message.error(`検証エラー: ${errorMessage}`)
       break
     case 500:
-      Message.error('サーバーエラーが発生しました。')
+      // 500は多すぎるので非表示
       break
     case 502:
     case 503:
