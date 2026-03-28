@@ -209,16 +209,16 @@ export default function CommentList({
   return (
     <div className="flex flex-col h-full">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-        <h2 className="text-lg font-bold flex items-center gap-2">
+      <div className="flex items-center justify-between px-4 py-1 border-b border-border shrink-0">
+        <h4 className="font-bold flex items-center gap-2">
           <span>コメント</span>
-        </h2>
+        </h4>
         <Button
           variant="ghost"
           size="sm"
           className="gap-1"
         >
-          <Filter className="w-4 h-4" />
+          <Filter className="size-4" />
           <span>ミュート設定</span>
         </Button>
       </div>
@@ -330,7 +330,7 @@ function CommentItem({
 
   return (
     <div
-      className={`px-4 py-2 text-sm h-[38px] flex items-center justify-between group hover:bg-muted/50 transition-colors border-b border-border/50 ${
+      className={`px-4 py-2 text-sm  flex items-center justify-between group hover:bg-muted/50 transition-colors border-b border-border/50 ${
         isVideoMode ? 'cursor-pointer' : ''
       }`}
       onClick={() => isVideoMode && onCommentClick(comment)}

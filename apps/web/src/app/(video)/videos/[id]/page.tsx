@@ -126,6 +126,7 @@ export default function VideoPage() {
             src={videoSrc}
             commentList={commentList}
             videoId={videoId}
+            commentDelay={commentDelay}
             onCurrentTimeChange={setCurrentTime}
           />
         </div>
