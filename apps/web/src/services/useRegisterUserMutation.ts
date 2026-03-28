@@ -3,7 +3,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { z } from 'zod'
 import { UsersApi, type DtoUserCreateRequest } from '@/generated'
-import { useRouter } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useSnackbarStore } from '@/stores/snackbar-store'
 
 /**
@@ -39,7 +39,7 @@ const usersApi = new UsersApi()
  * OpenAPI生成ファイル（UsersApi）を使用
  */
 export function useRegisterUserMutation() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const show = useSnackbarStore((state) => state.show)
 
   return useMutation({
@@ -53,7 +53,8 @@ export function useRegisterUserMutation() {
       return response.data
     },
     onSuccess: async () => {
-      await show('success', 'ユーザー登録が完了しました。ログインしてください。')
+      await show('success', 'ユーザー登録が完了しました。')
+      navigate({ to: '/' })
     },
     onError: (error: any) => {
       const errorMessage =

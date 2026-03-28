@@ -75,7 +75,7 @@ export default function RegisterPage() {
                     {...register("username")}
                   />
                   {errors.username && (
-                    <FieldError>{errors.username.message}</FieldError>
+                    <FieldError className='text-xs'>{errors.username.message}</FieldError>
                   )}
                 </FieldContent>
               </Field>
@@ -111,7 +111,7 @@ export default function RegisterPage() {
                     </button>
                   </div>
                   {errors.password && (
-                    <FieldError>{errors.password.message}</FieldError>
+                    <FieldError className='text-xs'>{errors.password.message}</FieldError>
                   )}
                 </FieldContent>
               </Field>
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <FieldError>{errors.confirmPassword.message}</FieldError>
+                    <FieldError className='text-xs'>{errors.confirmPassword.message}</FieldError>
                   )}
                   {password && passwordsMatch && !errors.confirmPassword && (
                     <p className="text-xs text-green-600">
