@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { CapturesApi, type DtoCaptureListResponse, type EntityCapture } from "@/generated";
 
 // APIクライアントのセットアップ
@@ -24,6 +24,39 @@ export function useCapturesQuery(
       );
       return response.data;
     },
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+}
+
+/**
+ * キャプチャを無限ページネーションで取得
+ */
+export function useCapturesInfiniteQuery(
+  params?: {
+    video_id?: number;
+    limit?: number;
+  },
+  options?: any,
+) {
+  return useInfiniteQuery({
+    queryKey: ["captures", "infinite", params],
+    queryFn: async ({ pageParam = 1 }) => {
+      const page = typeof pageParam === 'number' ? pageParam : 1;
+      const response = await capturesApi.apiV1CapturesGet(
+        params?.video_id,
+        page,
+        params?.limit || 12,
+      );
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      // 最後のページで合計ページ数に達していれば、次のページは無い
+      const currentPage = lastPage.pagination?.page || 1;
+      const totalPages = lastPage.pagination?.total_pages || 0;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: 1000 * 60 * 5,
     ...options,
   });
