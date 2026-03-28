@@ -341,6 +341,101 @@
                 }
             }
         },
+        "/api/v1/settings/client": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "ログイン中のユーザーアカウントのクライアント設定を取得する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "クライアント設定取得 API",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientSettingsDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "ログイン中のユーザーアカウントのクライアント設定を更新する",
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "クライアント設定更新 API",
+                "parameters": [
+                    {
+                        "description": "更新するクライアント設定のデータ",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateClientSettingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
             "post": {
                 "description": "新しいユーザーアカウントを作成します",
@@ -767,6 +862,87 @@
                 }
             }
         },
+        "dto.ClientSettingsDTO": {
+            "type": "object",
+            "properties": {
+                "close_comment_form_after_sending": {
+                    "type": "boolean"
+                },
+                "comment_font_size": {
+                    "type": "integer"
+                },
+                "comment_speed_rate": {
+                    "description": "コメント設定",
+                    "type": "number"
+                },
+                "default_comment_color": {
+                    "type": "string"
+                },
+                "last_synced_at": {
+                    "description": "Unix timestamp (ms)",
+                    "type": "integer"
+                },
+                "max_comments_display_count": {
+                    "type": "integer"
+                },
+                "mute_abusive_discriminatory_prejudiced_comments": {
+                    "type": "boolean"
+                },
+                "mute_big_size_comments": {
+                    "type": "boolean"
+                },
+                "mute_colored_comments": {
+                    "type": "boolean"
+                },
+                "mute_comment_keywords_normalize_alphanumeric_width_case": {
+                    "type": "boolean"
+                },
+                "mute_consecutive_same_characters_comments": {
+                    "type": "boolean"
+                },
+                "mute_fixed_comments": {
+                    "description": "コメントNG設定",
+                    "type": "boolean"
+                },
+                "mute_vulgar_comments": {
+                    "type": "boolean"
+                },
+                "muted_comment_keywords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MutedCommentKeyword"
+                    }
+                },
+                "muted_niconico_user_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mylist": {
+                    "description": "マイリスト情報",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MylistItem"
+                    }
+                },
+                "sync_settings": {
+                    "description": "設定の同期",
+                    "type": "boolean"
+                },
+                "video_watched_history_max_count": {
+                    "description": "動画履歴",
+                    "type": "integer"
+                },
+                "watched_history": {
+                    "description": "動画視聴履歴",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.WatchedHistoryItem"
+                    }
+                }
+            }
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -834,6 +1010,30 @@
                 }
             }
         },
+        "dto.MutedCommentKeyword": {
+            "type": "object",
+            "properties": {
+                "match": {
+                    "description": "partial, forward, backward, exact, regex",
+                    "type": "string"
+                },
+                "pattern": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MylistItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Unix timestamp (ms)",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.Pagination": {
             "type": "object",
             "properties": {
@@ -887,6 +1087,87 @@
                 },
                 "thumbnail_info": {
                     "$ref": "#/definitions/entity.ThumbnailInfo"
+                }
+            }
+        },
+        "dto.UpdateClientSettingsRequest": {
+            "type": "object",
+            "properties": {
+                "close_comment_form_after_sending": {
+                    "type": "boolean"
+                },
+                "comment_font_size": {
+                    "type": "integer"
+                },
+                "comment_speed_rate": {
+                    "description": "コメント設定",
+                    "type": "number"
+                },
+                "default_comment_color": {
+                    "type": "string"
+                },
+                "last_synced_at": {
+                    "description": "Unix timestamp (ms)",
+                    "type": "integer"
+                },
+                "max_comments_display_count": {
+                    "type": "integer"
+                },
+                "mute_abusive_discriminatory_prejudiced_comments": {
+                    "type": "boolean"
+                },
+                "mute_big_size_comments": {
+                    "type": "boolean"
+                },
+                "mute_colored_comments": {
+                    "type": "boolean"
+                },
+                "mute_comment_keywords_normalize_alphanumeric_width_case": {
+                    "type": "boolean"
+                },
+                "mute_consecutive_same_characters_comments": {
+                    "type": "boolean"
+                },
+                "mute_fixed_comments": {
+                    "description": "コメントNG設定",
+                    "type": "boolean"
+                },
+                "mute_vulgar_comments": {
+                    "type": "boolean"
+                },
+                "muted_comment_keywords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MutedCommentKeyword"
+                    }
+                },
+                "muted_niconico_user_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mylist": {
+                    "description": "マイリスト情報",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MylistItem"
+                    }
+                },
+                "sync_settings": {
+                    "description": "設定の同期",
+                    "type": "boolean"
+                },
+                "video_watched_history_max_count": {
+                    "description": "動画履歴",
+                    "type": "integer"
+                },
+                "watched_history": {
+                    "description": "動画視聴履歴",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.WatchedHistoryItem"
+                    }
                 }
             }
         },
@@ -960,6 +1241,28 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.WatchedHistoryItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "jikkyo_comment_offset": {
+                    "description": "ミリ秒",
+                    "type": "integer"
+                },
+                "last_playback_position": {
+                    "description": "ミリ秒",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "integer"
+                },
+                "video_id": {
+                    "type": "integer"
                 }
             }
         },

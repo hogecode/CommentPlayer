@@ -14,11 +14,17 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/settings-api';
-export * from './apis/static-files-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface DtoWatchedHistoryItem {
+    'created_at'?: number;
+    /**
+     * ミリ秒
+     */
+    'jikkyo_comment_offset'?: number;
+    /**
+     * ミリ秒
+     */
+    'last_playback_position'?: number;
+    'updated_at'?: number;
+    'video_id'?: number;
+}
 

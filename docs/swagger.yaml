@@ -8,6 +8,62 @@ definitions:
       pagination:
         $ref: '#/definitions/dto.Pagination'
     type: object
+  dto.ClientSettingsDTO:
+    properties:
+      close_comment_form_after_sending:
+        type: boolean
+      comment_font_size:
+        type: integer
+      comment_speed_rate:
+        description: コメント設定
+        type: number
+      default_comment_color:
+        type: string
+      last_synced_at:
+        description: Unix timestamp (ms)
+        type: integer
+      max_comments_display_count:
+        type: integer
+      mute_abusive_discriminatory_prejudiced_comments:
+        type: boolean
+      mute_big_size_comments:
+        type: boolean
+      mute_colored_comments:
+        type: boolean
+      mute_comment_keywords_normalize_alphanumeric_width_case:
+        type: boolean
+      mute_consecutive_same_characters_comments:
+        type: boolean
+      mute_fixed_comments:
+        description: コメントNG設定
+        type: boolean
+      mute_vulgar_comments:
+        type: boolean
+      muted_comment_keywords:
+        items:
+          $ref: '#/definitions/dto.MutedCommentKeyword'
+        type: array
+      muted_niconico_user_ids:
+        items:
+          type: string
+        type: array
+      mylist:
+        description: マイリスト情報
+        items:
+          $ref: '#/definitions/dto.MylistItem'
+        type: array
+      sync_settings:
+        description: 設定の同期
+        type: boolean
+      video_watched_history_max_count:
+        description: 動画履歴
+        type: integer
+      watched_history:
+        description: 動画視聴履歴
+        items:
+          $ref: '#/definitions/dto.WatchedHistoryItem'
+        type: array
+    type: object
   dto.ErrorResponse:
     properties:
       code:
@@ -51,6 +107,22 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.MutedCommentKeyword:
+    properties:
+      match:
+        description: partial, forward, backward, exact, regex
+        type: string
+      pattern:
+        type: string
+    type: object
+  dto.MylistItem:
+    properties:
+      created_at:
+        description: Unix timestamp (ms)
+        type: integer
+      id:
+        type: integer
+    type: object
   dto.Pagination:
     properties:
       limit:
@@ -87,6 +159,62 @@ definitions:
         type: string
       thumbnail_info:
         $ref: '#/definitions/entity.ThumbnailInfo'
+    type: object
+  dto.UpdateClientSettingsRequest:
+    properties:
+      close_comment_form_after_sending:
+        type: boolean
+      comment_font_size:
+        type: integer
+      comment_speed_rate:
+        description: コメント設定
+        type: number
+      default_comment_color:
+        type: string
+      last_synced_at:
+        description: Unix timestamp (ms)
+        type: integer
+      max_comments_display_count:
+        type: integer
+      mute_abusive_discriminatory_prejudiced_comments:
+        type: boolean
+      mute_big_size_comments:
+        type: boolean
+      mute_colored_comments:
+        type: boolean
+      mute_comment_keywords_normalize_alphanumeric_width_case:
+        type: boolean
+      mute_consecutive_same_characters_comments:
+        type: boolean
+      mute_fixed_comments:
+        description: コメントNG設定
+        type: boolean
+      mute_vulgar_comments:
+        type: boolean
+      muted_comment_keywords:
+        items:
+          $ref: '#/definitions/dto.MutedCommentKeyword'
+        type: array
+      muted_niconico_user_ids:
+        items:
+          type: string
+        type: array
+      mylist:
+        description: マイリスト情報
+        items:
+          $ref: '#/definitions/dto.MylistItem'
+        type: array
+      sync_settings:
+        description: 設定の同期
+        type: boolean
+      video_watched_history_max_count:
+        description: 動画履歴
+        type: integer
+      watched_history:
+        description: 動画視聴履歴
+        items:
+          $ref: '#/definitions/dto.WatchedHistoryItem'
+        type: array
     type: object
   dto.UserAccessToken:
     properties:
@@ -136,6 +264,21 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  dto.WatchedHistoryItem:
+    properties:
+      created_at:
+        type: integer
+      jikkyo_comment_offset:
+        description: ミリ秒
+        type: integer
+      last_playback_position:
+        description: ミリ秒
+        type: integer
+      updated_at:
+        type: integer
+      video_id:
+        type: integer
     type: object
   entity.Capture:
     properties:
@@ -444,6 +587,66 @@ paths:
       summary: 監視対象フォルダを削除
       tags:
       - Folders
+  /api/v1/settings/client:
+    get:
+      description: ログイン中のユーザーアカウントのクライアント設定を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClientSettingsDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: クライアント設定取得 API
+      tags:
+      - Settings
+    put:
+      description: ログイン中のユーザーアカウントのクライアント設定を更新する
+      parameters:
+      - description: 更新するクライアント設定のデータ
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateClientSettingsRequest'
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: クライアント設定更新 API
+      tags:
+      - Settings
   /api/v1/users:
     post:
       description: 新しいユーザーアカウントを作成します

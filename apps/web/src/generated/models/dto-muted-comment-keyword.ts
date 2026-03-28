@@ -14,11 +14,11 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/settings-api';
-export * from './apis/static-files-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface DtoMutedCommentKeyword {
+    /**
+     * partial, forward, backward, exact, regex
+     */
+    'match'?: string;
+    'pattern'?: string;
+}
 
