@@ -79,7 +79,7 @@ export default function VideoPanel({
       {/* コメント遅延設定タブ */}
       <TabsContent
         value="delay"
-        className="flex-1 flex flex-col justify-center gap-4 p-4"
+        className="flex-1 flex flex-col gap-4 p-4"
       >
         <CommentDelay
           currentTime={currentTime}

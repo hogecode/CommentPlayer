@@ -89,7 +89,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
   };
 
   return (
-    <>
+    <div className="flex flex-col justify-start  gap-4 p-4">
       {/* ヘッダー */}
       <div className="flex justify-center">
         <Label className="text-base font-medium">
@@ -179,7 +179,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           B
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -3,14 +3,33 @@
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { useCapturesInfiniteQuery } from '@/services/useCaptures'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { config } from '@/lib/config'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty, EmptyContent, EmptyMedia } from '@/components/ui/empty'
-import { Image as ImageIcon } from 'lucide-react'
+import { Image as ImageIcon, MoreVertical } from 'lucide-react'
+import { DeleteCaptureModal } from '@/components/capture/DeleteCaptureModal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 
 export default function CapturesPage() {
   const limit = 12
+
+  // 削除モーダルの状態管理
+  const [deleteModalState, setDeleteModalState] = useState<{
+    open: boolean
+    captureId: number | null
+    filename: string
+  }>({
+    open: false,
+    captureId: null,
+    filename: '',
+  })
 
   // 無限ページネーションで取得
   const {
@@ -24,6 +43,22 @@ export default function CapturesPage() {
   })
 
   const observerTarget = useRef<HTMLDivElement>(null)
+
+  const handleDeleteClick = (captureId: number, filename: string) => {
+    setDeleteModalState({
+      open: true,
+      captureId,
+      filename,
+    })
+  }
+
+  const handleDeleteModalClose = () => {
+    setDeleteModalState({
+      open: false,
+      captureId: null,
+      filename: '',
+    })
+  }
 
   // IntersectionObserverを使用した自動ロード
   useEffect(() => {
@@ -105,12 +140,42 @@ export default function CapturesPage() {
 
                       {/* Overlay with info on hover */}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
-                        <p className="text-white text-xs font-medium truncate">{capture.filename}</p>
-                        {capture.created_at && (
-                          <p className="text-white/70 text-xs">
-                            {new Date(capture.created_at).toLocaleDateString('ja-JP')}
-                          </p>
-                        )}
+                        <div className="flex justify-end items-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="text-white hover:bg-white/20"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => {
+                                  if (capture.id) {
+                                    handleDeleteClick(
+                                      capture.id,
+                                      capture.filename || `Capture ${capture.id}`
+                                    )
+                                  }
+                                }}
+                              >
+                                削除
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <div>
+                          <p className="text-white text-xs font-medium truncate">{capture.filename}</p>
+                          {capture.created_at && (
+                            <p className="text-white/70 text-xs">
+                              {new Date(capture.created_at).toLocaleDateString('ja-JP')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -137,6 +202,16 @@ export default function CapturesPage() {
             )}
           </div>
         </div>
+
+        {/* 削除確認モーダル */}
+        {deleteModalState.captureId !== null && (
+          <DeleteCaptureModal
+            captureId={deleteModalState.captureId}
+            filename={deleteModalState.filename}
+            open={deleteModalState.open}
+            onOpenChange={handleDeleteModalClose}
+          />
+        )}
       </div>
     </RootLayout>
   )
