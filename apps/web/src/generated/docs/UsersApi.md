@@ -1,6 +1,6 @@
 # UsersApi
 
-All URIs are relative to *http://100.72.160.115:8000*
+All URIs are relative to *https://100.72.160.115*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|

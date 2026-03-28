@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "ビデオ管理アプリケーションのREST API",
@@ -6,7 +9,7 @@
         "contact": {},
         "version": "1.0.0"
     },
-    "host": "100.72.160.115:8000",
+    "host": "100.72.160.115",
     "paths": {
         "/api/v1/captures": {
             "get": {

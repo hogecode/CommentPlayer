@@ -218,7 +218,7 @@ definitions:
       views:
         type: integer
     type: object
-host: 100.72.160.115:8000
+host: 100.72.160.115
 info:
   contact: {}
   description: ビデオ管理アプリケーションのREST API
@@ -716,4 +716,6 @@ paths:
       summary: 埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）
       tags:
       - Debug
+schemes:
+- https
 swagger: "2.0"
