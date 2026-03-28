@@ -258,7 +258,7 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 // @Tags Captures
 // @Param id path int true "キャプチャID"
 // @Produce json
-// @Success 200 {object} dto.MessageResponse
+// @Success 200 {object} dto.SuccessResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /api/v1/captures/{id} [delete]

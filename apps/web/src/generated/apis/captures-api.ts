@@ -26,6 +26,8 @@ import type { DtoCaptureListResponse } from '../models';
 // @ts-ignore
 import type { DtoErrorResponse } from '../models';
 // @ts-ignore
+import type { DtoSuccessResponse } from '../models';
+// @ts-ignore
 import type { EntityCapture } from '../models';
 /**
  * CapturesApi - axios parameter creator
@@ -65,6 +67,74 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * キャプチャをファイルシステムとDBから削除します
+         * @summary キャプチャを削除
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesIdDelete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1CapturesIdDelete', 'id', id)
+            const localVarPath = `/api/v1/captures/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * キャプチャをIDで取得します
+         * @summary キャプチャを取得
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesIdGet: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1CapturesIdGet', 'id', id)
+            const localVarPath = `/api/v1/captures/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -149,6 +219,32 @@ export const CapturesApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * キャプチャをファイルシステムとDBから削除します
+         * @summary キャプチャを削除
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1CapturesIdDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesIdDelete(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * キャプチャをIDで取得します
+         * @summary キャプチャを取得
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1CapturesIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesIdGet(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 新しいキャプチャを作成します
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
@@ -184,6 +280,26 @@ export const CapturesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.apiV1CapturesGet(videoId, page, limit, options).then((request) => request(axios, basePath));
         },
         /**
+         * キャプチャをファイルシステムとDBから削除します
+         * @summary キャプチャを削除
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesIdDelete(id: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoSuccessResponse> {
+            return localVarFp.apiV1CapturesIdDelete(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * キャプチャをIDで取得します
+         * @summary キャプチャを取得
+         * @param {number} id キャプチャID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1CapturesIdGet(id: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
+            return localVarFp.apiV1CapturesIdGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 新しいキャプチャを作成します
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
@@ -212,6 +328,28 @@ export class CapturesApi extends BaseAPI {
      */
     public apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig) {
         return CapturesApiFp(this.configuration).apiV1CapturesGet(videoId, page, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * キャプチャをファイルシステムとDBから削除します
+     * @summary キャプチャを削除
+     * @param {number} id キャプチャID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1CapturesIdDelete(id: number, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesIdDelete(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * キャプチャをIDで取得します
+     * @summary キャプチャを取得
+     * @param {number} id キャプチャID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1CapturesIdGet(id: number, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesIdGet(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

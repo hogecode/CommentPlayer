@@ -62,6 +62,11 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
   dto.ThumbnailRegenerateRequest:
     properties:
       height:
@@ -285,6 +290,59 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: キャプチャを作成
+      tags:
+      - Captures
+  /api/v1/captures/{id}:
+    delete:
+      description: キャプチャをファイルシステムとDBから削除します
+      parameters:
+      - description: キャプチャID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: キャプチャを削除
+      tags:
+      - Captures
+    get:
+      description: キャプチャをIDで取得します
+      parameters:
+      - description: キャプチャID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Capture'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: キャプチャを取得
       tags:
       - Captures
   /api/v1/files/{folderID}/{filepath}:

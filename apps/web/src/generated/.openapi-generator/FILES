@@ -19,6 +19,7 @@ docs/DtoFolderListResponse.md
 docs/DtoFolderRequest.md
 docs/DtoFolderResponse.md
 docs/DtoPagination.md
+docs/DtoSuccessResponse.md
 docs/DtoThumbnailRegenerateRequest.md
 docs/DtoThumbnailRegenerateResponse.md
 docs/DtoUserAccessToken.md
@@ -43,6 +44,7 @@ models/dto-folder-list-response.ts
 models/dto-folder-request.ts
 models/dto-folder-response.ts
 models/dto-pagination.ts
+models/dto-success-response.ts
 models/dto-thumbnail-regenerate-request.ts
 models/dto-thumbnail-regenerate-response.ts
 models/dto-user-access-token-request.ts

@@ -115,6 +115,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/captures/{id}": {
+            "get": {
+                "description": "キャプチャをIDで取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャを取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "キャプチャID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Capture"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "キャプチャをファイルシステムとDBから削除します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャを削除",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "キャプチャID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/files/{folderID}/{filepath}": {
             "get": {
                 "description": "指定されたフォルダ内のファイルを取得します",
@@ -772,6 +852,14 @@ const docTemplate = `{
                 },
                 "total_pages": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
                 }
             }
         },

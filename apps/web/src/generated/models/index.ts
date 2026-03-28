@@ -5,6 +5,7 @@ export * from './dto-folder-list-response';
 export * from './dto-folder-request';
 export * from './dto-folder-response';
 export * from './dto-pagination';
+export * from './dto-success-response';
 export * from './dto-thumbnail-regenerate-request';
 export * from './dto-thumbnail-regenerate-response';
 export * from './dto-user-access-token';
