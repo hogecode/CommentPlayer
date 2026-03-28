@@ -108,12 +108,13 @@ export default function VideoPanel({
         <TabsTrigger value="comments" className="flex items-center gap-2 h-8">
           <MessageCircle className="size-6" />
         </TabsTrigger>
+        <TabsTrigger value="search" className="flex items-center gap-2 h-8">
+          <Search className="size-6" />
+        </TabsTrigger>        
         <TabsTrigger value="delay" className="flex items-center gap-2 h-8">
           <Clock className="size-6" />
         </TabsTrigger>
-        <TabsTrigger value="search" className="flex items-center gap-2 h-8">
-          <Search className="size-6" />
-        </TabsTrigger>
+
       </TabsList>
     </Tabs>
   );

@@ -46,7 +46,7 @@ const CommentSearch: React.FC<CommentSearchProps> = React.memo(({ comments }) =>
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1"
+          className="max-w-80 text-sm"
         />
         <Button onClick={handleSearch}>検索</Button>
       </div>
@@ -54,8 +54,8 @@ const CommentSearch: React.FC<CommentSearchProps> = React.memo(({ comments }) =>
       {/* 検索結果テーブル */}
       <div className="border rounded-lg overflow-hidden">
         <div className="max-h-64 overflow-y-auto">
-          <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-muted">
+          <table className="max-w-full text-sm">
+            <thead className="">
               <tr>
                 <th className="px-4 py-2 text-left font-semibold w-20">時間</th>
                 <th className="px-4 py-2 text-left font-semibold">コメント</th>
@@ -73,13 +73,13 @@ const CommentSearch: React.FC<CommentSearchProps> = React.memo(({ comments }) =>
                 ))
               ) : searchTerm ? (
                 <tr>
-                  <td colSpan={2} className="px-4 py-2 text-center text-xs text-muted-foreground">
+                  <td colSpan={2} className="px-4 py-2 text-xs text-muted-foreground">
                     検索結果がありません
                   </td>
                 </tr>
               ) : (
                 <tr>
-                  <td colSpan={2} className="px-4 py-2 text-center text-xs text-muted-foreground">
+                  <td colSpan={2} className="px-4 py-2 text-xs text-muted-foreground">
                     検索キーワードを入力して検索してください
                   </td>
                 </tr>
