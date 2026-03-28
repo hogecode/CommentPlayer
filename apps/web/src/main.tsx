@@ -7,6 +7,7 @@ import { queryClient } from "@/providers/QueryClientProvider";
 import { App } from "@/App";
 import { SnackbarContainer } from "./components/common/snackbar";
 import { TooltipProvider } from "@/components/ui/tooltip";
+
 import "@/styles/globals.css";
 import "@/styles/mixin.scss";
 import "@/styles/dplayer.scss";
