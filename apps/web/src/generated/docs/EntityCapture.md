@@ -5,11 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**_u** | **string** |  | [optional] [default to undefined]
 **created_at** | **string** |  | [optional] [default to undefined]
 **filename** | **string** |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
-**save_dir** | **string** |  | [optional] [default to undefined]
-**save_path** | **string** |  | [optional] [default to undefined]
 **video_id** | **number** |  | [optional] [default to undefined]
 
 ## Example
@@ -18,11 +17,10 @@ Name | Type | Description | Notes
 import { EntityCapture } from './api';
 
 const instance: EntityCapture = {
+    _u,
     created_at,
     filename,
     id,
-    save_dir,
-    save_path,
     video_id,
 };
 ```

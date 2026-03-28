@@ -9,7 +9,8 @@ import WatchedHistoryPage from '@/app/(video)/watched-history/page'
 import SettingsPage from '@/app/(settings)/settings/page'
 import NotFoundPage from '@/app/not-found'
 import RedirectToVideos from '@/app/page'
-
+import LoginPage from '@/app/(auth)/login/page'
+import RegisterPage from '@/app/(auth)/register/page'
 /**
  * ルート定義
  * ページ遷移時のスクロール挙動と View Transitions API は
@@ -33,6 +34,8 @@ const pages: { path: string; component: any }[] = [
   { path: '/mylist', component: MyListPage },
   { path: '/watched-history', component: WatchedHistoryPage },
   { path: '/settings', component: SettingsPage },
+  { path: '/login', component: LoginPage },
+  { path: '/register', component: RegisterPage },
   { path: '*', component: NotFoundPage },
 ]
 

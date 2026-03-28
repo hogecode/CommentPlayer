@@ -15,6 +15,7 @@
 
 
 export interface DtoUserCreateRequest {
+    'confirm_password': string;
     'password': string;
     'username': string;
 }

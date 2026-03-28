@@ -835,10 +835,15 @@ const docTemplate = `{
         "dto.UserCreateRequest": {
             "type": "object",
             "required": [
+                "confirm_password",
                 "password",
                 "username"
             ],
             "properties": {
+                "confirm_password": {
+                    "type": "string",
+                    "minLength": 1
+                },
                 "password": {
                     "type": "string",
                     "minLength": 1
@@ -877,6 +882,9 @@ const docTemplate = `{
         "entity.Capture": {
             "type": "object",
             "properties": {
+                "_": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -885,12 +893,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "save_dir": {
-                    "type": "string"
-                },
-                "save_path": {
-                    "type": "string"
                 },
                 "video_id": {
                     "type": "integer"

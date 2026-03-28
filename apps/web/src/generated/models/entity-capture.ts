@@ -15,11 +15,10 @@
 
 
 export interface EntityCapture {
+    '_'?: string;
     'created_at'?: string;
     'filename'?: string;
     'id'?: number;
-    'save_dir'?: string;
-    'save_path'?: string;
     'video_id'?: number;
 }
 

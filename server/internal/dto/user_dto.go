@@ -4,8 +4,9 @@ import "github.com/hogecode/commentPlayer/internal/entity"
 
 // UserCreateRequest - ユーザー作成リクエスト
 type UserCreateRequest struct {
-	Username string `json:"username" binding:"required,min=1"`
-	Password string `json:"password" binding:"required,min=1"`
+	Username        string `json:"username" binding:"required,min=1"`
+	Password        string `json:"password" binding:"required,min=1"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,min=1"`
 }
 
 // UserAccessTokenRequest - アクセストークン発行リクエスト（OAuth2準拠）

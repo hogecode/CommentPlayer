@@ -5,6 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**confirm_password** | **string** |  | [default to undefined]
 **password** | **string** |  | [default to undefined]
 **username** | **string** |  | [default to undefined]
 
@@ -14,6 +15,7 @@ Name | Type | Description | Notes
 import { DtoUserCreateRequest } from './api';
 
 const instance: DtoUserCreateRequest = {
+    confirm_password,
     password,
     username,
 };

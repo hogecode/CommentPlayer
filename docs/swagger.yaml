@@ -102,6 +102,9 @@ definitions:
     type: object
   dto.UserCreateRequest:
     properties:
+      confirm_password:
+        minLength: 1
+        type: string
       password:
         minLength: 1
         type: string
@@ -109,6 +112,7 @@ definitions:
         minLength: 1
         type: string
     required:
+    - confirm_password
     - password
     - username
     type: object
@@ -130,16 +134,14 @@ definitions:
     type: object
   entity.Capture:
     properties:
+      _:
+        type: string
       created_at:
         type: string
       filename:
         type: string
       id:
         type: integer
-      save_dir:
-        type: string
-      save_path:
-        type: string
       video_id:
         type: integer
     type: object

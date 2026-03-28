@@ -52,6 +52,15 @@ func (a *App) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	// パスワードと確認用パスワードが一致するか確認
+	if req.Password != req.ConfirmPassword {
+		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "Passwords do not match",
+			Code:  "PASSWORD_MISMATCH",
+		})
+		return
+	}
+
 	// ユーザー名の重複チェック
 	var existingUser entity.User
 	if result := a.DB.Where("name = ?", req.Username).First(&existingUser); result.Error == nil {
