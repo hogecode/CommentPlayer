@@ -96,22 +96,22 @@ export default function VideoPanel({
         <CommentSearch comments={comments} />
       </TabsContent>
       <TabsList
-        className="w-full align-start min-h-12 bg-red-950"
+        className="fixed bottom-0 w-[95%] flex align-center justify-center min-h-12 bg-red-950"
         variant="line"
       >
-        <TabsTrigger value="info" className="flex items-center gap-2 h-8">
+        <TabsTrigger value="info">
           <Info className="size-6" />
         </TabsTrigger>
-        <TabsTrigger value="series" className="flex items-center gap-2 h-8">
+        <TabsTrigger value="series">
           <List className="size-6" />
         </TabsTrigger>
-        <TabsTrigger value="comments" className="flex items-center gap-2 h-8">
+        <TabsTrigger value="comments">
           <MessageCircle className="size-6" />
         </TabsTrigger>
-        <TabsTrigger value="search" className="flex items-center gap-2 h-8">
+        <TabsTrigger value="search">
           <Search className="size-6" />
         </TabsTrigger>        
-        <TabsTrigger value="delay" className="flex items-center gap-2 h-8">
+        <TabsTrigger value="delay">
           <Clock className="size-6" />
         </TabsTrigger>
 

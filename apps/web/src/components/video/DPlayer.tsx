@@ -2,6 +2,7 @@
 
 import { Comment } from '@/types/danmaku';
 import { useSettingsStore } from '@/stores/settings-store';
+import { usePlayerHeaderStore } from '@/stores/player-header-store';
 import { useEffect, useRef } from 'react';
 import Message from '@/message';
 import { useCreateCaptureMutation } from '@/services/useCaptures';
@@ -48,7 +49,6 @@ export default function DPlayer({
   onCurrentTimeChange,
   videoTitle,
   programTime,
-  isShowingOriginalBroadcastTime,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const DPlayerRef = useRef<any>(null);
@@ -57,6 +57,7 @@ export default function DPlayer({
   const mutateRef = useRef<any>(null);
 
   const { settings } = useSettingsStore();
+  const { showHeader: toggleHeaderVisibility, hideHeader } = usePlayerHeaderStore();
   const createCaptureMutation = useCreateCaptureMutation();
   
   // mutateを参照に保存
@@ -204,6 +205,24 @@ export default function DPlayer({
 
       DPlayerRef.current = dp;
 
+      // dplayer-containerのクリック/タップイベント：ヘッダーをトグル
+      const handlePlayerTap = () => {
+        toggleHeaderVisibility();
+      };
+
+      // 動画外のクリック：ヘッダーを非表示
+      const handleOutsideClick = (e: MouseEvent) => {
+        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+          hideHeader();
+        }
+      };
+
+      if (containerRef.current) {
+        containerRef.current.addEventListener('click', handlePlayerTap);
+        containerRef.current.addEventListener('touchstart', handlePlayerTap);
+        document.addEventListener('click', handleOutsideClick);
+      }
+
       // 再生時間更新イベントをリッスン
       if (onCurrentTimeChange && dp.video) {
         const handleTimeUpdate = () => {
@@ -215,6 +234,21 @@ export default function DPlayer({
         // クリーンアップ関数を保存
         DPlayerRef.current._cleanup = () => {
           dp.video.removeEventListener('timeupdate', handleTimeUpdate);
+          // リスナーをクリーンアップ
+          if (containerRef.current) {
+            containerRef.current.removeEventListener('click', handlePlayerTap);
+            containerRef.current.removeEventListener('touchstart', handlePlayerTap);
+          }
+          document.removeEventListener('click', handleOutsideClick);
+        };
+      } else {
+        // onCurrentTimeChange がない場合のクリーンアップ
+        DPlayerRef.current._cleanup = () => {
+          if (containerRef.current) {
+            containerRef.current.removeEventListener('click', handlePlayerTap);
+            containerRef.current.removeEventListener('touchstart', handlePlayerTap);
+          }
+          document.removeEventListener('click', handleOutsideClick);
         };
       }
     });
@@ -225,7 +259,7 @@ export default function DPlayer({
       DPlayerRef.current?.destroy();
       DPlayerRef.current = null;
     };
-  }, [src, videoId, onCurrentTimeChange]);
+  }, [src, videoId, onCurrentTimeChange, toggleHeaderVisibility, hideHeader]);
 
   // delayOffset が変わったらコメント位置を再同期
   useEffect(() => {
@@ -241,7 +275,6 @@ export default function DPlayer({
       <VideoHeader
         title={videoTitle}
         programTime={programTime}
-        isShowingOriginalBroadcastTime={isShowingOriginalBroadcastTime}
       />
       {/* DPlayer はこの div に直接マウントされる */}
       <div ref={containerRef} className="dplayer-container" />

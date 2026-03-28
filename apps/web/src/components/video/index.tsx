@@ -19,8 +19,6 @@ interface Props {
   videoTitle?: string;
   /** プログラム時間情報（VideoHeader表示用） */
   programTime?: string;
-  /** タイムシフト表示フラグ（VideoHeader表示用） */
-  isShowingOriginalBroadcastTime?: boolean;
 }
 
 /**
@@ -38,7 +36,6 @@ export default function DPlayerVideo({
   commentDelay = 0,
   videoTitle,
   programTime,
-  isShowingOriginalBroadcastTime,
 }: Props) {
   return (
     <div className="dplayer-video-wrapper space-y-4">
@@ -51,7 +48,6 @@ export default function DPlayerVideo({
         onCurrentTimeChange={onCurrentTimeChange}
         videoTitle={videoTitle}
         programTime={programTime}
-        isShowingOriginalBroadcastTime={isShowingOriginalBroadcastTime}
       />
     </div>
   );

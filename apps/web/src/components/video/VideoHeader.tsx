@@ -3,14 +3,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import { usePlayerHeaderStore } from "@/stores/player-header-store";
 
 interface VideoHeaderProps {
   /** ビデオタイトル */
   title?: string;
   /** 再生時間情報（例: "10:30 - 11:00"） */
   programTime?: string;
-  /** タイムシフト表示フラグ */
-  isShowingOriginalBroadcastTime?: boolean;
 }
 
 /**
@@ -21,15 +20,18 @@ interface VideoHeaderProps {
  * - タイトル表示
  * - プログラム時間表示
  * - 現在時刻表示
- * - タイムシフト表示
+ *
+ * スマートフォン対応：
+ * - 動画をタップするとヘッダーが表示/非表示切り替え
+ * - 動画外をクリックするとヘッダーが非表示
  */
 export default function VideoHeader({
   title = "",
   programTime = "",
-  isShowingOriginalBroadcastTime = false,
 }: VideoHeaderProps) {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState<string>("");
+  const isVisible = usePlayerHeaderStore((state) => state.isVisible);
 
   // 現在時刻を更新
   useEffect(() => {
@@ -56,10 +58,11 @@ export default function VideoHeader({
 
   return (
     <header
-      className="absolute top-0 left-0 z-5 flex w-full items-center justify-between px-2
+      className={`absolute top-0 left-0 z-5 flex w-full items-center justify-between px-2
     transition-all duration-300 ease-in-out bg-gradient-to-b 
-    from-black/80 to-transparent opacity-0 
-    group-hover:opacity-100 group-hover:visibility-visible visible"
+    from-black/80 to-transparent
+    ${isVisible ? 'opacity-100 visibility-visible' : 'opacity-0'}
+    group-hover:opacity-100 group-hover:visibility-visible`}
     >
       {/* バック矢印ボタン */}
       <button
@@ -89,9 +92,7 @@ export default function VideoHeader({
 
       {/* 現在時刻 */}
       <span className="flex items-center whitespace-nowrap text-xs text-white">
-        {isShowingOriginalBroadcastTime && (
           <Clock className="mr-1.5 inline-block h-4 w-4 flex-shrink-0 text-white" />
-        )}
         {currentTime}
       </span>
     </header>
