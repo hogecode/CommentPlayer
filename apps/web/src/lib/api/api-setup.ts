@@ -1,11 +1,11 @@
 /**
  * OpenAPI生成クライアントのセットアップ
  * アプリケーション初期化時にこのファイルをインポートして、
- * エラーインターセプターを設定
+ * エラーインターセプターと認証インターセプターを設定
  */
 
 import globalAxios from 'axios'
-import { setupErrorInterceptor } from '@/lib/api/api-interceptor'
+import { setupErrorInterceptor, setupAuthInterceptor } from '@/lib/api/api-interceptor'
 
 /**
  * APIクライアントの初期化
@@ -20,7 +20,11 @@ import { setupErrorInterceptor } from '@/lib/api/api-interceptor'
  * ```
  */
 export function initializeApiClient(): void {
-  // グローバルなAxiosインスタンスにエラーインターセプターを設定
+  // グローバルなAxiosインスタンスに認証インターセプターを設定
+  // （リクエストインターセプターはレスポンスインターセプターより先に実行される）
+  setupAuthInterceptor(globalAxios)
+  
+  // エラーインターセプターを設定
   setupErrorInterceptor(globalAxios)
 }
 

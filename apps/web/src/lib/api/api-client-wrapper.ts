@@ -9,7 +9,7 @@
 import type { Configuration } from '@/generated/configuration'
 import { BaseAPI } from '@/generated/base'
 import type { AxiosInstance } from 'axios'
-import { setupErrorInterceptor } from '@/lib/api/api-interceptor'
+import { setupAuthInterceptor, setupErrorInterceptor } from '@/lib/api/api-interceptor'
 
 /**
  * エラーインターセプターが自動的に設定されたBaseAPI
@@ -26,6 +26,7 @@ export class WrappedBaseAPI extends BaseAPI {
     // Axiosインスタンスにエラーインターセプターを設定
     if (axiosInstance) {
       setupErrorInterceptor(axiosInstance)
+      setupAuthInterceptor(axiosInstance)
     }
   }
 }

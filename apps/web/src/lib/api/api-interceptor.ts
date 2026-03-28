@@ -1,11 +1,12 @@
 /**
- * Axiosエラーインターセプター
- * OpenAPI生成クライアントのエラーレスポンスを処理し、
- * message.ts を使ってユーザーにエラーメッセージを表示
+ * Axiosインターセプター設定
+ * - リクエストインターセプター: JWT認証トークンを自動追加
+ * - レスポンスインターセプター: エラーレスポンスを処理してユーザーにメッセージ表示
  */
 
 import type { AxiosInstance, AxiosError } from 'axios'
 import Message from '@/message'
+import { useAuthStore } from '@/stores/auth-store'
 
 /**
  * APIエラーレスポンスの型定義
@@ -132,6 +133,28 @@ function extractErrorMessage(data: ApiErrorResponse | undefined, status: number)
 }
 
 /**
+ * 認証インターセプターを設定
+ * リクエストヘッダーに自動的にJWT認証トークンを含める
+ * @param axiosInstance - インターセプターを適用するAxiosインスタンス
+ */
+export function setupAuthInterceptor(axiosInstance: AxiosInstance): void {
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      // authstoreからアクセストークンを取得
+      const { accessToken } = useAuthStore.getState()
+      
+      // トークンが存在する場合、ヘッダーに追加
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`
+      }
+      
+      return config
+    },
+    (error) => Promise.reject(error)
+  )
+}
+
+/**
  * 特定のエラーコード/メッセージに対してカスタム処理を行う
  * 必要に応じてこの関数を拡張してください
  * @param error - Axiosエラーオブジェクト
@@ -149,6 +172,7 @@ export function handleCustomApiError(
 
 export default {
   setupErrorInterceptor,
+  setupAuthInterceptor,
   handleApiError,
   handleCustomApiError,
 }
