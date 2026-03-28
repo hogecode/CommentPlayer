@@ -385,3 +385,14 @@ body {
     @apply font-sans;
     }
 }
+
+/* ========== 共通ページレイアウト ========== */
+/* メインコンテンツが全画面を占める場合 */
+.page-container {
+  @apply h-screen bg-[#0D0807] flex flex-col pt-16;
+}
+
+/* エラー/ローディング画面のような中央配置コンテナ */
+.page-center-container {
+  @apply min-h-screen bg-[#0D0807] flex flex-col items-center justify-center p-8 pt-16;
+}

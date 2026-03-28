@@ -26,7 +26,7 @@ interface CommentPanelProps {
  * コメントリストとコメント遅延のタブ付きパネルコンポーネント
  * /videos/:id ページの下部に配置される
  */
-export default function CommentPanel({
+export default function VideoPanel({
   comments,
   playbackMode,
   currentTime,
@@ -45,7 +45,7 @@ export default function CommentPanel({
       {/* コメント一覧タブ */}
       <TabsContent
         value="comments"
-        className="flex-1 flex flex-col overflow-hidden"
+        className="flex-1 flex flex-col overflow-scroll"
       >
         <CommentList
           comments={comments}
@@ -66,12 +66,12 @@ export default function CommentPanel({
           handleCommentDelay={onCommentDelayChange}
         />
       </TabsContent>{" "}
-      <TabsList className="w-full align-start bg-gray-800" variant="default">
-        <TabsTrigger value="comments" className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4" />
+      <TabsList className="w-full align-start bg-red-950" variant="default">
+        <TabsTrigger value="comments" className="flex items-center gap-2 h-8">
+          <MessageCircle className="size-4" />
         </TabsTrigger>
-        <TabsTrigger value="delay" className="flex items-center gap-2">
-          <Clock className="w-4 h-4" />
+        <TabsTrigger value="delay" className="flex items-center gap-2 h-8">
+          <Clock className="size-4" />
         </TabsTrigger>
       </TabsList>
     </Tabs>

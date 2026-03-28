@@ -4,7 +4,7 @@ import { useParams } from '@tanstack/react-router';
 import { RootLayout } from '@/components/common/RootLayout';
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
-import CommentPanel from '@/components/video/CommentPanel';
+import VideoPanel from '@/components/video/VideoPanel';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
 import type { Comment } from '@/types/danmaku';
@@ -35,7 +35,7 @@ export default function VideoPage() {
   if (!isValidId) {
     return (
       <RootLayout>
-        <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-8 pt-24">
+        <div className="page-center-container">
           <div className="text-red-500 text-xl">ビデオIDが無効です</div>
         </div>
       </RootLayout>
@@ -92,7 +92,7 @@ export default function VideoPage() {
   if (isLoading) {
     return (
       <RootLayout>
-        <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-center p-8 pt-24">
+        <div className="page-center-container">
           <div className="text-white text-xl">読み込み中...</div>
         </div>
       </RootLayout>
@@ -102,7 +102,7 @@ export default function VideoPage() {
   if (error) {
     return (
       <RootLayout>
-        <div className="min-h-screen bg-[#0D0807] flex flex-col items-center justify-center p-8 pt-24">
+        <div className="page-center-container">
           <div className="text-red-500 text-xl">ビデオの読み込みに失敗しました</div>
         </div>
       </RootLayout>
@@ -111,7 +111,7 @@ export default function VideoPage() {
 
   return (
     <RootLayout>
-      <div className="h-screen bg-[#0D0807] flex flex-col pt-24">
+      <div className="page-container">
         <div className="px-8 pt-8">
           <PageBreadcrumb items={[
             { label: 'ホーム', href: '/'},
@@ -121,7 +121,7 @@ export default function VideoPage() {
         </div>
         
         {/* ビデオプレイヤーとタイトル */}
-        <div className="flex-1 flex flex-col overflow-hidden px-8 py-4">
+        <div className="flex flex-col overflow-hidden px-8 pb-4">
           <DPlayerVideo
             src={videoSrc}
             commentList={commentList}
@@ -131,8 +131,8 @@ export default function VideoPage() {
         </div>
 
         {/* コメントパネル（固定高さ） */}
-        <div className="h-64 border-t border-gray-700 bg-[#0D0807] overflow-hidden">
-          <CommentPanel
+        <div className="flex-1 border-t border-gray-700 bg-[#0D0807] overflow-hidden">
+          <VideoPanel
             comments={commentList}
             playbackMode="Video"
             currentTime={currentTime}
