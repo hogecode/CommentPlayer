@@ -24,6 +24,7 @@ func init() {
 	initFFmpegPaths()
 }
 
+// TODO: 自分でサードパーティライブラリをインストールするようにする
 // initFFmpegPaths - ffmpeg/ffprobe のパスを探す
 func initFFmpegPaths() {
 	// 複数の候補パスを定義（Windows/Linux/Mac対応）
@@ -244,24 +245,52 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 	const maxRetries = 2
 	const retryDelay = 500 * time.Millisecond
 
+	// 動画の長さを取得してランダムな位置を計算
+	duration, err := GetVideoDuration(videoPath)
+	if err != nil {
+		slog.Error("CaptureScreenshot: Failed to get video duration",
+			"video_path", videoPath,
+			"error", err.Error())
+		return nil, fmt.Errorf("failed to get video duration: %w", err)
+	}
+
+	// ランダムな位置を計算（0 から duration-1 秒の間）
+	// ただし、スクリーンショットが最後のフレームになるのを避けるため、最後の1秒は除外
+	var randomPosition float64
+	if duration > 1 {
+		seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+		randomPosition = seededRand.Float64() * (duration - 1)
+	} else {
+		randomPosition = 0
+	}
+
+	// 秒数を分:秒:ミリ秒の形式に変換
+	minutes := int(randomPosition) / 60
+	seconds := int(randomPosition) % 60
+	milliseconds := int((randomPosition - float64(int(randomPosition))) * 1000)
+	timeStr := fmt.Sprintf("%02d:%02d:%02d.%03d", minutes, seconds, milliseconds, 0)
+
 	// ランダムなファイル名を生成
 	screenshotFileName := generateRandomString(16) + ".jpg"
 	screenshotPath := filepath.Join(outputDir, screenshotFileName)
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
-		// TODO: 動画の長さに応じてスクリーンショットを撮る位置をランダムで撮るようにする
-		// 動画の中央付近（30%）からスクリーンショットを撮る
 		cmd := exec.Command(
 			ffmpegPath,
 			"-i", videoPath,
-			"-ss", "00:00:15",
+			"-ss", timeStr,
 			"-vframes", "1",
 			"-q:v", "5",
 			screenshotPath,
 		)
 
 		if err := cmd.Run(); err == nil {
+			slog.Debug("CaptureScreenshot: Screenshot captured successfully",
+				"video_path", videoPath,
+				"random_position_seconds", randomPosition,
+				"time_str", timeStr,
+				"screenshot_path", screenshotPath)
 			return &screenshotFileName, nil
 		} else {
 			lastErr = err

@@ -8,10 +8,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/hogecode/commentPlayer/internal/dto"
+	"github.com/hogecode/commentPlayer/internal/entity"
 	"github.com/hogecode/commentPlayer/internal/i18n"
 	"github.com/hogecode/commentPlayer/internal/service"
 )
@@ -328,8 +330,50 @@ func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
 			return
 		}
 
-		// サムネイル再生成ロジック（ここでは省略）
-		// TODO:FFmpeg を使用してサムネイルを生成
+		// サムネイル再生成ロジック
+		screenshotFileName, err := service.CaptureScreenshot(video.FilePath, filepath.Dir(video.FilePath))
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_regenerate_thumbnail"),
+				Code:  "THUMBNAIL_GENERATION_ERROR",
+			})
+			return
+		}
+
+		// ThumbnailInfo を更新
+		// リクエストから幅・高さが指定されていればそれを使用、なければデフォルト値を設定
+		// TODO: サムネイル画像の実際のサイズを取得して設定するようにする
+		// TODO: 画像を小さくして、WEBP形式で保存するようにする
+		width := 1280   // デフォルト幅
+		height := 720  // デフォルト高さ
+
+		if req.Width != nil && *req.Width > 0 {
+			width = *req.Width
+		}
+		if req.Height != nil && *req.Height > 0 {
+			height = *req.Height
+		}
+
+		video.ThumbnailInfo = &entity.ThumbnailInfo{
+			Width:       width,
+			Height:      height,
+			GeneratedAt: time.Now(),
+		}
+
+		// スクリーンショットファイルパスを更新
+		if screenshotFileName != nil {
+			screenshotPath := filepath.Join(filepath.Dir(video.FilePath), *screenshotFileName)
+			video.ScreenshotFilePath = &screenshotPath
+		}
+
+		// DBに保存
+		if err := a.DB.Save(video).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_save_video"),
+				Code:  "DATABASE_ERROR",
+			})
+			return
+		}
 
 		ctx.JSON(http.StatusOK, dto.ThumbnailRegenerateResponse{
 			ID:            video.ID,
