@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { API_V1 } from "./config";
 
 /**
  * Format a date string to a full readable date.
@@ -86,17 +85,4 @@ export function formatVideoDateTimeWithDuration(date: Date | string, durationSec
     } catch {
         return typeof date === "string" ? date : date.toString();
     }
-}
-
-/**
- * Build the thumbnail proxy URL for a note.
- * Returns undefined if the note has no thumbnail.
- * Appends a cache-bust `v` param to force reload after upload.
- */
-export function thumbnailUrl(
-    noteId: number,
-    thumbnailKey: string | undefined | null
-): string | undefined {
-    if (!thumbnailKey) return undefined;
-    return `${API_V1}/notes/${noteId}/thumbnail?v=${encodeURIComponent(thumbnailKey)}`;
 }

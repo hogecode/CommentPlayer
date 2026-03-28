@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from '@tanstack/react-router';
+import { config } from '@/lib/config';
 import { RootLayout } from '@/components/common/RootLayout';
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
@@ -88,7 +89,7 @@ export default function VideoPage() {
   }, [videoData, settings]);
 
   const videoTitle = ((videoData as any)?.file_name) || `弾幕プレイヤー - ${videoId}`;
-  const videoSrc = (`http://100.72.160.115:8000${(videoData as any)?.src}`) || '/blank30.mp4';
+  const videoSrc = (`${config.apiBaseUrl}${(videoData as any)?.src}`) || '/blank30.mp4';
   
   if (isLoading) {
     return (

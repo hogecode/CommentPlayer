@@ -1,6 +1,7 @@
 'use client'
 
 import { EntityCapture } from '@/generated'
+import { config } from '@/lib/config'
 import { Button } from '@/components/ui/button'
 import {
   Pagination,
@@ -105,7 +106,7 @@ export function CaptureList({
                 className="group relative rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
               >
                   <img
-                    src={`http://localhost:8000/captures/${capture.filename}`}
+                    src={`${config.apiBaseUrl}/captures/${capture.filename}`}
                     alt={capture.filename || `Capture ${capture.id}`}
                     className=" object-contain group-hover:scale-105 transition-transform duration-200"
                   />
