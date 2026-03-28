@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useRegisterSW } from "@/hooks/useRegisterSW";
 import { useSettingsStore } from "@/stores/settings-store";
+import { useSettingsQuery, useUpdateSettingsMutation } from "@/services/useSettings";
 import Message from "@/message";
 import { sleep } from "@/lib/utils";
 import { hashClientSettings } from "@/lib/settings";
@@ -15,12 +16,10 @@ export function App() {
     (state) => state.initializeSettings,
   );
   const updateSettings = useSettingsStore((state) => state.updateSettings);
-  const syncClientSettingsToServer = useSettingsStore(
-    (state) => state.syncClientSettingsToServer,
-  );
-  const syncClientSettingsFromServer = useSettingsStore(
-    (state) => state.syncClientSettingsFromServer,
-  );
+  
+  // React Query を使用した設定の同期
+  const updateSettingsMutation = useUpdateSettingsMutation();
+  const { refetch: refetchSettings } = useSettingsQuery();
 
   const isUpdatingWatchedHistoryRef = useRef(false);
   const previousSettingsHashRef = useRef("");
@@ -98,21 +97,23 @@ export function App() {
     const currentHash = hashClientSettings(settings);
     if (previousSettingsHashRef.current !== currentHash) {
       console.log("Client Settings Changed");
-      void syncClientSettingsToServer();
+      // ローカル設定をサーバーに同期する
+      updateSettingsMutation.mutate(settings as any);
       previousSettingsHashRef.current = currentHash;
     }
-  }, [settings, updateSettings, syncClientSettingsToServer]);
+  }, [settings, updateSettings, updateSettingsMutation]);
 
   // ログイン時かつ設定の同期が有効な場合、3秒おきにサーバーから設定を取得する
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       if (settings.sync_settings === true) {
-        void syncClientSettingsFromServer();
+        // サーバーから設定を再フェッチする
+        void refetchSettings();
       }
     }, 3 * 1000);
 
     return () => clearInterval(intervalId);
-  }, [settings.sync_settings, syncClientSettingsFromServer]);
+  }, [settings.sync_settings, refetchSettings]);
 
   return null;
 }
