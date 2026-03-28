@@ -144,10 +144,11 @@ export function setupAuthInterceptor(axiosInstance: AxiosInstance): void {
       const { accessToken } = useAuthStore.getState()
       
       // トークンが存在する場合、ヘッダーに追加
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`
+      if (!accessToken) {
+        console.warn('アクセストークンが見つかりません。認証が必要なAPIリクエストは失敗する可能性があります。')
+        return config
       }
-      
+      config.headers.Authorization = `Bearer ${accessToken}`
       return config
     },
     (error) => Promise.reject(error)

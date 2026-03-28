@@ -11,6 +11,7 @@ import { initializeApiClient } from "@/lib/api/api-setup";
  * アプリケーション全体の初期化と Service Worker 管理を行うコンポーネント
  */
 export function App() {
+  // 設定ストアから必要な状態とアクションを取得
   const settings = useSettingsStore((state) => state.settings);
   const initializeSettings = useSettingsStore(
     (state) => state.initializeSettings,
@@ -54,6 +55,7 @@ export function App() {
     initializeSettings();
   }, [initializeSettings]);
 
+  
   // 設定データの変更を監視して LocalStorage に保存しサーバーに同期する
   useEffect(() => {
     // 視聴履歴の保持件数を変更した際に、既存の視聴履歴件数が上限を超えている場合は削除する
@@ -103,14 +105,14 @@ export function App() {
     }
   }, [settings, updateSettings, updateSettingsMutation]);
 
-  // ログイン時かつ設定の同期が有効な場合、3秒おきにサーバーから設定を取得する
+  // ログイン時かつ設定の同期が有効な場合、30秒おきにサーバーから設定を取得する
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       if (settings.sync_settings === true) {
         // サーバーから設定を再フェッチする
         void refetchSettings();
       }
-    }, 3 * 1000);
+    }, 30 * 1000);
 
     return () => clearInterval(intervalId);
   }, [settings.sync_settings, refetchSettings]);

@@ -47,7 +47,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: new EncryptedStorage(),
+      storage: localStorage as unknown as PersistStorage<AuthState>, 
+      // CryptoJSの設定がうまくいかないため、通常のlocalStorageを一時的に使用
+      //storage: new EncryptedStorage(),
     }
   )
 )

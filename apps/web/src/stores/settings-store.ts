@@ -3,7 +3,7 @@
  */
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, PersistStorage } from 'zustand/middleware'
 import { ClientSettings, createDefaultSettings } from '@/types/settings'
 import { getNormalizedLocalClientSettings } from '@/lib/settings'
 
@@ -47,6 +47,7 @@ export const useSettingsStore = create<SettingsStoreState>()(
     }),
     {
       name: SETTINGS_STORAGE_KEY, // LocalStorage のキー名
+      storage: localStorage as unknown as PersistStorage<SettingsStoreState>, 
     }
   )
 )
