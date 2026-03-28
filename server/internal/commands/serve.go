@@ -92,7 +92,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	engine.Use(middleware.Recovery())
 
 	// API アプリケーションを初期化
-	app := handler.NewApp(db)
+	app := handler.NewApp(db, cfg)
 
 	// ファイルウォッチャーを初期化・開始
 	// TODO: Configに値を設定するようにする

@@ -16,3 +16,7 @@ db:
 log:
   level: "info"
   format: "json"
+
+# ストレージ設定
+storage:
+  captures_dir: "C:\\Users\\user\\Pictures\\Screenshots"

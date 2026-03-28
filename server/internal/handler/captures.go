@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -151,11 +154,36 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-		// ファイルを保存（実装例：server/captures/ ディレクトリ）
-		// savePath := filepath.Join("captures", fmt.Sprintf("%d_%s", capture.ID, filename))
-		// if err := ctx.SaveUploadedFile(file, savePath); err != nil {
-		//     // エラー処理
-		// }
+		// キャプチャファイルの保存処理
+		// config.yamlで指定した保存先ディレクトリに保存する
+		if a.Config == nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_save_capture_file"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		capturesDir := a.Config.Storage.CapturesDir
+
+		// ディレクトリが存在しない場合は作成
+		if err := os.MkdirAll(capturesDir, 0755); err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_save_capture_file"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// ファイルを保存：キャプチャIDとファイル名から保存先パスを構築
+		savePath := filepath.Join(capturesDir, fmt.Sprintf("%d_%s", capture.ID, file.Filename))
+		if err := ctx.SaveUploadedFile(file, savePath); err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_save_capture_file"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
 
 		ctx.JSON(http.StatusCreated, capture)
 	})
