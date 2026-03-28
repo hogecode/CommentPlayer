@@ -29,6 +29,7 @@ bin/
 # Database
 *.db
 *.db-journal
+app.db
 
 # Server config
 /server/config.*.yaml
