@@ -26,7 +26,7 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
-  const thumbnailUrl = `http://100.72.160.115:8000/screenshots/${video.screenshot_file_path}`
+  const thumbnailUrl = `${import.meta.env.VITE_API_BASE_URL}/screenshots/${video.screenshot_file_path}`
   const downloadMutation = useVideoDownloadMutation()
   const [isDownloading, setIsDownloading] = useState(false)
 

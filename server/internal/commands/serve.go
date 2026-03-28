@@ -95,7 +95,6 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	app := handler.NewApp(db, cfg)
 
 	// ファイルウォッチャーを初期化・開始
-	// TODO: Configに値を設定するようにする
 	screenshotDir := filepath.Join(".", "public", "screenshots")
 	watcher, err := service.NewFileWatcher(db, screenshotDir)
 	if err != nil {

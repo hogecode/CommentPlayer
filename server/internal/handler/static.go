@@ -58,21 +58,73 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 		}
 	}
 
-	// キャプチャディレクトリを静的配信
+	// キャプチャディレクトリを静的配信（CORS対応）
 	capturesDir := a.Config.Storage.CapturesDir
 	if err := os.MkdirAll(capturesDir, 0755); err != nil {
 		slog.Warn("RegisterStaticRoutes: Failed to create captures directory",
 			"captures_dir", capturesDir,
 			"error", err.Error())
 	} else {
-		engine.Static("/captures", capturesDir)
-		slog.Info("RegisterStaticRoutes: Captures directory static route registered",
+		// CORSヘッダーを設定してから静的ファイルを配信
+		engine.GET("/captures/*filepath", func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
+			c.File(filepath.Join(capturesDir, c.Param("filepath")))
+		})
+		
+		// OPTIONSリクエストにも対応
+		engine.OPTIONS("/captures/*filepath", func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
+			c.Header("Access-Control-Max-Age", "86400")
+			c.Status(http.StatusNoContent)
+		})
+		
+		slog.Info("RegisterStaticRoutes: Captures directory route registered with CORS support",
 			"captures_dir", capturesDir,
 			"route", "/captures")
 	}
 
-	// スクリーンショットの配信
-	engine.Static("/screenshots", "./public/screenshots")
+	// スクリーンショットの配信（CORS対応）
+	screenshotsDir := filepath.Join(".", "public", "screenshots")
+	// 相対パスを絶対パスに変換（より堅牢）
+	absScreenshotsDir, err := filepath.Abs(screenshotsDir)
+	if err != nil {
+		absScreenshotsDir = screenshotsDir
+	}
+	
+	if err := os.MkdirAll(absScreenshotsDir, 0755); err != nil {
+		slog.Warn("RegisterStaticRoutes: Failed to create screenshots directory",
+			"screenshots_dir", absScreenshotsDir,
+			"error", err.Error())
+	} else {
+		// CORSヘッダーを設定してから静的ファイルを配信
+		engine.GET("/screenshots/*filepath", func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
+			c.File(filepath.Join(absScreenshotsDir, c.Param("filepath")))
+		})
+		
+		// OPTIONSリクエストにも対応
+		engine.OPTIONS("/screenshots/*filepath", func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
+			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
+			c.Header("Access-Control-Max-Age", "86400")
+			c.Status(http.StatusNoContent)
+		})
+		
+		slog.Info("RegisterStaticRoutes: Screenshots directory route registered with CORS support",
+			"screenshots_dir", absScreenshotsDir,
+			"route", "/screenshots")
+	}
 
 	// cd serverで実行していることに注意
 	builtDir := "../apps/web/dist"
