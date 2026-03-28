@@ -65,6 +65,30 @@ export function formatDuration(seconds: number): string {
 }
 
 /**
+ * Format video date with start time, end time and duration.
+ * e.g., "2026/03/26 (木) 23:56 ～ 00:26 (30分)"
+ */
+export function formatVideoDateTimeWithDuration(date: Date | string, durationSeconds: number): string {
+    try {
+        const dateObj = typeof date === "string" ? new Date(date) : date;
+        
+        // Start date and time
+        const startFormatted = format(dateObj, "yyyy/MM/dd (E) HH:mm", { locale: ja });
+        
+        // Calculate end time
+        const endDate = new Date(dateObj.getTime() + durationSeconds * 1000);
+        const endFormatted = format(endDate, "HH:mm", { locale: ja });
+        
+        // Format duration in minutes
+        const minutes = Math.round(durationSeconds / 60);
+        
+        return `${startFormatted} ～ ${endFormatted} (${minutes}分)`;
+    } catch {
+        return typeof date === "string" ? date : date.toString();
+    }
+}
+
+/**
  * Build the thumbnail proxy URL for a note.
  * Returns undefined if the note has no thumbnail.
  * Appends a cache-bust `v` param to force reload after upload.

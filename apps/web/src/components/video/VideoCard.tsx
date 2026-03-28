@@ -3,7 +3,7 @@
 import { EntityVideo } from '@/generated'
 import { MoreVertical, Heart, Download, Trash2, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { formatFileSize, formatDuration, formatDateTimeJP } from '@/lib/format'
+import { formatFileSize, formatDuration, formatDateTimeJP, formatVideoDateTimeWithDuration } from '@/lib/format'
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader } from '@/components/ui/item'
 import { Button } from '@/components/ui/button'
 import {
@@ -54,7 +54,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
 
   return (
     <a href={`/videos/${video.id}`} >
-    <Item variant="default">
+    <Item variant="default"className="transition-colors hover:bg-gray-800 rounded-md">
       {/* サムネイル */}
       <ItemMedia variant="image" className="h-27 w-48">
           <img
@@ -74,8 +74,8 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
         </ItemHeader>
 
         <ItemDescription>
-          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-            <div>{formatDateTimeJP(video.jikkyo_date as string)}</div>
+          <div className="gap-2 text-xs text-muted-foreground">
+            <div>{formatVideoDateTimeWithDuration(video.jikkyo_date as string, video.duration ?? 0)}</div>
           </div>
         </ItemDescription>
       </ItemContent>
@@ -100,14 +100,14 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
               <MoreVertical size={18} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="min-w-35">
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={(e) => {
               e.preventDefault()
               handleDownload()
             }}>
-              <Download size={16} className="mr-2" />
-              ダウンロード ({formatFileSize(video.file_size ?? 0)})
+              <Download size={32} className="mr-2" />
+              <p className="text-xs">ダウンロード ({formatFileSize(video.file_size ?? 0)})</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>

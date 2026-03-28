@@ -1,57 +1,59 @@
-'use client'
+"use client";
 
-import { RootLayout } from '@/components/common/RootLayout'
-import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
-import { VideoList } from '@/components/video/VideoList'
-import { useVideosQuery, useVideoYearsQuery } from '@/services/useVideosQuery'
-import { useLocation } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { RootLayout } from "@/components/common/RootLayout";
+import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
+import { VideoList } from "@/components/video/VideoList";
+import { useVideosQuery, useVideoYearsQuery } from "@/services/useVideosQuery";
+import { useLocation } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const location = useLocation()
-  const [page, setPage] = useState(1)
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  const [sortField, setSortField] = useState<'jikkyo_date' | 'file_name'>('jikkyo_date')
-  const [selectedYear, setSelectedYear] = useState<number | null>(null)
+  const location = useLocation();
+  const [page, setPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortField, setSortField] = useState<"jikkyo_date" | "file_name">(
+    "jikkyo_date",
+  );
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   // URLからクエリパラメータを読み取る
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    
+    const searchParams = new URLSearchParams(window.location.search);
+
     // pageパラメータを読み取る
-    const pageParam = searchParams.get('page')
+    const pageParam = searchParams.get("page");
     if (pageParam) {
-      const parsedPage = parseInt(pageParam, 10)
+      const parsedPage = parseInt(pageParam, 10);
       if (!isNaN(parsedPage) && parsedPage > 0) {
-        setPage(parsedPage)
+        setPage(parsedPage);
       }
     }
-    
+
     // orderパラメータを読み取る
-    const orderParam = searchParams.get('order')
-    if (orderParam === 'asc' || orderParam === 'desc') {
-      setSortOrder(orderParam)
+    const orderParam = searchParams.get("order");
+    if (orderParam === "asc" || orderParam === "desc") {
+      setSortOrder(orderParam);
     }
 
     // sortParamを読み取る
-    const sortParam = searchParams.get('sort')
-    if (sortParam === 'jikkyo_date' || sortParam === 'file_name') {
-      setSortField(sortParam)
+    const sortParam = searchParams.get("sort");
+    if (sortParam === "jikkyo_date" || sortParam === "file_name") {
+      setSortField(sortParam);
     }
 
     // yearパラメータを読み取る
-    const yearParam = searchParams.get('year')
+    const yearParam = searchParams.get("year");
     if (yearParam) {
-      const parsedYear = parseInt(yearParam, 10)
+      const parsedYear = parseInt(yearParam, 10);
       if (!isNaN(parsedYear) && parsedYear > 0) {
-        setSelectedYear(parsedYear)
+        setSelectedYear(parsedYear);
       }
     }
-  }, [location.search])
+  }, [location.search]);
 
   // 年一覧を取得
-  const { data: yearData } = useVideoYearsQuery()
-  const yearList = (yearData as any) || []
+  const { data: yearData } = useVideoYearsQuery();
+  const yearList = (yearData as any) || [];
 
   // ビデオ一覧を取得（年フィルタリング対応）
   const { data, isLoading } = useVideosQuery({
@@ -59,57 +61,59 @@ export default function HomePage() {
     limit: 20,
     sort: sortField,
     order: sortOrder,
-    year: selectedYear || undefined
-  })
+    year: selectedYear || undefined,
+  });
 
-  const videos = (data as any)?.data || []
-  const total = (data as any)?.pagination?.total || 0
-  const totalPages = (data as any)?.pagination?.total_pages || 0
+  const videos = (data as any)?.data || [];
+  const total = (data as any)?.pagination?.total || 0;
+  const totalPages = (data as any)?.pagination?.total_pages || 0;
 
   // ページ変更時にURLを更新
   const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    const searchParams = new URLSearchParams(window.location.search)
-    searchParams.set('page', newPage.toString())
-    window.history.replaceState({}, '', `?${searchParams.toString()}`)
-  }
+    setPage(newPage);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("page", newPage.toString());
+    window.history.replaceState({}, "", `?${searchParams.toString()}`);
+  };
 
   // ソート順序変更時にURLを更新
-  const handleSortChange = (newOrder: 'asc' | 'desc') => {
-    setSortOrder(newOrder)
-    const searchParams = new URLSearchParams(window.location.search)
-    searchParams.set('order', newOrder)
-    window.history.replaceState({}, '', `?${searchParams.toString()}`)
-  }
+  const handleSortChange = (newOrder: "asc" | "desc") => {
+    setSortOrder(newOrder);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("order", newOrder);
+    window.history.replaceState({}, "", `?${searchParams.toString()}`);
+  };
 
   // 年フィルター変更時にURLを更新
   const handleYearChange = (newYear: number | null) => {
-    setSelectedYear(newYear)
-    setPage(1) // 年フィルター変更時はページを1にリセット
-    const searchParams = new URLSearchParams(window.location.search)
+    setSelectedYear(newYear);
+    setPage(1); // 年フィルター変更時はページを1にリセット
+    const searchParams = new URLSearchParams(window.location.search);
     if (newYear) {
-      searchParams.set('year', newYear.toString())
+      searchParams.set("year", newYear.toString());
     } else {
-      searchParams.delete('year')
+      searchParams.delete("year");
     }
-    searchParams.set('page', '1')
-    window.history.replaceState({}, '', `?${searchParams.toString()}`)
-  }
+    searchParams.set("page", "1");
+    window.history.replaceState({}, "", `?${searchParams.toString()}`);
+  };
 
   // ソートフィールド変更時にURLを更新
-  const handleSortFieldChange = (newField: 'jikkyo_date' | 'file_name') => {
-    setSortField(newField)
-    setPage(1) // ソートフィールド変更時はページを1にリセット
-    const searchParams = new URLSearchParams(window.location.search)
-    searchParams.set('sort', newField)
-    searchParams.set('page', '1')
-    window.history.replaceState({}, '', `?${searchParams.toString()}`)
-  }
+  const handleSortFieldChange = (newField: "jikkyo_date" | "file_name") => {
+    setSortField(newField);
+    setPage(1); // ソートフィールド変更時はページを1にリセット
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("sort", newField);
+    searchParams.set("page", "1");
+    window.history.replaceState({}, "", `?${searchParams.toString()}`);
+  };
 
   return (
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
-        <PageBreadcrumb items={[{label: 'ホーム', href: '/'},{ label: '動画一覧' }]} />
+        <PageBreadcrumb
+          items={[{ label: "ホーム", href: "/" }, { label: "動画一覧" }]}
+        />
         <VideoList
           title="動画一覧"
           videos={videos}
@@ -128,5 +132,5 @@ export default function HomePage() {
         />
       </div>
     </RootLayout>
-  )
+  );
 }
