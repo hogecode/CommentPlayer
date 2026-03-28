@@ -6,7 +6,6 @@ import { create } from 'zustand'
 import { persist, PersistStorage } from 'zustand/middleware'
 import { ClientSettings, createDefaultSettings } from '@/types/settings'
 import { getNormalizedLocalClientSettings } from '@/lib/settings'
-import { getAccessToken } from '@/lib/auth'
 
 interface SettingsStoreState {
   settings: ClientSettings
@@ -53,11 +52,6 @@ export const useSettingsStore = create<SettingsStoreState>()(
        * TODO: サーバーAPIの実装が完了したら実装する
        */
       syncClientSettingsToServer: async () => {
-        const token = getAccessToken()
-        if (!token) {
-          console.log('Not authenticated, skipping settings sync to server')
-          return
-        }
 
         try {
           const { settings } = get()
@@ -93,11 +87,6 @@ export const useSettingsStore = create<SettingsStoreState>()(
        * TODO: サーバーAPIの実装が完了したら実装する
        */
       syncClientSettingsFromServer: async () => {
-        const token = getAccessToken()
-        if (!token) {
-          console.log('Not authenticated, skipping settings sync from server')
-          return
-        }
 
         try {
           // TODO: サーバーAPIエンドポイントを実装してここで呼び出す

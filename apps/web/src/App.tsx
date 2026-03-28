@@ -3,7 +3,6 @@ import { useRegisterSW } from "@/hooks/useRegisterSW";
 import { useSettingsStore } from "@/stores/settings-store";
 import Message from "@/message";
 import { sleep } from "@/lib/utils";
-import { getAccessToken } from "@/lib/auth";
 import { hashClientSettings } from "@/lib/settings";
 import { initializeApiClient } from "@/lib/api/api-setup";
 
@@ -107,7 +106,7 @@ export function App() {
   // ログイン時かつ設定の同期が有効な場合、3秒おきにサーバーから設定を取得する
   useEffect(() => {
     const intervalId = window.setInterval(() => {
-      if (getAccessToken() !== null && settings.sync_settings === true) {
+      if (settings.sync_settings === true) {
         void syncClientSettingsFromServer();
       }
     }, 3 * 1000);
