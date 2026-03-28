@@ -1,3 +1,7 @@
+{
+	admin :2019
+}
+
 https://{$LOCAL_DOMAIN} {
 	tls internal
 
@@ -12,4 +16,13 @@ https://{$LOCAL_DOMAIN} {
 	log {
 		level info
 	}
+}
+
+localhost {
+	reverse_proxy localhost:8000
+}
+
+https://{$VPN_IP}{
+    reverse_proxy localhost:8000
+    tls internal
 }
