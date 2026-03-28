@@ -1,7 +1,7 @@
 'use client'
 
 import { EntityVideo } from '@/generated'
-import { MoreVertical, Heart, Download, Trash2, Plus } from 'lucide-react'
+import { MoreVertical, Heart, Download, Trash2, Plus, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { formatFileSize, formatDuration, formatDateTimeJP, formatVideoDateTimeWithDuration } from '@/lib/format'
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader } from '@/components/ui/item'
@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { useVideoDownloadMutation } from '@/services/useVideoDownload'
+import { useRegenerateThumbnailMutation } from '@/services/useVideos'
 import Message from '@/message'
 
 interface VideoCardProps {
@@ -28,7 +29,9 @@ interface VideoCardProps {
 export function VideoCard({ video, onDelete }: VideoCardProps) {
   const thumbnailUrl = `${import.meta.env.VITE_API_BASE_URL}/screenshots/${video.screenshot_file_path}`
   const downloadMutation = useVideoDownloadMutation()
+  const regenerateThumbnailMutation = useRegenerateThumbnailMutation()
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isRegenerating, setIsRegenerating] = useState(false)
 
   const handleDownload = async () => {
     Message.info('ビデオをダウンロードしています。しばらくお待ちください...')
@@ -49,6 +52,28 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
       Message.error('ビデオのダウンロードに失敗しました')
     } finally {
       setIsDownloading(false)
+    }
+  }
+
+  const handleRegenerateThumbnail = async () => {
+    Message.info('サムネイルを再生成しています。しばらくお待ちください...')
+
+    if (!video.id) {
+      console.error('ビデオIDが見つかりません')
+      return
+    }
+
+    try {
+      setIsRegenerating(true)
+      await regenerateThumbnailMutation.mutateAsync({
+        id: video.id,
+      })
+      Message.success('サムネイルが正常に再生成されました')
+    } catch (error) {
+      console.error('サムネイル再生成エラー:', error)
+      Message.error('サムネイルの再生成に失敗しました')
+    } finally {
+      setIsRegenerating(false)
     }
   }
 
@@ -108,6 +133,13 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
             }}>
               <Download size={32} className="mr-2" />
               <p className="text-xs">ダウンロード ({formatFileSize(video.file_size ?? 0)})</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => {
+              e.preventDefault()
+              handleRegenerateThumbnail()
+            }} disabled={isRegenerating}>
+              <RefreshCw size={32} className="mr-2" />
+              <p className="text-xs">{isRegenerating ? '再生成中...' : 'サムネイル再生成'}</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>

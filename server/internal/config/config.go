@@ -27,7 +27,8 @@ type Config struct {
 
 // StorageConfig - ストレージ設定
 type StorageConfig struct {
-	CapturesDir string `mapstructure:"captures_dir"`
+	CapturesDir   string `mapstructure:"captures_dir"`
+	ScreenshotsDir string `mapstructure:"screenshots_dir"`
 }
 
 // ServerConfig - サーバー設定
@@ -112,4 +113,5 @@ func setDefaults() {
 	viper.SetDefault("log.format", "json")
 	viper.SetDefault("log.use_color", true)
 	viper.SetDefault("storage.captures_dir", "captures")
+	viper.SetDefault("storage.screenshots_dir", "public/screenshots")
 }

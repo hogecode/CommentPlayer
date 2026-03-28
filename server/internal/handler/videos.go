@@ -286,102 +286,120 @@ func (a *App) DownloadVideo(videosGroup *gin.RouterGroup) {
 	})
 }
 
-// RegenerateThumbnail - サムネイルを再生成
-// @Summary サムネイルを再生成
-// @Description ビデオのサムネイルを再生成します
-// @Tags Videos
-// @Param id path int true "ビデオID"
-// @Param body body dto.ThumbnailRegenerateRequest false "リクエストボディ"
-// @Produce json
-// @Success 200 {object} dto.ThumbnailRegenerateResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
-// @Router /api/v1/videos/{id}/thumbnail/regenerate [post]
-func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
-	videosGroup.POST("/:id/thumbnail/regenerate", func(ctx *gin.Context) {
-		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+	// RegenerateThumbnail - サムネイルを再生成
+	// @Summary サムネイルを再生成
+	// @Description ビデオのサムネイルを再生成します
+	// @Tags Videos
+	// @Param id path int true "ビデオID"
+	// @Param body body dto.ThumbnailRegenerateRequest false "リクエストボディ"
+	// @Produce json
+	// @Success 200 {object} dto.ThumbnailRegenerateResponse
+	// @Failure 404 {object} dto.ErrorResponse
+	// @Failure 500 {object} dto.ErrorResponse
+	// @Router /api/v1/videos/{id}/thumbnail/regenerate [post]
+	func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
+		videosGroup.POST("/:id/thumbnail/regenerate", func(ctx *gin.Context) {
+			locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
-		idStr := ctx.Param("id")
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "invalid_video_id"),
-				Code:  "INVALID_ID",
+			idStr := ctx.Param("id")
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "invalid_video_id"),
+					Code:  "INVALID_ID",
+				})
+				return
+			}
+
+			var req dto.ThumbnailRegenerateRequest
+			if err := ctx.ShouldBindJSON(&req); err != nil {
+				ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "invalid_request_body"),
+					Code:  "VALIDATION_ERROR",
+				})
+				return
+			}
+
+			// DB処理をqueryパッケージに委譲
+			video, err := a.VideoQuery.GetVideoByID(id)
+			if err != nil {
+				ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "video_not_found"),
+					Code:  "NOT_FOUND",
+				})
+				return
+			}
+
+			// ビデオファイルが存在するか確認
+			if _, err := os.Stat(video.FilePath); err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_regenerate_thumbnail"),
+					Code:  "FILE_NOT_FOUND",
+				})
+				return
+			}
+
+			// サムネイル出力ディレクトリを取得（Configで管理）
+			screenshotDir := a.Config.Storage.ScreenshotsDir
+
+			// ディレクトリが存在しなければ作成
+			if err := os.MkdirAll(screenshotDir, 0755); err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_regenerate_thumbnail"),
+					Code:  "DIRECTORY_CREATE_ERROR",
+				})
+				return
+			}
+
+			// サムネイル再生成ロジック
+			screenshotFileName, err := service.CaptureScreenshot(video.FilePath, screenshotDir)
+			if err != nil || screenshotFileName == nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_regenerate_thumbnail"),
+					Code:  "THUMBNAIL_GENERATION_ERROR",
+				})
+				return
+			}
+
+			// ThumbnailInfo を更新
+			// リクエストから幅・高さが指定されていればそれを使用、なければデフォルト値を設定
+			// TODO: サムネイル画像の実際のサイズを取得して設定するようにする
+			// TODO: 画像を小さくして、WEBP形式で保存するようにする
+			width := 1280   // デフォルト幅
+			height := 720  // デフォルト高さ
+
+			if req.Width != nil && *req.Width > 0 {
+				width = *req.Width
+			}
+			if req.Height != nil && *req.Height > 0 {
+				height = *req.Height
+			}
+
+			video.ThumbnailInfo = &entity.ThumbnailInfo{
+				Width:       width,
+				Height:      height,
+				GeneratedAt: time.Now(),
+			}
+
+			// スクリーンショットファイルパスを更新
+			video.ScreenshotFilePath = screenshotFileName
+
+			// DBに保存
+			if err := a.DB.Save(video).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_save_video"),
+					Code:  "DATABASE_ERROR",
+				})
+				return
+			}
+
+			ctx.JSON(http.StatusOK, dto.ThumbnailRegenerateResponse{
+				ID:            video.ID,
+				ThumbnailInfo: video.ThumbnailInfo,
+				Message:       i18n.GetSuccessMessage(locale, "thumbnail_regenerated"),
 			})
-			return
-		}
-
-		var req dto.ThumbnailRegenerateRequest
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "invalid_request_body"),
-				Code:  "VALIDATION_ERROR",
-			})
-			return
-		}
-
-		// DB処理をqueryパッケージに委譲
-		video, err := a.VideoQuery.GetVideoByID(id)
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "video_not_found"),
-				Code:  "NOT_FOUND",
-			})
-			return
-		}
-
-		// サムネイル再生成ロジック
-		screenshotFileName, err := service.CaptureScreenshot(video.FilePath, filepath.Dir(video.FilePath))
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "failed_regenerate_thumbnail"),
-				Code:  "THUMBNAIL_GENERATION_ERROR",
-			})
-			return
-		}
-
-		// ThumbnailInfo を更新
-		// リクエストから幅・高さが指定されていればそれを使用、なければデフォルト値を設定
-		// TODO: サムネイル画像の実際のサイズを取得して設定するようにする
-		// TODO: 画像を小さくして、WEBP形式で保存するようにする
-		width := 1280   // デフォルト幅
-		height := 720  // デフォルト高さ
-
-		if req.Width != nil && *req.Width > 0 {
-			width = *req.Width
-		}
-		if req.Height != nil && *req.Height > 0 {
-			height = *req.Height
-		}
-
-		video.ThumbnailInfo = &entity.ThumbnailInfo{
-			Width:       width,
-			Height:      height,
-			GeneratedAt: time.Now(),
-		}
-
-		// スクリーンショットファイルパスを更新
-		if screenshotFileName != nil {
-			screenshotPath := filepath.Join(filepath.Dir(video.FilePath), *screenshotFileName)
-			video.ScreenshotFilePath = &screenshotPath
-		}
-
-		// DBに保存
-		if err := a.DB.Save(video).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "failed_save_video"),
-				Code:  "DATABASE_ERROR",
-			})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, dto.ThumbnailRegenerateResponse{
-			ID:            video.ID,
-			ThumbnailInfo: video.ThumbnailInfo,
-			Message:       i18n.GetSuccessMessage(locale, "thumbnail_regenerated"),
 		})
-	})
-}
+	}
 
 // getCommentsFromFile - ビデオファイルに対応するコメントファイルを取得してApiCommentに変換
 func (a *App) getCommentsFromFile(videoFilePath string) []dto.ApiComment {

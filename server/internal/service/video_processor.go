@@ -125,7 +125,7 @@ type VideoMetadata struct {
 func CalculateFileHash(filePath string) (string, error) {
 	// ファイルが別プロセスで使用中の可能性があるため、リトライロジックを実装
 	const maxRetries = 5
-	const retryDelay = 500 * time.Millisecond
+	const retryDelay = 3 * time.Second
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
@@ -163,7 +163,7 @@ func CalculateFileHash(filePath string) (string, error) {
 // GetFileSize - ファイルサイズをバイト単位で取得（リトライ付き）
 func GetFileSize(filePath string) (int64, error) {
 	const maxRetries = 3
-	const retryDelay = 200 * time.Millisecond
+	const retryDelay = 3 * time.Second
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
@@ -190,7 +190,7 @@ func GetFileSize(filePath string) (int64, error) {
 // GetVideoDuration - ffprobeを使用して動画の長さを取得（秒数、リトライ付き）
 func GetVideoDuration(filePath string) (float64, error) {
 	const maxRetries = 3
-	const retryDelay = 200 * time.Millisecond
+	const retryDelay = 3 * time.Second
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
@@ -243,7 +243,7 @@ func GetVideoDuration(filePath string) (float64, error) {
 // CaptureScreenshot - ffmpegを使用してスクリーンショットを撮る（リトライ付き）
 func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 	const maxRetries = 2
-	const retryDelay = 500 * time.Millisecond
+	const retryDelay = 3 * time.Second
 
 	// 動画の長さを取得してランダムな位置を計算
 	duration, err := GetVideoDuration(videoPath)
@@ -264,34 +264,66 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 		randomPosition = 0
 	}
 
-	// 秒数を分:秒:ミリ秒の形式に変換
-	minutes := int(randomPosition) / 60
+	// 秒数を HH:MM:SS.ms の形式に変換
+	hours := int(randomPosition) / 3600
+	minutes := (int(randomPosition) % 3600) / 60
 	seconds := int(randomPosition) % 60
 	milliseconds := int((randomPosition - float64(int(randomPosition))) * 1000)
-	timeStr := fmt.Sprintf("%02d:%02d:%02d.%03d", minutes, seconds, milliseconds, 0)
+	timeStr := fmt.Sprintf("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds)
 
 	// ランダムなファイル名を生成
 	screenshotFileName := generateRandomString(16) + ".jpg"
 	screenshotPath := filepath.Join(outputDir, screenshotFileName)
 
 	var lastErr error
+	var stderrOutput strings.Builder
+	
 	for attempt := 0; attempt < maxRetries; attempt++ {
 		cmd := exec.Command(
 			ffmpegPath,
-			"-i", videoPath,
 			"-ss", timeStr,
-			"-vframes", "1",
+			"-i", videoPath,
+			"-frames:v", "1",
 			"-q:v", "5",
+			"-y", // 上書き許可
 			screenshotPath,
 		)
+		
+		// stderrをキャプチャして詳細なエラー情報を取得
+		stderrOutput.Reset()
+		cmd.Stderr = &stderrOutput
 
 		if err := cmd.Run(); err == nil {
-			slog.Debug("CaptureScreenshot: Screenshot captured successfully",
-				"video_path", videoPath,
-				"random_position_seconds", randomPosition,
-				"time_str", timeStr,
-				"screenshot_path", screenshotPath)
-			return &screenshotFileName, nil
+			// ファイルが実際に作成されたか確認
+			if _, statErr := os.Stat(screenshotPath); statErr == nil {
+				slog.Debug("CaptureScreenshot: Screenshot captured successfully",
+					"video_path", videoPath,
+					"random_position_seconds", randomPosition,
+					"time_str", timeStr,
+					"screenshot_path", screenshotPath)
+				return &screenshotFileName, nil
+			} else {
+				// cmd.Runは成功したがファイルが存在しない場合
+				slog.Warn("CaptureScreenshot: ffmpeg ran without error but file was not created",
+					"video_path", videoPath,
+					"screenshot_path", screenshotPath,
+					"stat_error", statErr.Error(),
+					"ffmpeg_error", stderrOutput.String())
+				lastErr = statErr
+				
+				// 最後の試行でない場合はリトライ
+				if attempt < maxRetries-1 {
+					slog.Debug("CaptureScreenshot: Retrying ffmpeg command",
+						"video_path", videoPath,
+						"output_path", screenshotPath,
+						"attempt", attempt+1,
+						"max_retries", maxRetries,
+						"ffmpeg_error", stderrOutput.String(),
+						"error", statErr.Error())
+					time.Sleep(retryDelay)
+				}
+				continue
+			}
 		} else {
 			lastErr = err
 
@@ -302,6 +334,7 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 					"output_path", screenshotPath,
 					"attempt", attempt+1,
 					"max_retries", maxRetries,
+					"ffmpeg_error", stderrOutput.String(),
 					"error", err.Error())
 				time.Sleep(retryDelay)
 			}
