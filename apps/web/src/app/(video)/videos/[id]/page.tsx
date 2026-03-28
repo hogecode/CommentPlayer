@@ -4,10 +4,11 @@ import { useParams } from '@tanstack/react-router';
 import { RootLayout } from '@/components/common/RootLayout';
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb';
 import DPlayerVideo from '@/components/video';
-import VideoPanel from '@/components/video/VideoPanel';
+import VideoPanel from '@/components/video/panel/VideoPanel';
 import { useVideoQuery } from '@/services/useVideosQuery';
 import { sampleDanmaku } from '@/misc/sampleDanmaku';
 import type { Comment } from '@/types/danmaku';
+import { EntityVideo } from '@/generated';
 import Message from '@/message';
 import { CommentUtils } from '@/lib/comment-utils';
 import { useSettingsStore } from '@/stores/settings-store';
@@ -86,7 +87,7 @@ export default function VideoPage() {
     return CommentUtils.selectRandomComments(filteredComments, maxCommentsCount);
   }, [videoData, settings]);
 
-  const videoTitle = ((videoData as any)?.title) || `弾幕プレイヤー - ${videoId}`;
+  const videoTitle = ((videoData as any)?.file_name) || `弾幕プレイヤー - ${videoId}`;
   const videoSrc = (`http://100.72.160.115:8000${(videoData as any)?.src}`) || '/blank30.mp4';
   
   if (isLoading) {
@@ -139,6 +140,7 @@ export default function VideoPage() {
             currentTime={currentTime}
             commentDelay={commentDelay}
             onCommentDelayChange={setCommentDelay}
+            video={videoData as EntityVideo}
           />
         </div>
       </div>

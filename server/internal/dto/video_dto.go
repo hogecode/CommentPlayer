@@ -72,12 +72,11 @@ func (v *VideoSearchRequest) SetDefaults() {
 
 // ---Video---
 // VideoResponse - ビデオ詳細レスポンス
+// entity.Videoを埋め込み、SrcとCommentsを追加
 type VideoResponse struct {
-	IsSuccess   bool         `json:"is_success"`
-	Src         string       `json:"src"`
-	Title       *string      `json:"title"`
-	Description *string      `json:"description"`
-	Comments    []ApiComment `json:"comments"`
+	*entity.Video
+	Src      string       `json:"src"`
+	Comments []ApiComment `json:"comments"`
 }
 
 // ---ThumbnailRegenerate---

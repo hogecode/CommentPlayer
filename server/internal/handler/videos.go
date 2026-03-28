@@ -236,12 +236,10 @@ func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 		// http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式
 		videoURL := a.buildVideoURL(video.FolderID, video.FileName)
 
-		response := dto.VideoResponse{
-			IsSuccess:   true,
-			Src:         videoURL,
-			Title:       &video.FileName,
-			Description: video.Description,
-			Comments:    comments,
+		response := &dto.VideoResponse{
+			Video:    video,
+			Src:      videoURL,
+			Comments: comments,
 		}
 		ctx.JSON(http.StatusOK, response)
 	})
