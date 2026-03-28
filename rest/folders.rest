@@ -41,5 +41,7 @@ http://localhost:8000/api/v1/files/1/hibi01.mp4
 ### jpg
 localhost:8000/screenshots/zsBPJrEqtKbF3jM9.jpg
 
-----------------------------------------------------
+### キャプチャ
+http://localhost:8000/captures/5_screenshot_1774659740886.png
 
+----------------------------------------------------

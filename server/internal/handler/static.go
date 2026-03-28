@@ -58,6 +58,19 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 		}
 	}
 
+	// キャプチャディレクトリを静的配信
+	capturesDir := a.Config.Storage.CapturesDir
+	if err := os.MkdirAll(capturesDir, 0755); err != nil {
+		slog.Warn("RegisterStaticRoutes: Failed to create captures directory",
+			"captures_dir", capturesDir,
+			"error", err.Error())
+	} else {
+		engine.Static("/captures", capturesDir)
+		slog.Info("RegisterStaticRoutes: Captures directory static route registered",
+			"captures_dir", capturesDir,
+			"route", "/captures")
+	}
+
 	// スクリーンショットの配信
 	engine.Static("/screenshots", "./public/screenshots")
 

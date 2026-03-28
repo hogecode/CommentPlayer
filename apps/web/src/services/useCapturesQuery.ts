@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CapturesApi } from "@/generated";
+import { CapturesApi, type DtoCaptureListResponse } from "@/generated";
 
 // APIクライアントのセットアップ
 const capturesApi = new CapturesApi();
@@ -14,7 +14,7 @@ export function useCapturesQuery(
   },
   options?: any,
 ) {
-  return useQuery({
+  return useQuery<DtoCaptureListResponse>({
     queryKey: ["captures", params],
     queryFn: async () => {
       const response = await capturesApi.apiV1CapturesGet(

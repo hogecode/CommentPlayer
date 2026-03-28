@@ -265,168 +265,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/mylist": {
-            "get": {
-                "description": "ユーザーのマイリスト一覧を取得します",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Mylist"
-                ],
-                "summary": "マイリスト一覧を取得",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "ページ番号",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "1ページあたりのアイテム数",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.MylistListResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "動画をマイリストに追加します",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Mylist"
-                ],
-                "summary": "マイリストに追加",
-                "parameters": [
-                    {
-                        "description": "リクエストボディ",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.MylistRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.MylistResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/mylist/:videoID": {
-            "delete": {
-                "description": "動画をマイリストから削除します",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Mylist"
-                ],
-                "summary": "マイリストから削除",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ビデオID",
-                        "name": "videoID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SuccessResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/mylist/:videoID/check": {
-            "get": {
-                "description": "動画がマイリストに入っているかチェックします",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Mylist"
-                ],
-                "summary": "マイリスト登録済みかチェック",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ビデオID",
-                        "name": "videoID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "boolean"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/users": {
             "post": {
                 "description": "新しいユーザーアカウントを作成します",
@@ -920,68 +758,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.MylistListResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.MylistWithVideoResponse"
-                    }
-                },
-                "pagination": {
-                    "$ref": "#/definitions/dto.Pagination"
-                }
-            }
-        },
-        "dto.MylistRequest": {
-            "type": "object",
-            "required": [
-                "video_id"
-            ],
-            "properties": {
-                "video_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.MylistResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.MylistWithVideoResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video": {
-                    "$ref": "#/definitions/entity.Video"
-                },
-                "video_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.Pagination": {
             "type": "object",
             "properties": {
@@ -996,14 +772,6 @@ const docTemplate = `{
                 },
                 "total_pages": {
                     "type": "integer"
-                }
-            }
-        },
-        "dto.SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
                 }
             }
         },
@@ -1117,6 +885,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "save_dir": {
+                    "type": "string"
+                },
+                "save_path": {
+                    "type": "string"
                 },
                 "video_id": {
                     "type": "integer"

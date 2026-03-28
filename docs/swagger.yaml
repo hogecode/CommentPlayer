@@ -51,46 +51,6 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.MylistListResponse:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/dto.MylistWithVideoResponse'
-        type: array
-      pagination:
-        $ref: '#/definitions/dto.Pagination'
-    type: object
-  dto.MylistRequest:
-    properties:
-      video_id:
-        type: integer
-    required:
-    - video_id
-    type: object
-  dto.MylistResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      updated_at:
-        type: string
-      video_id:
-        type: integer
-    type: object
-  dto.MylistWithVideoResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      updated_at:
-        type: string
-      video:
-        $ref: '#/definitions/entity.Video'
-      video_id:
-        type: integer
-    type: object
   dto.Pagination:
     properties:
       limit:
@@ -101,11 +61,6 @@ definitions:
         type: integer
       total_pages:
         type: integer
-    type: object
-  dto.SuccessResponse:
-    properties:
-      message:
-        type: string
     type: object
   dto.ThumbnailRegenerateRequest:
     properties:
@@ -181,6 +136,10 @@ definitions:
         type: string
       id:
         type: integer
+      save_dir:
+        type: string
+      save_path:
+        type: string
       video_id:
         type: integer
     type: object
@@ -425,113 +384,6 @@ paths:
       summary: 監視対象フォルダを削除
       tags:
       - Folders
-  /api/v1/mylist:
-    get:
-      description: ユーザーのマイリスト一覧を取得します
-      parameters:
-      - default: 1
-        description: ページ番号
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: 1ページあたりのアイテム数
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.MylistListResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      summary: マイリスト一覧を取得
-      tags:
-      - Mylist
-    post:
-      description: 動画をマイリストに追加します
-      parameters:
-      - description: リクエストボディ
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.MylistRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.MylistResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      summary: マイリストに追加
-      tags:
-      - Mylist
-  /api/v1/mylist/:videoID:
-    delete:
-      description: 動画をマイリストから削除します
-      parameters:
-      - description: ビデオID
-        in: path
-        name: videoID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SuccessResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      summary: マイリストから削除
-      tags:
-      - Mylist
-  /api/v1/mylist/:videoID/check:
-    get:
-      description: 動画がマイリストに入っているかチェックします
-      parameters:
-      - description: ビデオID
-        in: path
-        name: videoID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      summary: マイリスト登録済みかチェック
-      tags:
-      - Mylist
   /api/v1/users:
     post:
       description: 新しいユーザーアカウントを作成します

@@ -119,7 +119,7 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 		}
 
 		// ビデオの存在確認
-		_, err = a.VideoQuery.GetVideoByID(videoID)
+		video, err := a.VideoQuery.GetVideoByID(videoID)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
 				Error: i18n.GetErrorMessage(locale, "video_not_found"),
@@ -134,22 +134,6 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
 				Error: i18n.GetErrorMessage(locale, "file_required"),
 				Code:  "VALIDATION_ERROR",
-			})
-			return
-		}
-
-		// Capture エンティティを作成
-		capture := entity.Capture{
-			Filename:  file.Filename,
-			VideoID:   videoID,
-			CreatedAt: time.Now(),
-		}
-
-		// DB処理をqueryパッケージに委譲
-		if err := a.CaptureQuery.CreateCapture(&capture); err != nil {
-			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "failed_create_capture"),
-				Code:  "INTERNAL_ERROR",
 			})
 			return
 		}
@@ -175,8 +159,30 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-		// ファイルを保存：キャプチャIDとファイル名から保存先パスを構築
-		savePath := filepath.Join(capturesDir, fmt.Sprintf("%d_%s", capture.ID, file.Filename))
+		// Capture エンティティを作成（まずIDを取得するために先にDBに保存）
+		capture := entity.Capture{
+			Filename:  file.Filename,
+			VideoID:   videoID,
+			CreatedAt: time.Now(),
+		}
+
+		// DB処理をqueryパッケージに委譲（IDを自動生成させる）
+		if err := a.CaptureQuery.CreateCapture(&capture); err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_create_capture"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// IDを取得した後、ビデオファイル名を含めたキャプチャファイル名を生成
+		// ファイル名形式: {captureID}_{videoID}_{videoFileName}{ext}
+		ext := filepath.Ext(file.Filename)
+		videoFileNameWithoutExt := video.FileName[:len(video.FileName)-len(filepath.Ext(video.FileName))]
+		saveFileName := fmt.Sprintf("%d_%d_%s%s", capture.ID, videoID, videoFileNameWithoutExt, ext)
+		savePath := filepath.Join(capturesDir, saveFileName)
+
+		// ファイルを保存
 		if err := ctx.SaveUploadedFile(file, savePath); err != nil {
 			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 				Error: i18n.GetErrorMessage(locale, "failed_save_capture_file"),
@@ -185,6 +191,21 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
+		// SaveDir と SavePath を設定して更新
+		capture.SaveDir = capturesDir
+		capture.SavePath = savePath
+		capture.Filename = saveFileName // DBに保存するファイル名を更新
+
+		// DBに更新
+		if err := a.CaptureQuery.UpdateCapture(&capture); err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_save_capture_file"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// 作成した情報でレスポンスを返す
 		ctx.JSON(http.StatusCreated, capture)
 	})
 }

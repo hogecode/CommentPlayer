@@ -56,3 +56,8 @@ func (q *CaptureQuery) GetCaptureByID(id int) (*entity.Capture, error) {
 	}
 	return &capture, nil
 }
+
+// UpdateCapture - キャプチャを更新
+func (q *CaptureQuery) UpdateCapture(capture *entity.Capture) error {
+	return q.db.Save(capture).Error
+}

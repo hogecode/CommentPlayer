@@ -6,9 +6,11 @@ import (
 
 // Capture - キャプチャエンティティ
 type Capture struct {
-	ID        int       `gorm:"primaryKey" json:"id"`
-	Filename  string    `json:"filename"`
-	VideoID   int       `json:"video_id"`
+	ID       int       `gorm:"primaryKey" json:"id"`
+	Filename string    `json:"filename"`
+	VideoID  int       `json:"video_id"`
+	SaveDir  string    `json:"_"`
+	SavePath string    `json:"_"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

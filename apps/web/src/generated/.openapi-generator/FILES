@@ -4,7 +4,6 @@ api.ts
 apis/captures-api.ts
 apis/debug-api.ts
 apis/folders-api.ts
-apis/mylist-api.ts
 apis/static-files-api.ts
 apis/users-api.ts
 apis/videos-api.ts
@@ -19,12 +18,7 @@ docs/DtoFolderActionResponse.md
 docs/DtoFolderListResponse.md
 docs/DtoFolderRequest.md
 docs/DtoFolderResponse.md
-docs/DtoMylistListResponse.md
-docs/DtoMylistRequest.md
-docs/DtoMylistResponse.md
-docs/DtoMylistWithVideoResponse.md
 docs/DtoPagination.md
-docs/DtoSuccessResponse.md
 docs/DtoThumbnailRegenerateRequest.md
 docs/DtoThumbnailRegenerateResponse.md
 docs/DtoUserAccessToken.md
@@ -37,7 +31,6 @@ docs/EntityThumbnailInfo.md
 docs/EntityUser.md
 docs/EntityVideo.md
 docs/FoldersApi.md
-docs/MylistApi.md
 docs/StaticFilesApi.md
 docs/UsersApi.md
 docs/VideosApi.md
@@ -49,12 +42,7 @@ models/dto-folder-action-response.ts
 models/dto-folder-list-response.ts
 models/dto-folder-request.ts
 models/dto-folder-response.ts
-models/dto-mylist-list-response.ts
-models/dto-mylist-request.ts
-models/dto-mylist-response.ts
-models/dto-mylist-with-video-response.ts
 models/dto-pagination.ts
-models/dto-success-response.ts
 models/dto-thumbnail-regenerate-request.ts
 models/dto-thumbnail-regenerate-response.ts
 models/dto-user-access-token-request.ts

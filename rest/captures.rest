@@ -65,5 +65,3 @@ Accept: application/json
 Accept-Language: ja
 
 <file C:\Users\user\Desktop\sample_capture.png>
-
-###
