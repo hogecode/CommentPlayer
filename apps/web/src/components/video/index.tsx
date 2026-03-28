@@ -15,6 +15,12 @@ interface Props {
   onCurrentTimeChange?: (time: number) => void;
   /** コメント遅延オフセット（秒） */
   commentDelay?: number;
+  /** ビデオタイトル（VideoHeader表示用） */
+  videoTitle?: string;
+  /** プログラム時間情報（VideoHeader表示用） */
+  programTime?: string;
+  /** タイムシフト表示フラグ（VideoHeader表示用） */
+  isShowingOriginalBroadcastTime?: boolean;
 }
 
 /**
@@ -24,7 +30,16 @@ interface Props {
  * 動画再生とコメント遅延コントロールの機能を提供します。
  * CommentDelayは A、B、C コメント遷移機能を備えています。
  */
-export default function DPlayerVideo({ src = '', videoId, commentList = [], onCurrentTimeChange, commentDelay = 0 }: Props) {
+export default function DPlayerVideo({ 
+  src = '', 
+  videoId, 
+  commentList = [], 
+  onCurrentTimeChange, 
+  commentDelay = 0,
+  videoTitle,
+  programTime,
+  isShowingOriginalBroadcastTime,
+}: Props) {
   return (
     <div className="dplayer-video-wrapper space-y-4">
       {/* 動画プレイヤー */}
@@ -34,6 +49,9 @@ export default function DPlayerVideo({ src = '', videoId, commentList = [], onCu
         commentList={commentList}
         delayOffset={commentDelay}
         onCurrentTimeChange={onCurrentTimeChange}
+        videoTitle={videoTitle}
+        programTime={programTime}
+        isShowingOriginalBroadcastTime={isShowingOriginalBroadcastTime}
       />
     </div>
   );

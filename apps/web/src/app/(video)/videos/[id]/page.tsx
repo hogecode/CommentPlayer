@@ -113,6 +113,7 @@ export default function VideoPage() {
   return (
     <RootLayout>
       <div className="page-container">
+        {/*
         <div className="px-8 pt-8">
           <PageBreadcrumb items={[
             { label: 'ホーム', href: '/'},
@@ -120,15 +121,16 @@ export default function VideoPage() {
             { label: videoTitle }
           ]} />
         </div>
-        
+        */}
         {/* ビデオプレイヤーとタイトル */}
-        <div className="flex flex-col overflow-hidden px-8 pb-4">
+        <div className="overflow-hidden px-8 pt-4 pb-4">
           <DPlayerVideo
             src={videoSrc}
             commentList={commentList}
             videoId={videoId}
             commentDelay={commentDelay}
             onCurrentTimeChange={setCurrentTime}
+            videoTitle={videoTitle}
           />
         </div>
 

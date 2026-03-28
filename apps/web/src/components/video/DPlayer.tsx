@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useEffect, useRef } from 'react';
 import Message from '@/message';
 import { useCreateCaptureMutation } from '@/services/useCapturesQuery';
+import VideoHeader from '@/components/video/VideoHeader';
 
 interface Props {
   /** 動画ファイルのURL */
@@ -17,6 +18,12 @@ interface Props {
   delayOffset?: number;
   /** 再生時間が更新されたときのコールバック */
   onCurrentTimeChange?: (time: number) => void;
+  /** ビデオタイトル（VideoHeader表示用） */
+  videoTitle?: string;
+  /** プログラム時間情報（VideoHeader表示用） */
+  programTime?: string;
+  /** タイムシフト表示フラグ（VideoHeader表示用） */
+  isShowingOriginalBroadcastTime?: boolean;
 }
 
 /**
@@ -33,7 +40,16 @@ interface Props {
  *     () => video.currentTime - delayOffset
  *   に差し替えることで、コメントの表示タイミングをずらす。
  */
-export default function DPlayer({ src = '', videoId, commentList: danList = [], delayOffset = 0, onCurrentTimeChange }: Props) {
+export default function DPlayer({ 
+  src = '', 
+  videoId, 
+  commentList: danList = [], 
+  delayOffset = 0, 
+  onCurrentTimeChange,
+  videoTitle,
+  programTime,
+  isShowingOriginalBroadcastTime,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const DPlayerRef = useRef<any>(null);
   const commentListRef = useRef<Comment[]>(danList);
@@ -220,7 +236,13 @@ export default function DPlayer({ src = '', videoId, commentList: danList = [], 
   }, [delayOffset]);
 
   return (
-    <div className="dplayer-container-wrapper">
+    <div className="dplayer-container-wrapper group relative w-full h-full">
+      {/* ビデオヘッダー */}
+      <VideoHeader
+        title={videoTitle}
+        programTime={programTime}
+        isShowingOriginalBroadcastTime={isShowingOriginalBroadcastTime}
+      />
       {/* DPlayer はこの div に直接マウントされる */}
       <div ref={containerRef} className="dplayer-container" />
     </div>
