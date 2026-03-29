@@ -20,10 +20,10 @@ import { EntityVideo } from "@/generated";
 interface CommentListProps {
   /** コメント一覧 */
   comments: Comment[];
-  /** 再生モード ('Live' または 'Video') */
-  playbackMode: "Live" | "Video";
   /** ビデオの現在の再生位置（秒） */
   currentPlaybackPosition?: number;
+  /** コメント遅延時間（秒） */
+  commentDelay?: number;
   /** ユーザーがコメントをクリック時のコールバック */
   onCommentClick?: (comment: Comment) => void;
   /** ビデオデータ */
@@ -40,8 +40,8 @@ interface CommentItemWithId extends Comment {
  */
 export default function CommentList({
   comments,
-  playbackMode,
   currentPlaybackPosition = 0,
+  commentDelay = 0,
   onCommentClick,
   video,
 }: CommentListProps) {
@@ -114,7 +114,7 @@ export default function CommentList({
 
   // 動画の再生時間に基づいて表示するコメントインデックスを計算
   useEffect(() => {
-    if (playbackMode !== "Video" || displayedComments.length === 0) return;
+    if ( displayedComments.length === 0) return;
 
     const findCurrentCommentIndex = (fixedVideoTime: number) => {
       let index = 0;
@@ -147,7 +147,9 @@ export default function CommentList({
       return index;
     };
 
-    const index = findCurrentCommentIndex(currentPlaybackPosition);
+    // コメント遅延を適用した再生位置を計算
+    const adjustedPlaybackPosition = currentPlaybackPosition - commentDelay;
+    const index = findCurrentCommentIndex(adjustedPlaybackPosition);
     setCurrentCommentIndex(index);
 
     // 再生時間に合わせてスクロール
@@ -157,7 +159,7 @@ export default function CommentList({
         behavior: "auto",
       });
     }
-  }, [currentPlaybackPosition, playbackMode, displayedComments, virtualizer]);
+  }, [currentPlaybackPosition, commentDelay, displayedComments, virtualizer]);
 
   // 自動スクロール
   useEffect(() => {
@@ -170,16 +172,16 @@ export default function CommentList({
         behavior: "auto",
       });
     }
-  }, [displayedComments.length, playbackMode, isManualScroll, virtualizer]);
+  }, [displayedComments.length, isManualScroll, virtualizer]);
 
   // ビデオ再生時のコメントクリック処理
   const handleCommentClick = useCallback(
     (comment: Comment) => {
-      if (playbackMode === "Video" && onCommentClick) {
+      if (onCommentClick) {
         onCommentClick(comment);
       }
     },
-    [playbackMode, onCommentClick],
+    [onCommentClick],
   );
 
   const handleMuteKeyword = useCallback((comment: CommentItemWithId) => {

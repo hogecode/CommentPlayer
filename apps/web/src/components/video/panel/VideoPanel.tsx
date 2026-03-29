@@ -71,8 +71,8 @@ export default function VideoPanel({
       >
         <CommentList
           comments={comments}
-          playbackMode={playbackMode}
           currentPlaybackPosition={currentTime}
+          commentDelay={commentDelay}
           onCommentClick={onCommentClick}
           video={video} 
         />
