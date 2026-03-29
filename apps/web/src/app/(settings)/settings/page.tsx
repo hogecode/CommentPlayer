@@ -7,6 +7,7 @@ import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { FolderManagement } from '@/components/settings/FolderManagement'
 import { MutedKeywordsSettings } from '@/components/settings/MutedKeywordsSettings'
 import { CommentDisplaySettings } from '@/components/settings/CommentDisplaySettings'
+import { SeriesManagement } from '@/components/settings/SeriesManagement'
 
 export default function SettingsPage() {
 
@@ -36,6 +37,12 @@ export default function SettingsPage() {
           <section className="border rounded-lg p-6">
             <h3 className="text-2xl font-bold mb-4">コメントフィルタリング設定</h3>
             <MutedKeywordsSettings />
+          </section>
+
+          {/* シリーズ管理セクション */}
+          <section className="border rounded-lg p-6">
+            <h3 className="text-2xl font-bold mb-4">シリーズ管理</h3>
+            <SeriesManagement />
           </section>
         </div>
       </div>
