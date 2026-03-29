@@ -577,10 +577,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -644,15 +640,12 @@ paths:
       - Users
   /api/v1/videos:
     get:
-      description: ページネーション対応のビデオ一覧を取得します
+      description: ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
       parameters:
-      - collectionFormat: csv
-        description: ビデオID（複数指定可能）
+      - description: ビデオID（複数指定可能、コンマ区切り、例：
         in: query
-        items:
-          type: integer
         name: ids
-        type: array
+        type: string
       - description: フィルター
         in: query
         name: filterBy

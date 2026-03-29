@@ -14,7 +14,7 @@ All URIs are relative to *https://100.72.160.115*
 # **apiV1VideosGet**
 > DtoVideoListResponse apiV1VideosGet()
 
-ページネーション対応のビデオ一覧を取得します
+ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
 
 ### Example
 
@@ -27,7 +27,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideosApi(configuration);
 
-let ids: Array<number>; //ビデオID（複数指定可能） (optional) (default to undefined)
+let ids: string; //ビデオID（複数指定可能、コンマ区切り、例： (optional) (default to undefined)
 let filterBy: string; //フィルター (optional) (default to undefined)
 let year: number; //年フィルター（例：2023） (optional) (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
@@ -50,7 +50,7 @@ const { status, data } = await apiInstance.apiV1VideosGet(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **ids** | **Array&lt;number&gt;** | ビデオID（複数指定可能） | (optional) defaults to undefined|
+| **ids** | [**string**] | ビデオID（複数指定可能、コンマ区切り、例： | (optional) defaults to undefined|
 | **filterBy** | [**string**] | フィルター | (optional) defaults to undefined|
 | **year** | [**number**] | 年フィルター（例：2023） | (optional) defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|

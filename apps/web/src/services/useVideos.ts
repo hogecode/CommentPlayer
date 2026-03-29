@@ -23,8 +23,13 @@ export function useVideosQuery(
   return useQuery({
     queryKey: ["videos", params],
     queryFn: async () => {
+      // IDsをコンマ区切り文字列に変換
+      const idsString = params?.ids && params.ids.length > 0 
+        ? params.ids.join(",")
+        : undefined;
+      
       const response = await videosApi.apiV1VideosGet(
-        params?.ids,
+        idsString,
         params?.filterBy,
         params?.year ?? undefined,
         params?.page,

@@ -39,9 +39,9 @@ import type { EntityVideo } from '../models';
 export const VideosApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * ページネーション対応のビデオ一覧を取得します
+         * ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
          * @summary ビデオ一覧を取得
-         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [ids] ビデオID（複数指定可能、コンマ区切り、例：
          * @param {string} [filterBy] フィルター
          * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
@@ -51,7 +51,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1VideosGet: async (ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1VideosGet: async (ids?: string, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/videos`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -64,8 +64,8 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (ids) {
-                localVarQueryParameter['ids'] = ids.join(COLLECTION_FORMATS.csv);
+            if (ids !== undefined) {
+                localVarQueryParameter['ids'] = ids;
             }
 
             if (filterBy !== undefined) {
@@ -305,9 +305,9 @@ export const VideosApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = VideosApiAxiosParamCreator(configuration)
     return {
         /**
-         * ページネーション対応のビデオ一覧を取得します
+         * ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
          * @summary ビデオ一覧を取得
-         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [ids] ビデオID（複数指定可能、コンマ区切り、例：
          * @param {string} [filterBy] フィルター
          * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
@@ -317,7 +317,7 @@ export const VideosApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
+        async apiV1VideosGet(ids?: string, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoVideoListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosGet']?.[localVarOperationServerIndex]?.url;
@@ -402,9 +402,9 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = VideosApiFp(configuration)
     return {
         /**
-         * ページネーション対応のビデオ一覧を取得します
+         * ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
          * @summary ビデオ一覧を取得
-         * @param {Array<number>} [ids] ビデオID（複数指定可能）
+         * @param {string} [ids] ビデオID（複数指定可能、コンマ区切り、例：
          * @param {string} [filterBy] フィルター
          * @param {number} [year] 年フィルター（例：2023）
          * @param {number} [page] ページ番号
@@ -414,7 +414,7 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
+        apiV1VideosGet(ids?: string, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig): AxiosPromise<DtoVideoListResponse> {
             return localVarFp.apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options).then((request) => request(axios, basePath));
         },
         /**
@@ -479,9 +479,9 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
  */
 export class VideosApi extends BaseAPI {
     /**
-     * ページネーション対応のビデオ一覧を取得します
+     * ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です
      * @summary ビデオ一覧を取得
-     * @param {Array<number>} [ids] ビデオID（複数指定可能）
+     * @param {string} [ids] ビデオID（複数指定可能、コンマ区切り、例：
      * @param {string} [filterBy] フィルター
      * @param {number} [year] 年フィルター（例：2023）
      * @param {number} [page] ページ番号
@@ -491,7 +491,7 @@ export class VideosApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1VideosGet(ids?: Array<number>, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig) {
+    public apiV1VideosGet(ids?: string, filterBy?: string, year?: number, page?: number, limit?: number, sort?: string, order?: string, options?: RawAxiosRequestConfig) {
         return VideosApiFp(this.configuration).apiV1VideosGet(ids, filterBy, year, page, limit, sort, order, options).then((request) => request(this.axios, this.basePath));
     }
 

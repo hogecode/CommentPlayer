@@ -81,7 +81,6 @@ func (a *App) GetClientSettings(ctx *gin.Context) {
 // @Success 204
 // @Failure 401 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
-// @Failure 422 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /api/v1/settings/client [put]
 func (a *App) UpdateClientSettings(ctx *gin.Context) {

@@ -425,12 +425,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ErrorResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -522,7 +516,7 @@ const docTemplate = `{
         },
         "/api/v1/videos": {
             "get": {
-                "description": "ページネーション対応のビデオ一覧を取得します",
+                "description": "ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です",
                 "produces": [
                     "application/json"
                 ],
@@ -532,12 +526,8 @@ const docTemplate = `{
                 "summary": "ビデオ一覧を取得",
                 "parameters": [
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "integer"
-                        },
-                        "collectionFormat": "csv",
-                        "description": "ビデオID（複数指定可能）",
+                        "type": "string",
+                        "description": "ビデオID（複数指定可能、コンマ区切り、例：",
                         "name": "ids",
                         "in": "query"
                     },

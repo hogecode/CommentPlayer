@@ -16,7 +16,7 @@ type ApiComment struct {
 // ---VideoList---
 // VideoListRequest - ビデオ一覧取得リクエスト
 type VideoListRequest struct {
-	IDs      []int  `form:"ids" validate:"dive,min=1"`
+	IDs      string `form:"ids"`  // コンマ区切りまたは&で区切られた複数ID（例："103,102" または "103&102"）
 	FilterBy string `form:"filterBy"`
 	Year     *int   `form:"year"`  // 年フィルター（例：2023）
 	Page     int    `form:"page" validate:"min=1"`
