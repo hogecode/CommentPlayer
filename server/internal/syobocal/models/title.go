@@ -23,3 +23,38 @@ type Title struct {
 	Search        int    `json:"Search"`
 	Programs      []Program `json:"Programs"` // Optional programs
 }
+
+// TitleLookupResponse is the response from Syoboi TitleLookup API
+type TitleLookupResponse struct {
+	Result      Result       `xml:"Result"`
+	TitleItems  []TitleItem  `xml:"TitleItems>TitleItem"`
+}
+
+// Result represents the result status from TitleLookup API
+type Result struct {
+	Code    int    `xml:"Code"`
+	Message string `xml:"Message"`
+}
+
+// TitleItem represents a title item from TitleLookup API
+type TitleItem struct {
+	ID            string `xml:"id,attr"`
+	TID           string `xml:"TID"`
+	LastUpdate    string `xml:"LastUpdate"`
+	Title         string `xml:"Title"`
+	ShortTitle    string `xml:"ShortTitle"`
+	TitleYomi     string `xml:"TitleYomi"`
+	TitleEN       string `xml:"TitleEN"`
+	Comment       string `xml:"Comment"`
+	Cat           string `xml:"Cat"`
+	TitleFlag     string `xml:"TitleFlag"`
+	FirstYear     string `xml:"FirstYear"`
+	FirstMonth    string `xml:"FirstMonth"`
+	FirstEndYear  string `xml:"FirstEndYear"`
+	FirstEndMonth string `xml:"FirstEndMonth"`
+	FirstCh       string `xml:"FirstCh"`
+	Keywords      string `xml:"Keywords"`
+	UserPoint     string `xml:"UserPoint"`
+	UserPointRank string `xml:"UserPointRank"`
+	SubTitles     string `xml:"SubTitles"`
+}

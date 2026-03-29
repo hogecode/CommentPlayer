@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -156,4 +157,82 @@ func extractDate(dateStr string) time.Time {
 	}
 
 	return time.Unix(timestamp, 0).UTC()
+}
+
+// ParseCommentStructure - Syobocal XML Comment を JSON に構造化
+// XML形式: *セクション -項目1 -項目2 *セクション2 ...
+func ParseCommentStructure(xmlComment string) map[string]interface{} {
+	if xmlComment == "" {
+		return make(map[string]interface{})
+	}
+
+	result := make(map[string]interface{})
+	lines := strings.Split(xmlComment, "\n")
+
+	var currentSection string
+	var currentItems []string
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		if strings.HasPrefix(line, "*") {
+			// 新しいセクション
+			if currentSection != "" && len(currentItems) > 0 {
+				result[currentSection] = currentItems
+			}
+			currentSection = strings.TrimPrefix(line, "*")
+			currentItems = []string{}
+		} else if strings.HasPrefix(line, "-") {
+			// セクション内の項目
+			item := strings.TrimPrefix(line, "-")
+			currentItems = append(currentItems, strings.TrimSpace(item))
+		}
+	}
+
+	// 最後のセクションを追加
+	if currentSection != "" && len(currentItems) > 0 {
+		result[currentSection] = currentItems
+	}
+
+	return result
+}
+
+// ParseSubtitles - Syobocal XML SubTitles を JSON配列に構造化
+// XML形式: *01*タイトル *02*タイトル ...
+func ParseSubtitles(xmlSubtitles string) []map[string]interface{} {
+	if xmlSubtitles == "" {
+		return []map[string]interface{}{}
+	}
+
+	result := []map[string]interface{}{}
+	lines := strings.Split(xmlSubtitles, "\n")
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// *##* という形式を探す
+		if strings.HasPrefix(line, "*") {
+			// 最初の * を削除
+			line = strings.TrimPrefix(line, "*")
+			parts := strings.SplitN(line, "*", 2)
+
+			if len(parts) == 2 {
+				episodeNum := strings.TrimSpace(parts[0])
+				title := strings.TrimSpace(parts[1])
+
+				result = append(result, map[string]interface{}{
+					"episode": episodeNum,
+					"title":   title,
+				})
+			}
+		}
+	}
+
+	return result
 }

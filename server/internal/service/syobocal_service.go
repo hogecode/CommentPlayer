@@ -87,36 +87,66 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 	}, nil
 }
 
-// SaveTitleToSeries - 選択したタイトル情報を Series に保存
+// SaveTitleToSeries - 選択したタイトル情報を Series に保存（TitleLookup APIを呼び出す）
 func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) (*dto.SyobocalSaveTitleResponse, error) {
 	slog.Info("Saving Syobocal title to Series",
 		slog.Int("syobocal_title_id", req.SyobocalTitleID),
-		slog.String("syobocal_title_name", req.SyobocalTitleName))
+		slog.String("syobocal_title_name", req.SyobocalTitleName),
+		slog.String("tid", req.TID))
+
+	// TitleLookup API を呼び出して詳細情報を取得
+	titleLookup, err := ss.client.TitleLookup(req.TID)
+	if err != nil {
+		slog.Error("Failed to call TitleLookup API",
+			slog.String("tid", req.TID),
+			slog.String("error", err.Error()))
+		// エラーでもリクエストのデータで続行
+	}
+
+	// Comment と Subtitles をパース
+	commentJSON := make(entity.JSONMap)
+	subtitlesJSON := make(entity.JSONArray, 0)
+
+	if titleLookup != nil && len(titleLookup.TitleItems) > 0 {
+		item := titleLookup.TitleItems[0]
+		if item.Comment != "" {
+			commentJSON = entity.JSONMap(ParseCommentStructure(item.Comment))
+		}
+		if item.SubTitles != "" {
+			subtitlesJSON = entity.JSONArray(ParseSubtitles(item.SubTitles))
+		}
+	}
 
 	// Series を作成または更新
-	series := entity.Series{
-		SeriesNameFile:      req.SyobocalTitleName,
-		SyobocalTitleID:     &req.SyobocalTitleID,
-		SyobocalTitleName:   &req.SyobocalTitleName,
-		SyobocalTitleNameEn: req.TitleNameEN,
-		Comment:             req.Comment,
+	updates := map[string]interface{}{
+		"syobocal_title_id":     req.SyobocalTitleID,
+		"syobocal_title_name":   req.SyobocalTitleName,
+		"syobocal_title_name_en": req.TitleNameEN,
+		"comment":               commentJSON,
+		"subtitles":             subtitlesJSON,
 	}
 
-	// FirstYear と FirstMonth を int* に変換
+	// FirstYear, FirstMonth, FirstEndYear, FirstEndMonth を追加
 	if req.FirstYear != nil {
-		series.FirstYear = req.FirstYear
+		updates["first_year"] = req.FirstYear
 	}
 	if req.FirstMonth != nil {
-		series.FirstMonth = req.FirstMonth
+		updates["first_month"] = req.FirstMonth
+	}
+	if req.FirstEndYear != nil {
+		updates["first_end_year"] = req.FirstEndYear
+	}
+	if req.FirstEndMonth != nil {
+		updates["first_end_month"] = req.FirstEndMonth
 	}
 
-	// 既存チェック - SyobocalTitleID で検索
+	// 既存チェック
 	var existingSeries entity.Series
 	result := ss.db.Where("syobocal_title_id = ?", req.SyobocalTitleID).First(&existingSeries)
 
 	if result.Error == nil {
 		// 既存レコード更新
-		if err := ss.db.Model(&existingSeries).Updates(&series).Error; err != nil {
+		if err := ss.db.Model(&existingSeries).Updates(updates).Error; err != nil {
 			slog.Error("Failed to update Series",
 				slog.Int("syobocal_title_id", req.SyobocalTitleID),
 				slog.String("error", err.Error()))
@@ -134,6 +164,29 @@ func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) 
 		}, nil
 	} else if result.Error == gorm.ErrRecordNotFound {
 		// 新規作成
+		series := entity.Series{
+			SeriesNameFile:      req.SyobocalTitleName,
+			SyobocalTitleID:     &req.SyobocalTitleID,
+			SyobocalTitleName:   &req.SyobocalTitleName,
+			SyobocalTitleNameEn: req.TitleNameEN,
+			Comment:             commentJSON,
+			Subtitles:           subtitlesJSON,
+		}
+
+		// FirstYear, FirstMonth, FirstEndYear, FirstEndMonth をセット
+		if req.FirstYear != nil {
+			series.FirstYear = req.FirstYear
+		}
+		if req.FirstMonth != nil {
+			series.FirstMonth = req.FirstMonth
+		}
+		if req.FirstEndYear != nil {
+			series.FirstEndYear = req.FirstEndYear
+		}
+		if req.FirstEndMonth != nil {
+			series.FirstEndMonth = req.FirstEndMonth
+		}
+
 		if err := ss.db.Create(&series).Error; err != nil {
 			slog.Error("Failed to create Series",
 				slog.String("series_name", req.SyobocalTitleName),

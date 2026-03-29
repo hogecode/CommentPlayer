@@ -4,19 +4,19 @@ import "github.com/hogecode/commentPlayer/internal/entity"
 
 // SeriesResponse - シリーズレスポンス
 type SeriesResponse struct {
-	ID                int    `json:"id"`
-	SeriesNameFile    string `json:"series_name_file"`
-	SyobocalTitleID   *int   `json:"syobocal_title_id,omitempty"`
-	SyobocalTitleName *string `json:"syobocal_title_name,omitempty"`
-	SyobocalTitleNameEn *string `json:"syobocal_title_name_en,omitempty"`
-	Comment           *string `json:"comment,omitempty"`
-	FirstYear         *int   `json:"first_year,omitempty"`
-	FirstMonth        *int   `json:"first_month,omitempty"`
-	FirstEndYear      *int   `json:"first_end_year,omitempty"`
-	FirstEndMonth     *int   `json:"first_end_month,omitempty"`
-	Subtitles         *string `json:"subtitles,omitempty"`
-	CreatedAt         string  `json:"created_at"`
-	UpdatedAt         string  `json:"updated_at"`
+	ID                int         `json:"id"`
+	SeriesNameFile    string      `json:"series_name_file"`
+	SyobocalTitleID   *int        `json:"syobocal_title_id,omitempty"`
+	SyobocalTitleName *string     `json:"syobocal_title_name,omitempty"`
+	SyobocalTitleNameEn *string   `json:"syobocal_title_name_en,omitempty"`
+	Comment           interface{} `json:"comment,omitempty"`
+	FirstYear         *int        `json:"first_year,omitempty"`
+	FirstMonth        *int        `json:"first_month,omitempty"`
+	FirstEndYear      *int        `json:"first_end_year,omitempty"`
+	FirstEndMonth     *int        `json:"first_end_month,omitempty"`
+	Subtitles         interface{} `json:"subtitles,omitempty"`
+	CreatedAt         string      `json:"created_at"`
+	UpdatedAt         string      `json:"updated_at"`
 }
 
 // SeriesWithVideosResponse - シリーズとビデオを含むレスポンス

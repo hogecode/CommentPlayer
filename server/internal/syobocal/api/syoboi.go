@@ -75,3 +75,37 @@ func (c *Client) ProgLookup(tid string, chIDs string, count int) (*models.ProgLo
 
 	return &result, nil
 }
+
+// TitleLookup calls the Syoboi TitleLookup API
+func (c *Client) TitleLookup(tid string) (*models.TitleLookupResponse, error) {
+	c.logger.Debug("TitleLookup API called",
+		slog.String("TID", tid))
+
+	resp, err := c.R().
+		SetQueryParams(map[string]string{
+			"Command": "TitleLookup",
+			"TID":     tid,
+		}).
+		Get(config.SyoboiTitleSearchURL)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to call TitleLookup API: %w", err)
+	}
+
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("TitleLookup API returned status %d", resp.StatusCode())
+	}
+
+	// Parse XML response
+	var result models.TitleLookupResponse
+	if err := xml.Unmarshal(resp.Body(), &result); err != nil {
+		c.logger.Error("TitleLookup API response parse failed",
+			slog.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to parse TitleLookup response: %w", err)
+	}
+
+	c.logger.Debug("TitleLookup API completed successfully",
+		slog.Int("titleItemCount", len(result.TitleItems)))
+
+	return &result, nil
+}

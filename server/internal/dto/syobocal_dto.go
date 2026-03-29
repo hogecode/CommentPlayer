@@ -26,12 +26,17 @@ type SyobocalTitleResponse struct {
 
 // SyobocalSaveTitleRequest - Syobocal タイトルを Series に保存するリクエスト
 type SyobocalSaveTitleRequest struct {
+	TID               string  `json:"tid" binding:"required"`                  // Syobocal TID (Title ID)
 	SyobocalTitleID   int     `json:"syobocal_title_id" binding:"required"`   // Syobocal Title ID
 	SyobocalTitleName string  `json:"syobocal_title_name" binding:"required"` // Syobocal Title Name
+	SeriesID          *int    `json:"series_id"`                              // シリーズID（既存シリーズの場合）
 	TitleNameEN       *string `json:"title_name_en"`                          // 英語タイトル
-	Comment           *string `json:"comment"`                                // コメント
+	Comment           string  `json:"comment"`                                // コメント（XML形式）
 	FirstYear         *int    `json:"first_year"`                             // 初回放送年
 	FirstMonth        *int    `json:"first_month"`                            // 初回放送月
+	FirstEndYear      *int    `json:"first_end_year"`                         // 最終放送年
+	FirstEndMonth     *int    `json:"first_end_month"`                        // 最終放送月
+	Subtitles         string  `json:"subtitles"`                              // サブタイトル（XML形式）
 }
 
 // SyobocalSaveTitleResponse - Syobocal タイトル保存レスポンス
