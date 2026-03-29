@@ -1,6 +1,9 @@
 
 ### /api/v1/syobocal [post]
 
+
+#### フェーズ1
+
 - リクエストボディはTID、タイトル名(今まで通り)、そしてシリーズIDから取得したidも含める
 - レスポンスはそのままでいい
 - そのあと、GET http://cal.syoboi.jp/db?Command=TitleLookup&TID={number}にGo側でアクセス
@@ -60,3 +63,41 @@ CREATE TABLE `series` (
 変更する値は、各列の右にコメントで記している。
 
 また、comment subtitlesは現在構造化されていないので、*と-を頼りにして、JSONとして構造化するように変更。DBテーブルもtextからjsonにする。
+
+
+#### フェーズ2
+
+**APIリクエスト後の動作**
+
+以下のような非同期処理を実装する。
+先ほど、しょぼいカレンダーのTIDとシリーズテーブルのIDを受け取るリクエストが来た。
+そのTIDを使い、
+
+```sql
+CREATE TABLE `video` (
+    `id` integer PRIMARY KEY AUTOINCREMENT,
+    `file_name` text,
+    `folder_path` text,
+    `file_path` text,
+    `status` text,
+    `file_hash` text,
+    `file_size` integer,
+    `jikkyo_comment_count` integer,
+    `jikkyo_date` datetime,
+    `views` integer,
+    `liked` numeric,
+    `screenshot_file_path` text,
+    `duration` real,
+    `thumbnail_info_json` json,
+    `created_at` datetime,
+    `updated_at` datetime,
+    `folder_id` integer,
+    `description` text, --series.comment
+    `is_deleted` numeric,
+    `series_id` integer,
+    `episode` integer, --
+    `subtitle` text --
+)
+```
+
+これがvideoテーブルである。

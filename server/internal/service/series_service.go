@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/hogecode/commentPlayer/internal/config"
@@ -145,23 +146,41 @@ func (ss *SeriesService) ExtractAndSyncSeriesForVideo(video *entity.Video) error
 		return err
 	}
 
-	// ビデオにシリーズIDを設定
-	if video.SeriesID == nil || *video.SeriesID != series.ID {
-		video.SeriesID = &series.ID
+	// エピソード番号を整数に変換
+	episodeNum, _ := strconv.Atoi(match.EpisodeNum)
 
-		if err := ss.db.Model(video).Update("series_id", series.ID).Error; err != nil {
-			slog.Error("Failed to update video series_id",
+	// ビデオにシリーズIDとエピソードを設定
+	updateNeeded := false
+	if video.SeriesID == nil || *video.SeriesID != series.ID {
+		updateNeeded = true
+	}
+	if video.Episode == nil || *video.Episode != episodeNum {
+		updateNeeded = true
+	}
+
+	if updateNeeded {
+		video.SeriesID = &series.ID
+		video.Episode = &episodeNum
+
+		if err := ss.db.Model(video).
+			Updates(map[string]interface{}{
+				"series_id": series.ID,
+				"episode":   episodeNum,
+			}).Error; err != nil {
+			slog.Error("Failed to update video series_id and episode",
 				"video_id", video.ID,
 				"series_id", series.ID,
+				"episode", episodeNum,
 				"error", err.Error())
-			return fmt.Errorf("failed to update video series_id: %w", err)
+			return fmt.Errorf("failed to update video series_id and episode: %w", err)
 		}
 
-		slog.Debug("Updated video with series",
+		slog.Debug("Updated video with series and episode",
 			"video_id", video.ID,
 			"file_name", fileName,
 			"series_name", match.SeriesName,
-			"series_id", series.ID)
+			"series_id", series.ID,
+			"episode", episodeNum)
 	}
 
 	return nil

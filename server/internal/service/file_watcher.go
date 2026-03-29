@@ -204,7 +204,7 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 
 	// ファイルが別プロセスで使用中の可能性があるため、リトライロジックを実装
 	const maxRetries = 3
-	const retryDelay = 1 * time.Second
+	const retryDelay = 2 * time.Second
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
@@ -286,6 +286,15 @@ func (fw *FileWatcher) restoreVideoRecord(video *entity.Video) {
 		return
 	}
 	log.Printf("Restored video record: %s\n", video.FileName)
+
+	// シリーズを再同期
+	if fw.seriesService != nil {
+		if err := fw.seriesService.ExtractAndSyncSeriesForVideo(video); err != nil {
+			slog.Error("restoreVideoRecord: Failed to sync series",
+				"file_name", video.FileName,
+				"error", err.Error())
+		}
+	}
 }
 
 // getCommentData - コメントファイル情報を取得
@@ -382,20 +391,25 @@ func (fw *FileWatcher) processExistingFiles(folder *entity.Folder) {
 		filePath := filepath.Join(folder.Path, fileName)
 
 		// DBに既存レコードがあるか確認
-		var count int64
-		fw.db.Model(&entity.Video{}).
-			Where("file_name = ? AND folder_id = ?", fileName, folder.ID).
-			Count(&count)
+		var video entity.Video
+		result := fw.db.Where("file_name = ? AND folder_id = ?", fileName, folder.ID).First(&video)
 
-		if count == 0 {
+		if result.Error == gorm.ErrRecordNotFound {
 			// 新規レコードを作成
 			fw.createVideoRecord(filePath, folder.ID)
-		} else {
+		} else if result.Error == nil {
 			// 既存レコードを復旧（削除済みの場合）
-			var video entity.Video
-			fw.db.Where("file_name = ? AND folder_id = ?", fileName, folder.ID).First(&video)
 			if video.IsDeleted {
 				fw.db.Model(&video).Update("is_deleted", false)
+
+				// シリーズを再同期
+				if fw.seriesService != nil {
+					if err := fw.seriesService.ExtractAndSyncSeriesForVideo(&video); err != nil {
+						slog.Error("processExistingFiles: Failed to sync series",
+							"file_name", fileName,
+							"error", err.Error())
+					}
+				}
 			}
 		}
 	}
