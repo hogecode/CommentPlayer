@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { EntitySeries } from './entity-series';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { EntityThumbnailInfo } from './entity-thumbnail-info';
 
 export interface EntityVideo {
@@ -49,6 +52,10 @@ export interface EntityVideo {
      */
     'prog_start_time'?: string;
     'screenshot_file_path'?: string;
+    /**
+     * Series関連付け
+     */
+    'series'?: EntitySeries;
     /**
      * Seriesテーブルへの外部キー
      */

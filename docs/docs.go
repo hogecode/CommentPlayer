@@ -1609,6 +1609,14 @@ const docTemplate = `{
                 "screenshot_file_path": {
                     "type": "string"
                 },
+                "series": {
+                    "description": "Series関連付け",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.Series"
+                        }
+                    ]
+                },
                 "series_id": {
                     "description": "Seriesテーブルへの外部キー",
                     "type": "integer"
@@ -1684,6 +1692,59 @@ const docTemplate = `{
                 },
                 "video_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.JSONMap": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "entity.Series": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "$ref": "#/definitions/entity.JSONMap"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "first_end_month": {
+                    "type": "integer"
+                },
+                "first_end_year": {
+                    "type": "integer"
+                },
+                "first_month": {
+                    "type": "integer"
+                },
+                "first_year": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "series_name_file": {
+                    "description": "{title} 部分",
+                    "type": "string"
+                },
+                "subtitles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "syobocal_title_id": {
+                    "type": "integer"
+                },
+                "syobocal_title_name": {
+                    "type": "string"
+                },
+                "syobocal_title_name_en": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -1789,6 +1850,14 @@ const docTemplate = `{
                 },
                 "screenshot_file_path": {
                     "type": "string"
+                },
+                "series": {
+                    "description": "Series関連付け",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.Series"
+                        }
+                    ]
                 },
                 "series_id": {
                     "description": "Seriesテーブルへの外部キー",

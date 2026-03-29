@@ -22,6 +22,7 @@ Name | Type | Description | Notes
 **prog_end_time** | **string** | 放送終了時刻 | [optional] [default to undefined]
 **prog_start_time** | **string** | 放送開始時刻 | [optional] [default to undefined]
 **screenshot_file_path** | **string** |  | [optional] [default to undefined]
+**series** | [**EntitySeries**](EntitySeries.md) | Series関連付け | [optional] [default to undefined]
 **series_id** | **number** | Seriesテーブルへの外部キー | [optional] [default to undefined]
 **src** | **string** |  | [optional] [default to undefined]
 **status** | **string** | ready, processing, error | [optional] [default to undefined]
@@ -53,6 +54,7 @@ const instance: DtoVideoResponse = {
     prog_end_time,
     prog_start_time,
     screenshot_file_path,
+    series,
     series_id,
     src,
     status,

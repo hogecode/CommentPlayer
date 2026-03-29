@@ -28,6 +28,7 @@ export * from './dto-video-response';
 export * from './dto-video-years-response';
 export * from './dto-watched-history-item';
 export * from './entity-capture';
+export * from './entity-series';
 export * from './entity-thumbnail-info';
 export * from './entity-user';
 export * from './entity-video';

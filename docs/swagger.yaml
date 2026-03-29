@@ -397,6 +397,10 @@ definitions:
         type: string
       screenshot_file_path:
         type: string
+      series:
+        allOf:
+        - $ref: '#/definitions/entity.Series'
+        description: Series関連付け
       series_id:
         description: Seriesテーブルへの外部キー
         type: integer
@@ -448,6 +452,42 @@ definitions:
         type: integer
       video_id:
         type: integer
+    type: object
+  entity.JSONMap:
+    additionalProperties: true
+    type: object
+  entity.Series:
+    properties:
+      comment:
+        $ref: '#/definitions/entity.JSONMap'
+      created_at:
+        type: string
+      first_end_month:
+        type: integer
+      first_end_year:
+        type: integer
+      first_month:
+        type: integer
+      first_year:
+        type: integer
+      id:
+        type: integer
+      series_name_file:
+        description: '{title} 部分'
+        type: string
+      subtitles:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+      syobocal_title_id:
+        type: integer
+      syobocal_title_name:
+        type: string
+      syobocal_title_name_en:
+        type: string
+      updated_at:
+        type: string
     type: object
   entity.ThumbnailInfo:
     properties:
@@ -519,6 +559,10 @@ definitions:
         type: string
       screenshot_file_path:
         type: string
+      series:
+        allOf:
+        - $ref: '#/definitions/entity.Series'
+        description: Series関連付け
       series_id:
         description: Seriesテーブルへの外部キー
         type: integer

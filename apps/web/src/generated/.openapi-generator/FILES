@@ -45,6 +45,7 @@ docs/DtoVideoResponse.md
 docs/DtoVideoYearsResponse.md
 docs/DtoWatchedHistoryItem.md
 docs/EntityCapture.md
+docs/EntitySeries.md
 docs/EntityThumbnailInfo.md
 docs/EntityUser.md
 docs/EntityVideo.md
@@ -87,6 +88,7 @@ models/dto-video-response.ts
 models/dto-video-years-response.ts
 models/dto-watched-history-item.ts
 models/entity-capture.ts
+models/entity-series.ts
 models/entity-thumbnail-info.ts
 models/entity-user.ts
 models/entity-video.ts

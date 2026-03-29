@@ -18,6 +18,9 @@
 import type { DtoApiComment } from './dto-api-comment';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { EntitySeries } from './entity-series';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { EntityThumbnailInfo } from './entity-thumbnail-info';
 
 export interface DtoVideoResponse {
@@ -53,6 +56,10 @@ export interface DtoVideoResponse {
      */
     'prog_start_time'?: string;
     'screenshot_file_path'?: string;
+    /**
+     * Series関連付け
+     */
+    'series'?: EntitySeries;
     /**
      * Seriesテーブルへの外部キー
      */
