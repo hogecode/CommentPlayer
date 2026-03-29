@@ -17,6 +17,7 @@ import {
 import { useVideoDownloadMutation } from '@/services/useVideoDownload'
 import { useRegenerateThumbnailMutation } from '@/services/useVideos'
 import Message from '@/message'
+import { CHANNEL_ID_TO_NAME } from '@/constant'
 
 interface VideoCardProps {
   video: EntityVideo
@@ -96,13 +97,15 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
       {/* メインコンテンツ */}
       <ItemContent>
         <ItemHeader>
-          <ItemTitle>
-              {video.file_name}
+          <ItemTitle className="text-xs">
+              {video.series ? `${video.series.syobocal_title_name} #${video.episode} ${video.subtitle ?? ''}` : `${video.file_name}`}
           </ItemTitle>
         </ItemHeader>
 
         <ItemDescription>
-          <div className="gap-2 text-xs text-muted-foreground">
+          <div className="gap-2 text-[10px] text-muted-foreground min-h-16">
+            <div></div>
+            <div>{CHANNEL_ID_TO_NAME[video.channel_id as number]}</div>
             <div>{formatVideoDateTimeWithDuration(video.jikkyo_date as string, video.duration ?? 0)}</div>
           </div>
         </ItemDescription>
