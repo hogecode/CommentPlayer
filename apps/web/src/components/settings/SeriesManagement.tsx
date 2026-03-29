@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import type { DtoSeriesResponse } from '@/generated'
 import { useSeriesQuery, useResyncSeriesMutation } from '@/services/useSeries'
+import { useSearchSyobocalQuery, useSaveSyobocalTitleMutation } from '@/services/useSyobocal'
 import { Button } from '@/components/ui/button'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Spinner } from '@/components/ui/spinner'
+import { Input } from '@/components/ui/input'
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,12 +16,38 @@ import {
   flexRender,
   type SortingState,
 } from '@tanstack/react-table'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import { Check, ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+interface SeriesRowState {
+  [key: number]: {
+    searchQuery: string
+    selectedTid?: string
+    selectedTitle?: string
+    isOpen: boolean
+    isSaving: boolean
+  }
+}
 
 const columnHelper = createColumnHelper<DtoSeriesResponse>()
 
 export function SeriesManagement() {
   const [mounted, setMounted] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([])
+  const [rowStates, setRowStates] = useState<SeriesRowState>({})
 
   // マウント後のみクエリを実行
   const { data: seriesData, isLoading, error, isError } = useSeriesQuery({
@@ -27,6 +55,7 @@ export function SeriesManagement() {
   })
 
   const resyncMutation = useResyncSeriesMutation()
+  const saveMutation = useSaveSyobocalTitleMutation()
 
   useEffect(() => {
     setMounted(true)
@@ -38,6 +67,25 @@ export function SeriesManagement() {
   if (error) {
     console.error('Failed to fetch series:', error)
   }
+
+  // 行の状態を初期化
+  useEffect(() => {
+    const newStates: SeriesRowState = {}
+    series.forEach((s) => {
+      if (s.id && !rowStates[s.id]) {
+        newStates[s.id] = {
+          searchQuery: s.series_name_file || '',
+          selectedTid: s.syobocal_title_id?.toString(),
+          selectedTitle: s.syobocal_title_name || undefined,
+          isOpen: false,
+          isSaving: false,
+        }
+      }
+    })
+    if (Object.keys(newStates).length > 0) {
+      setRowStates((prev) => ({ ...prev, ...newStates }))
+    }
+  }, [series])
 
   // TanStack Table のカラム定義
   const columns = useMemo(
@@ -60,8 +108,22 @@ export function SeriesManagement() {
           <span className="text-sm">{info.getValue() ?? '-'}</span>
         ),
       }),
+      columnHelper.display({
+        id: 'syobocal-search',
+        header: 'Syobocal 検索',
+        cell: (info) => 
+          info.row.original.id ? (
+            <SyobocalSearchCell
+              rowId={info.row.original.id}
+              seriesNameFile={info.row.original.series_name_file ?? null}
+              rowStates={rowStates}
+              setRowStates={setRowStates}
+              saveMutation={saveMutation}
+            />
+          ) : null,
+      }),
     ],
-    []
+    [rowStates, saveMutation]
   )
 
   // テーブルインスタンスの作成
@@ -134,54 +196,232 @@ export function SeriesManagement() {
             </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="w-1/3 cursor-pointer select-none hover:bg-muted/50 transition-colors"
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      <div className="flex items-center gap-2">
-                        {header.isPlaceholder
-                          ? null
-                          : typeof header.column.columnDef.header === 'string'
-                            ? header.column.columnDef.header
-                            : ''}
-                        <span className="text-xs text-muted-foreground font-normal">
-                          {getSortIcon(header.id)}
-                        </span>
-                      </div>
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={
-                        cell.column.id === 'series_name_file'
-                          ? 'break-all'
-                          : cell.column.id === 'syobocal_title_name'
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className="cursor-pointer select-none hover:bg-muted/50 transition-colors"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        <div className="flex items-center gap-2">
+                          {header.isPlaceholder
+                            ? null
+                            : typeof header.column.columnDef.header === 'string'
+                              ? header.column.columnDef.header
+                              : ''}
+                          {header.id !== 'syobocal-search' && (
+                            <span className="text-xs text-muted-foreground font-normal">
+                              {getSortIcon(header.id)}
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={
+                          cell.column.id === 'series_name_file'
                             ? 'break-all'
-                            : ''
-                      }
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                            : cell.column.id === 'syobocal_title_name'
+                              ? 'break-all'
+                              : ''
+                        }
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// Syobocal 検索セルコンポーネント
+interface SyobocalSearchCellProps {
+  rowId: number
+  seriesNameFile: string | null
+  rowStates: SeriesRowState
+  setRowStates: React.Dispatch<React.SetStateAction<SeriesRowState>>
+  saveMutation: any
+}
+
+function SyobocalSearchCell({
+  rowId,
+  seriesNameFile,
+  rowStates,
+  setRowStates,
+  saveMutation,
+}: SyobocalSearchCellProps) {
+  const rowState = rowStates[rowId] || {
+    searchQuery: seriesNameFile || '',
+    selectedTid: undefined,
+    selectedTitle: undefined,
+    isOpen: false,
+    isSaving: false,
+  }
+
+  const { data: searchResults, isLoading: isSearching } = useSearchSyobocalQuery(
+    rowState.searchQuery
+  )
+
+  const titles = searchResults?.titles ?? []
+  
+  // デバッグ
+  if (searchResults) {
+    console.log('[Syobocal Debug]', {
+      searchQuery: rowState.searchQuery,
+      searchResults,
+      titles,
+      isSearching,
+    })
+  }
+
+  const handleSearch = (value: string) => {
+    setRowStates((prev) => ({
+      ...prev,
+      [rowId]: {
+        ...prev[rowId],
+        searchQuery: value,
+        isOpen: true,
+      },
+    }))
+  }
+
+  const handleSelect = (tid: string, title: string) => {
+    setRowStates((prev) => ({
+      ...prev,
+      [rowId]: {
+        ...prev[rowId],
+        selectedTid: tid,
+        selectedTitle: title,
+        isOpen: false,
+      },
+    }))
+  }
+
+  const handleSave = async () => {
+    if (!rowState.selectedTid || !rowState.selectedTitle) return
+
+    setRowStates((prev) => ({
+      ...prev,
+      [rowId]: { ...prev[rowId], isSaving: true },
+    }))
+
+    try {
+      await saveMutation.mutateAsync({
+        syobocal_title_id: parseInt(rowState.selectedTid),
+        syobocal_title_name: rowState.selectedTitle,
+      })
+    } finally {
+      setRowStates((prev) => ({
+        ...prev,
+        [rowId]: { ...prev[rowId], isSaving: false },
+      }))
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Popover open={rowState.isOpen} onOpenChange={(open) => {
+        setRowStates((prev) => ({
+          ...prev,
+          [rowId]: { ...prev[rowId], isOpen: open },
+        }))
+      }}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={rowState.isOpen}
+            className="w-[200px] justify-between text-black"
+          >
+            {rowState.selectedTitle || rowState.searchQuery || 'タイトルを検索...'}
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder="タイトルを検索..."
+              value={rowState.searchQuery}
+              onValueChange={handleSearch}
+            />
+            <CommandList>
+              <CommandEmpty>
+                {isSearching ? (
+                  <div className="flex justify-center py-2">
+                    <Spinner className="h-4 w-4" />
+                  </div>
+                ) : titles.length === 0 ? (
+                  'タイトルが見つかりません'
+                ) : null}
+              </CommandEmpty>
+              {titles.length > 0 && (
+              <CommandGroup>
+                {titles.map((title) => (
+                  <CommandItem
+                    key={title.tid}
+                    value={title.tid as string}
+                    onSelect={() =>
+                      handleSelect(title.tid as string, title.title as string)
+                    }
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        rowState.selectedTid === title.tid
+                          ? 'opacity-100'
+                          : 'opacity-70'
+                      )}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm">{title.title}</span>
+                      {title.short_title && (
+                        <span className="text-xs">
+                          {title.short_title}
+                        </span>
+                      )}
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      <Button
+        size="sm"
+        onClick={handleSave}
+        disabled={!rowState.selectedTid || rowState.isSaving || saveMutation.isPending}
+        className="bg-green-600 hover:bg-green-700"
+      >
+        {rowState.isSaving ? (
+          <>
+            <Spinner className="mr-1 h-3 w-3" />
+            保存中
+          </>
+        ) : (
+          '保存'
+        )}
+      </Button>
     </div>
   )
 }
