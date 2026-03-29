@@ -1,6 +1,6 @@
 "use client";
 
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { config } from "@/lib/config";
 import { RootLayout } from "@/components/common/RootLayout";
 import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
@@ -103,9 +103,10 @@ export default function VideoPage() {
     (videoData as any)?.file_name || `弾幕プレイヤー - ${videoId}`;
   const videoSrc =
     `${config.apiBaseUrl}${(videoData as any)?.src}` || "/blank30.mp4";
-
+  
+    const router = useRouter();
   const handleBackClick = () => {
-    navigate({ to: "/videos" });
+    router.history.back();
   };
 
   if (isLoading) {
