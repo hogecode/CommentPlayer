@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSettingsStore } from '@/stores/settings-store'
-import type { MutedCommentKeyword } from '@/types/settings'
+import type { DtoMutedCommentKeyword } from '@/types/settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -37,7 +37,7 @@ export function MutedKeywordsSettings() {
         {
           pattern: newKeyword,
           match: matchType,
-        } as MutedCommentKeyword,
+        } as DtoMutedCommentKeyword,
       ]
       updateSettings({ muted_comment_keywords: newKeywords })
       setNewKeyword('')
@@ -52,7 +52,7 @@ export function MutedKeywordsSettings() {
     updateSettings({ muted_comment_keywords: newKeywords })
   }
 
-  const getMatchTypeLabel = (type: string): string => {
+  const getMatchTypeLabel = (type: string | undefined): string => {
     const labels: Record<string, string> = {
       partial: '部分一致',
       forward: '前方一致',
@@ -60,7 +60,7 @@ export function MutedKeywordsSettings() {
       exact: '完全一致',
       regex: '正規表現',
     }
-    return labels[type] || type
+    return labels[type || 'partial'] || type || '部分一致'
   }
 
   return (

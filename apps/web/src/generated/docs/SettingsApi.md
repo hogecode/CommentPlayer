@@ -65,13 +65,13 @@ No authorization required
 import {
     SettingsApi,
     Configuration,
-    DtoUpdateClientSettingsRequest
+    DtoClientSettingsDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new SettingsApi(configuration);
 
-let body: DtoUpdateClientSettingsRequest; //更新するクライアント設定のデータ
+let body: DtoClientSettingsDTO; //更新するクライアント設定のデータ
 
 const { status, data } = await apiInstance.apiV1SettingsClientPut(
     body
@@ -82,7 +82,7 @@ const { status, data } = await apiInstance.apiV1SettingsClientPut(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **body** | **DtoUpdateClientSettingsRequest**| 更新するクライアント設定のデータ | |
+| **body** | **DtoClientSettingsDTO**| 更新するクライアント設定のデータ | |
 
 
 ### Return type

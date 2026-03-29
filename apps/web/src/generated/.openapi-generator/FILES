@@ -26,7 +26,6 @@ docs/DtoPagination.md
 docs/DtoSuccessResponse.md
 docs/DtoThumbnailRegenerateRequest.md
 docs/DtoThumbnailRegenerateResponse.md
-docs/DtoUpdateClientSettingsRequest.md
 docs/DtoUserAccessToken.md
 docs/DtoUserAccessTokenRequest.md
 docs/DtoUserCreateRequest.md
@@ -57,7 +56,6 @@ models/dto-pagination.ts
 models/dto-success-response.ts
 models/dto-thumbnail-regenerate-request.ts
 models/dto-thumbnail-regenerate-response.ts
-models/dto-update-client-settings-request.ts
 models/dto-user-access-token-request.ts
 models/dto-user-access-token.ts
 models/dto-user-create-request.ts

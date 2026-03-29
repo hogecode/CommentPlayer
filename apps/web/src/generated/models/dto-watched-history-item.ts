@@ -16,9 +16,6 @@
 
 export interface DtoWatchedHistoryItem {
     'created_at'?: number;
-    /**
-     * ミリ秒
-     */
     'jikkyo_comment_offset'?: number;
     /**
      * ミリ秒

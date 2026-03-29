@@ -8,6 +8,18 @@ import Message from '@/message';
 import { useCreateCaptureMutation } from '@/services/useCaptures';
 import VideoHeader from '@/components/video/VideoHeader';
 
+/**
+ * 視聴履歴更新の間隔（秒）
+ * この間隔で視聴履歴の再生位置を更新する
+ */
+const WATCHED_HISTORY_UPDATE_INTERVAL = 10;
+
+/**
+ * 視聴開始から履歴に追加するまでの時間（秒）
+ * 動画視聴開始からこの秒数経過した場合のみ視聴履歴に追加する
+ */
+const WATCHED_HISTORY_THRESHOLD_SECONDS = 5;
+
 interface Props {
   /** 動画ファイルのURL */
   src?: string;
@@ -223,34 +235,99 @@ export default function DPlayer({
         document.addEventListener('click', handleOutsideClick);
       }
 
+      // ──────────────────────────────────────────────────────────────
+      // 視聴履歴機能の初期化
+      // ──────────────────────────────────────────────────────────────
+
+      // 視聴履歴更新の時刻を記録（タイムアウト防止用）
+      let lastWatchedHistoryUpdateTime = 0;
+
+      // 再生開始時にイベントを発送したかを追跡
+      let playStartEventEmitted = false;
+
       // 再生時間更新イベントをリッスン
-      if (onCurrentTimeChange && dp.video) {
-        const handleTimeUpdate = () => {
+      const handleTimeUpdate = () => {
+        if (!dp.video) return;
+
+        // 最初の timeupdate イベントで再生開始を通知（App.tsx へ）
+        if (!playStartEventEmitted && videoIdRef.current) {
+          playStartEventEmitted = true;
+          window.dispatchEvent(
+            new CustomEvent('dplayer-video-play-start', {
+              detail: { videoId: videoIdRef.current },
+            })
+          );
+          console.log(
+            `[DPlayer] Video play start event dispatched. (Video ID: ${videoIdRef.current})`
+          );
+        }
+
+        // onCurrentTimeChange コールバックがあれば実行
+        if (onCurrentTimeChange) {
           onCurrentTimeChange(dp.video.currentTime);
-        };
-        
+        }
+
+        // ─────────────────────────────────────────
+        // 視聴履歴の更新処理（一定間隔で間引く）
+        // 既存の視聴履歴がある場合のみ再生位置を更新
+        // ─────────────────────────────────────────
+        const now = new Date().getTime();
+        if (now - lastWatchedHistoryUpdateTime >= WATCHED_HISTORY_UPDATE_INTERVAL * 1000) {
+          lastWatchedHistoryUpdateTime = now;
+
+          if (!videoIdRef.current) {
+            return;
+          }
+
+          const currentTime = dp.video.currentTime;
+          const videoId = videoIdRef.current;
+
+          // 現在の設定を取得
+          const { settings: currentSettings, updateSettings } = useSettingsStore.getState();
+          const watchedHistory = Array.isArray(currentSettings.watched_history)
+            ? currentSettings.watched_history
+            : [];
+
+          // 視聴履歴から該当の動画を検索
+          const historyIndex = watchedHistory.findIndex(
+            (history: any) => history.video_id === videoId
+          );
+
+          // 視聴履歴が既に登録されている場合のみ、再生位置を更新
+          if (historyIndex !== -1) {
+            const updatedHistory = [...watchedHistory];
+            updatedHistory[historyIndex] = {
+              ...updatedHistory[historyIndex],
+              last_playback_position: currentTime,
+              updated_at: Math.floor(Date.now() / 1000), // 秒単位
+            };
+
+            updateSettings({ watched_history: updatedHistory });
+
+            console.log(
+              `[DPlayer] Last playback position updated. (Video ID: ${videoId}, last_playback_position: ${currentTime})`
+            );
+          }
+        }
+      };
+
+      if (dp.video) {
         dp.video.addEventListener('timeupdate', handleTimeUpdate);
-        
-        // クリーンアップ関数を保存
-        DPlayerRef.current._cleanup = () => {
-          dp.video.removeEventListener('timeupdate', handleTimeUpdate);
-          // リスナーをクリーンアップ
-          if (containerRef.current) {
-            containerRef.current.removeEventListener('click', handlePlayerTap);
-            containerRef.current.removeEventListener('touchstart', handlePlayerTap);
-          }
-          document.removeEventListener('click', handleOutsideClick);
-        };
-      } else {
-        // onCurrentTimeChange がない場合のクリーンアップ
-        DPlayerRef.current._cleanup = () => {
-          if (containerRef.current) {
-            containerRef.current.removeEventListener('click', handlePlayerTap);
-            containerRef.current.removeEventListener('touchstart', handlePlayerTap);
-          }
-          document.removeEventListener('click', handleOutsideClick);
-        };
       }
+
+      // クリーンアップ関数を保存
+      DPlayerRef.current._cleanup = () => {
+        if (dp.video) {
+          dp.video.removeEventListener('timeupdate', handleTimeUpdate);
+        }
+
+        // リスナーをクリーンアップ
+        if (containerRef.current) {
+          containerRef.current.removeEventListener('click', handlePlayerTap);
+          containerRef.current.removeEventListener('touchstart', handlePlayerTap);
+        }
+        document.removeEventListener('click', handleOutsideClick);
+      };
     });
 
     return () => {
@@ -281,3 +358,18 @@ export default function DPlayer({
     </div>
   );
 }
+
+/**
+ * 実装完了: 視聴履歴機能（責任分離版）
+ * 
+ * 以下の処理が実装されました：
+ * 1. 再生開始通知: 最初の timeupdate で App.tsx へ dplayer-video-play-start イベントを発送
+ * 2. 再生位置の更新: timeupdate イベントを WATCHED_HISTORY_UPDATE_INTERVAL 秒ごとに間引いて
+ *    既存の視聴履歴の再生位置を更新（App.tsx が追加した履歴に限定）
+ * 3. クリーンアップ: コンポーネントのアンマウント時にイベントリスナーをクリア
+ * 
+ * 【責任分離】
+ * - DPlayer.tsx: 再生位置の更新と再生開始の通知のみを担当
+ * - App.tsx: 視聴開始検出、履歴への新規追加、件数管理を担当
+ *   このアプローチにより、App.tsx の既存処理との競合を回避
+ */

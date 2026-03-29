@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **created_at** | **number** |  | [optional] [default to undefined]
-**jikkyo_comment_offset** | **number** | ミリ秒 | [optional] [default to undefined]
+**jikkyo_comment_offset** | **number** |  | [optional] [default to undefined]
 **last_playback_position** | **number** | ミリ秒 | [optional] [default to undefined]
 **updated_at** | **number** |  | [optional] [default to undefined]
 **video_id** | **number** |  | [optional] [default to undefined]

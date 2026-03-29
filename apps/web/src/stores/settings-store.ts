@@ -3,14 +3,15 @@
  */
 
 import { create } from 'zustand'
-import { persist, PersistStorage } from 'zustand/middleware'
-import { ClientSettings, createDefaultSettings } from '@/types/settings'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import type { DtoClientSettingsDTO } from '@/generated/models'
+import { createDefaultSettings } from '@/types/settings'
 import { getNormalizedLocalClientSettings } from '@/lib/settings'
 
 interface SettingsStoreState {
-  settings: ClientSettings
+  settings: Required<DtoClientSettingsDTO>
   initializeSettings: () => void
-  updateSettings: (updates: Partial<ClientSettings>) => void
+  updateSettings: (updates: Partial<DtoClientSettingsDTO>) => void
 }
 
 const SETTINGS_STORAGE_KEY = 'client_settings'
@@ -34,7 +35,7 @@ export const useSettingsStore = create<SettingsStoreState>()(
        * 設定を更新する
        * persist ミドルウェアにより自動的にローカルストレージに保存されます
        */
-      updateSettings: (updates: Partial<ClientSettings>) => {
+      updateSettings: (updates: Partial<DtoClientSettingsDTO>) => {
         set((state) => {
           const newSettings = {
             ...state.settings,
@@ -47,7 +48,8 @@ export const useSettingsStore = create<SettingsStoreState>()(
     }),
     {
       name: SETTINGS_STORAGE_KEY, // LocalStorage のキー名
-      storage: localStorage as unknown as PersistStorage<SettingsStoreState>, 
+      storage: createJSONStorage(() => localStorage),
+      //storage: localStorage as unknown as PersistStorage<SettingsStoreState>, 
     }
   )
 )

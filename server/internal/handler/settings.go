@@ -77,7 +77,7 @@ func (a *App) GetClientSettings(ctx *gin.Context) {
 // @Description ログイン中のユーザーアカウントのクライアント設定を更新する
 // @Tags Settings
 // @Security Bearer
-// @Param body body dto.UpdateClientSettingsRequest true "更新するクライアント設定のデータ"
+// @Param body body dto.ClientSettingsDTO true "更新するクライアント設定のデータ"
 // @Success 204
 // @Failure 401 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
@@ -95,7 +95,7 @@ func (a *App) UpdateClientSettings(ctx *gin.Context) {
 		return
 	}
 
-	var req dto.UpdateClientSettingsRequest
+	var req dto.ClientSettingsDTO
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error: i18n.GetErrorMessage(locale, "invalid_request_body"),
@@ -132,15 +132,7 @@ func (a *App) UpdateClientSettings(ctx *gin.Context) {
 		}
 	}
 
-	// 現在サーバーに保存されているクライアント設定の最終同期時刻よりも古いクライアント設定が送られてきた場合、エラーを返す
-	if req.LastSyncedAt < currentSettings.LastSyncedAt {
-		ctx.JSON(http.StatusUnprocessableEntity, dto.ErrorResponse{
-			Error: "The client settings are outdated. Please update the client settings from the server.",
-			Code:  "OUTDATED_SETTINGS",
-		})
-		return
-	}
-
+	// 現在サーバーに保存されているクライアント設定とマージして更新
 	// UpdateClientSettingsRequestをClientSettingsDTOに変換
 	newSettings := dto.ClientSettingsDTO{
 		VideoWatchedHistoryMaxCount:                     req.VideoWatchedHistoryMaxCount,

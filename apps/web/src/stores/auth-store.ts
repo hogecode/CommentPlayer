@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist, PersistStorage } from 'zustand/middleware'
+import { createJSONStorage, persist, PersistStorage } from 'zustand/middleware'
 import { EncryptedStorage } from '@/lib/encrypted-storage'
 
 /**
@@ -47,7 +47,8 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: localStorage as unknown as PersistStorage<AuthState>, 
+      storage: createJSONStorage(() => localStorage),
+      // storage: localStorage as unknown as PersistStorage<AuthState>, 
       // CryptoJSの設定がうまくいかないため、通常のlocalStorageを一時的に使用
       //storage: new EncryptedStorage(),
     }

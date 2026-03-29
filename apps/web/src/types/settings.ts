@@ -1,45 +1,21 @@
 /**
  * クライアント設定の型定義
+ * サーバー側で定義された自動生成型を再エクスポート
  */
 
-export interface MutedCommentKeyword {
-  pattern: string
-  match: 'partial' | 'forward' | 'backward' | 'exact' | 'regex'
-}
+export type {
+  DtoClientSettingsDTO,
+  DtoMutedCommentKeyword,
+  DtoMylistItem,
+  DtoWatchedHistoryItem,
+} from '@/generated/models'
 
-export interface ClientSettings {
-  video_watched_history_max_count: number
-
-  // 設定の同期
-  sync_settings: boolean
-  last_synced_at: number
-
-  // コメント（弾幕）設定
-  comment_speed_rate: number // コメントの流れる速度（倍率）
-  comment_font_size: number // コメントのフォントサイズ（ピクセル）
-  close_comment_form_after_sending: boolean // コメント送信後にフォームを閉じるか
-  max_comments_display_count: number // 表示するコメントの最大数（フィルタリング）
-  default_comment_color: string // デフォルトのコメント色（16進数カラーコード）
-
-  // コメントNG設定
-  mute_fixed_comments: boolean // 上下固定コメントをミュート
-  mute_colored_comments: boolean // 色付きコメントをミュート
-  mute_big_size_comments: boolean // 大きいサイズのコメントをミュート
-  mute_vulgar_comments: boolean // 露骨な表現を含むコメントをミュート
-  mute_abusive_discriminatory_prejudiced_comments: boolean // 差別的・政治的表現をミュート
-  mute_consecutive_same_characters_comments: boolean // 連続同一文字をミュート
-  muted_comment_keywords: MutedCommentKeyword[] // ミュートキーワード
-  muted_niconico_user_ids: string[] // ミュートユーザーID
-  mute_comment_keywords_normalize_alphanumeric_width_case: boolean // キーワード正規化
-
-  // その他の設定
-  [key: string]: unknown
-}
+import type { DtoClientSettingsDTO } from '@/generated/models'
 
 /**
  * デフォルト設定を作成する
  */
-export function createDefaultSettings(): ClientSettings {
+export function createDefaultSettings(): Required<DtoClientSettingsDTO> {
   return {
     video_watched_history_max_count: 100,
     sync_settings: true,
@@ -58,5 +34,7 @@ export function createDefaultSettings(): ClientSettings {
     muted_comment_keywords: [],
     muted_niconico_user_ids: [],
     mute_comment_keywords_normalize_alphanumeric_width_case: false,
+    mylist: [],
+    watched_history: [],
   }
 }

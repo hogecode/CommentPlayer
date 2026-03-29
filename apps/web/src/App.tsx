@@ -6,6 +6,17 @@ import Message from "@/message";
 import { sleep } from "@/lib/utils";
 import { hashClientSettings } from "@/lib/settings";
 import { initializeApiClient } from "@/lib/api/api-setup";
+import type { DtoWatchedHistoryItem } from "@/generated/models";
+
+/**
+ * 視聴履歴更新の間隔（秒）
+ */
+const WATCHED_HISTORY_UPDATE_INTERVAL = 10;
+
+/**
+ * 視聴開始から履歴に追加するまでの時間（秒）
+ */
+const WATCHED_HISTORY_THRESHOLD_SECONDS = 5;
 
 /**
  * アプリケーション全体の初期化と Service Worker 管理を行うコンポーネント
@@ -24,6 +35,16 @@ export function App() {
 
   const isUpdatingWatchedHistoryRef = useRef(false);
   const previousSettingsHashRef = useRef("");
+
+  // ──────────────────────────────────────────────────────────────
+  // 視聴履歴管理用の状態
+  // ──────────────────────────────────────────────────────────────
+  /** 現在再生中の動画ID */
+  const currentPlayingVideoIdRef = useRef<number | undefined>(undefined);
+  /** 視聴開始時刻（Unix timestamp in ms） */
+  const watchingStartTimeRef = useRef<number | undefined>(undefined);
+  /** 視聴開始からのタイマーID */
+  const watchHistoryThresholdTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Service Worker の登録と更新イベントを管理
   useRegisterSW({
@@ -84,7 +105,7 @@ export function App() {
       );
 
       const watchedHistoryTrimmed = watchedHistory.filter(
-        (history: unknown) => !removeTargets.has(history),
+        (history: DtoWatchedHistoryItem) => !removeTargets.has(history),
       );
 
       isUpdatingWatchedHistoryRef.current = true;
@@ -104,6 +125,100 @@ export function App() {
       previousSettingsHashRef.current = currentHash;
     }
   }, [settings, updateSettings, updateSettingsMutation]);
+
+  // ──────────────────────────────────────────────────────────────
+  // 動画再生開始イベントをリッスン（DPlayer からの通知）
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const handleVideoPlayStart = (event: Event) => {
+      const customEvent = event as CustomEvent<{ videoId: number }>;
+      const videoId = customEvent.detail?.videoId;
+
+      if (!videoId) return;
+
+      // 既に同じ動画が再生中の場合はタイマーをリセット
+      if (currentPlayingVideoIdRef.current === videoId) {
+        return;
+      }
+
+      // 前のタイマーをクリア
+      if (watchHistoryThresholdTimerRef.current) {
+        clearTimeout(watchHistoryThresholdTimerRef.current);
+      }
+
+      // 現在の再生動画を記録
+      currentPlayingVideoIdRef.current = videoId;
+      watchingStartTimeRef.current = Date.now();
+
+      // 視聴開始から一定秒数後に視聴履歴に追加
+      watchHistoryThresholdTimerRef.current = setTimeout(() => {
+        if (!currentPlayingVideoIdRef.current) {
+          return;
+        }
+
+        const videoIdToAdd = currentPlayingVideoIdRef.current;
+        const { settings: currentSettings, updateSettings: updateSettingsNow } =
+          useSettingsStore.getState();
+
+        const watchedHistory = Array.isArray(currentSettings.watched_history)
+          ? currentSettings.watched_history
+          : [];
+
+        // 視聴履歴から該当の動画を検索
+        const historyIndex = watchedHistory.findIndex(
+          (history: any) => history.video_id === videoIdToAdd
+        );
+
+        // まだ視聴履歴に存在しない場合のみ追加
+        if (historyIndex === -1) {
+          const videoWatchedHistoryMaxCount =
+            currentSettings.video_watched_history_max_count;
+          let updatedHistory = [...watchedHistory];
+
+          // 視聴履歴が最大件数に達している場合は、最も古い履歴を削除
+          if (updatedHistory.length >= videoWatchedHistoryMaxCount) {
+            // 最も古い updated_at のタイムスタンプを持つ履歴を削除
+            const oldestIndex = updatedHistory.reduce(
+              (oldestIdx: number, current: any, idx: number, arr: any[]) => {
+                return (current.updated_at || current.created_at) <
+                  (arr[oldestIdx].updated_at || arr[oldestIdx].created_at)
+                  ? idx
+                  : oldestIdx;
+              },
+              0
+            );
+            updatedHistory.splice(oldestIndex, 1);
+          }
+
+          // 新しい視聴履歴を追加
+          const now = Math.floor(Date.now() / 1000); // 秒単位
+          updatedHistory.push({
+            video_id: videoIdToAdd,
+            last_playback_position: 0, // 初期値は0
+            created_at: now,
+            updated_at: now,
+          });
+
+          isUpdatingWatchedHistoryRef.current = true;
+          updateSettingsNow({ watched_history: updatedHistory });
+          isUpdatingWatchedHistoryRef.current = false;
+
+          console.log(
+            `[App] Watched history added. (Video ID: ${videoIdToAdd})`
+          );
+        }
+      }, WATCHED_HISTORY_THRESHOLD_SECONDS * 1000);
+    };
+
+    window.addEventListener('dplayer-video-play-start', handleVideoPlayStart);
+
+    return () => {
+      window.removeEventListener('dplayer-video-play-start', handleVideoPlayStart);
+      if (watchHistoryThresholdTimerRef.current) {
+        clearTimeout(watchHistoryThresholdTimerRef.current);
+      }
+    };
+  }, []);
 
   // ログイン時かつ設定の同期が有効な場合、30秒おきにサーバーから設定を取得する
   useEffect(() => {

@@ -50,6 +50,7 @@ export function useLoginUserMutation() {
         const { setAccessToken } = useAuthStore.getState()
         setAccessToken(data.access_token)
       }
+      
       await show('success', 'ログインしました。')
       navigate({ to: '/' })
     },

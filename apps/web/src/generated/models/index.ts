@@ -11,7 +11,6 @@ export * from './dto-pagination';
 export * from './dto-success-response';
 export * from './dto-thumbnail-regenerate-request';
 export * from './dto-thumbnail-regenerate-response';
-export * from './dto-update-client-settings-request';
 export * from './dto-user-access-token';
 export * from './dto-user-access-token-request';
 export * from './dto-user-create-request';

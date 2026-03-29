@@ -25,8 +25,6 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 import type { DtoClientSettingsDTO } from '../models';
 // @ts-ignore
 import type { DtoErrorResponse } from '../models';
-// @ts-ignore
-import type { DtoUpdateClientSettingsRequest } from '../models';
 /**
  * SettingsApi - axios parameter creator
  */
@@ -65,11 +63,11 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ログイン中のユーザーアカウントのクライアント設定を更新する
          * @summary クライアント設定更新 API
-         * @param {DtoUpdateClientSettingsRequest} body 更新するクライアント設定のデータ
+         * @param {DtoClientSettingsDTO} body 更新するクライアント設定のデータ
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1SettingsClientPut: async (body: DtoUpdateClientSettingsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1SettingsClientPut: async (body: DtoClientSettingsDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             assertParamExists('apiV1SettingsClientPut', 'body', body)
             const localVarPath = `/api/v1/settings/client`;
@@ -121,11 +119,11 @@ export const SettingsApiFp = function(configuration?: Configuration) {
         /**
          * ログイン中のユーザーアカウントのクライアント設定を更新する
          * @summary クライアント設定更新 API
-         * @param {DtoUpdateClientSettingsRequest} body 更新するクライアント設定のデータ
+         * @param {DtoClientSettingsDTO} body 更新するクライアント設定のデータ
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1SettingsClientPut(body: DtoUpdateClientSettingsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiV1SettingsClientPut(body: DtoClientSettingsDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SettingsClientPut(body, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SettingsApi.apiV1SettingsClientPut']?.[localVarOperationServerIndex]?.url;
@@ -152,11 +150,11 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
         /**
          * ログイン中のユーザーアカウントのクライアント設定を更新する
          * @summary クライアント設定更新 API
-         * @param {DtoUpdateClientSettingsRequest} body 更新するクライアント設定のデータ
+         * @param {DtoClientSettingsDTO} body 更新するクライアント設定のデータ
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1SettingsClientPut(body: DtoUpdateClientSettingsRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiV1SettingsClientPut(body: DtoClientSettingsDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.apiV1SettingsClientPut(body, options).then((request) => request(axios, basePath));
         },
     };
@@ -179,11 +177,11 @@ export class SettingsApi extends BaseAPI {
     /**
      * ログイン中のユーザーアカウントのクライアント設定を更新する
      * @summary クライアント設定更新 API
-     * @param {DtoUpdateClientSettingsRequest} body 更新するクライアント設定のデータ
+     * @param {DtoClientSettingsDTO} body 更新するクライアント設定のデータ
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1SettingsClientPut(body: DtoUpdateClientSettingsRequest, options?: RawAxiosRequestConfig) {
+    public apiV1SettingsClientPut(body: DtoClientSettingsDTO, options?: RawAxiosRequestConfig) {
         return SettingsApiFp(this.configuration).apiV1SettingsClientPut(body, options).then((request) => request(this.axios, this.basePath));
     }
 }

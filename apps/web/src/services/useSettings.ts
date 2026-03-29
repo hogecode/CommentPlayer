@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SettingsApi, type DtoClientSettingsDTO, type DtoUpdateClientSettingsRequest } from "@/generated";
+import { SettingsApi, type DtoClientSettingsDTO } from "@/generated";
 
 // APIクライアントのセットアップ
 const settingsApi = new SettingsApi();
@@ -17,7 +17,7 @@ async function fetchClientSettings() {
  * サーバーにクライアント設定を更新する（非-Hook）
  * @internal このサービスは内部使用のみ
  */
-async function updateClientSettings(settings: DtoUpdateClientSettingsRequest) {
+async function updateClientSettings(settings: DtoClientSettingsDTO) {
   const response = await settingsApi.apiV1SettingsClientPut(settings);
   return response.data;
 }

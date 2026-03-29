@@ -2,7 +2,8 @@
  * クライアント設定管理ユーティリティ
  */
 
-import { ClientSettings, createDefaultSettings } from '@/types/settings'
+import type { DtoClientSettingsDTO } from '@/generated/models'
+import { createDefaultSettings } from '@/types/settings'
 import crypto from 'crypto'
 
 const SETTINGS_STORAGE_KEY = 'client_settings'
@@ -10,7 +11,7 @@ const SETTINGS_STORAGE_KEY = 'client_settings'
 /**
  * LocalStorage から設定を取得する
  */
-export function getLocalStorageSettings(): ClientSettings {
+export function getLocalStorageSettings(): DtoClientSettingsDTO {
   try {
     const stored = localStorage.getItem(SETTINGS_STORAGE_KEY)
     if (stored) {
@@ -25,7 +26,7 @@ export function getLocalStorageSettings(): ClientSettings {
 /**
  * LocalStorage に設定を保存する
  */
-export function setLocalStorageSettings(settings: ClientSettings): void {
+export function setLocalStorageSettings(settings: DtoClientSettingsDTO): void {
   try {
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
   } catch (error) {
@@ -35,18 +36,19 @@ export function setLocalStorageSettings(settings: ClientSettings): void {
 
 /**
  * 設定データの正規化（無効なフィールドを削除、不足分を補充）
+ * すべてのフィールドが値を持つことを保証する
  */
-export function getNormalizedLocalClientSettings(settings: ClientSettings): ClientSettings {
+export function getNormalizedLocalClientSettings(settings: DtoClientSettingsDTO): Required<DtoClientSettingsDTO> {
   const defaults = createDefaultSettings()
   // デフォルト値を基に、入力された値でマージする
   const normalized = { ...defaults, ...settings }
-  return normalized
+  return normalized as Required<DtoClientSettingsDTO>
 }
 
 /**
  * 設定データのハッシュを計算する（last_synced_at は除外）
  */
-export function hashClientSettings(settings: ClientSettings): string {
+export function hashClientSettings(settings: DtoClientSettingsDTO): string {
   // last_synced_at を除外したコピーを作成
   const settingsForHash = { ...settings }
   delete (settingsForHash as any).last_synced_at

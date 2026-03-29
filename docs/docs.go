@@ -405,7 +405,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateClientSettingsRequest"
+                            "$ref": "#/definitions/dto.ClientSettingsDTO"
                         }
                     }
                 ],
@@ -1094,87 +1094,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateClientSettingsRequest": {
-            "type": "object",
-            "properties": {
-                "close_comment_form_after_sending": {
-                    "type": "boolean"
-                },
-                "comment_font_size": {
-                    "type": "integer"
-                },
-                "comment_speed_rate": {
-                    "description": "コメント設定",
-                    "type": "number"
-                },
-                "default_comment_color": {
-                    "type": "string"
-                },
-                "last_synced_at": {
-                    "description": "Unix timestamp (ms)",
-                    "type": "integer"
-                },
-                "max_comments_display_count": {
-                    "type": "integer"
-                },
-                "mute_abusive_discriminatory_prejudiced_comments": {
-                    "type": "boolean"
-                },
-                "mute_big_size_comments": {
-                    "type": "boolean"
-                },
-                "mute_colored_comments": {
-                    "type": "boolean"
-                },
-                "mute_comment_keywords_normalize_alphanumeric_width_case": {
-                    "type": "boolean"
-                },
-                "mute_consecutive_same_characters_comments": {
-                    "type": "boolean"
-                },
-                "mute_fixed_comments": {
-                    "description": "コメントNG設定",
-                    "type": "boolean"
-                },
-                "mute_vulgar_comments": {
-                    "type": "boolean"
-                },
-                "muted_comment_keywords": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.MutedCommentKeyword"
-                    }
-                },
-                "muted_niconico_user_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "mylist": {
-                    "description": "マイリスト情報",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.MylistItem"
-                    }
-                },
-                "sync_settings": {
-                    "description": "設定の同期",
-                    "type": "boolean"
-                },
-                "video_watched_history_max_count": {
-                    "description": "動画履歴",
-                    "type": "integer"
-                },
-                "watched_history": {
-                    "description": "動画視聴履歴",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.WatchedHistoryItem"
-                    }
-                }
-            }
-        },
         "dto.UserAccessToken": {
             "type": "object",
             "properties": {
@@ -1255,12 +1174,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "jikkyo_comment_offset": {
-                    "description": "ミリ秒",
                     "type": "integer"
                 },
                 "last_playback_position": {
                     "description": "ミリ秒",
-                    "type": "integer"
+                    "type": "number"
                 },
                 "updated_at": {
                     "type": "integer"
