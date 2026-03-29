@@ -30,7 +30,6 @@ const pages: { path: string; component: any }[] = [
   { path: '/videos', component: HomePage },
   { path: '/videos/search', component: SearchPage },
   { path: '/videos/$id', component: VideoPage },
-  { path: '/', component: RedirectToVideos }, 
   { path: '/captures/$id', component: CapturePage },
   { path: '/captures', component: CapturesPage },
   { path: '/mylist', component: MyListPage },
@@ -38,6 +37,7 @@ const pages: { path: string; component: any }[] = [
   { path: '/settings', component: SettingsPage },
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
+  { path: '/', component: RedirectToVideos }, 
   { path: '*', component: NotFoundPage },
 ]
 

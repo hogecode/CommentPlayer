@@ -17,6 +17,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyMedia } from '@/components/
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ChevronLeft } from 'lucide-react'
+import { is } from 'date-fns/locale'
 
 interface VideoListProps {
   title: string
@@ -225,6 +226,7 @@ export function VideoList({
                         onPageChange?.(p);
                       }}
                       isActive={p === page}
+                      className={p === page ? "bg-primary text-primary-foreground" : ""}
                     >
                       {p}
                     </PaginationLink>

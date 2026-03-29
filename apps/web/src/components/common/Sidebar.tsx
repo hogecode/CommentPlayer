@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocation, Link } from "@tanstack/react-router";
-import { Film, Image, ListMusic, History, Settings, Info } from "lucide-react";
+import { Home, Film, Image, ListMusic, History, Settings, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface SidebarProps {
   /**
@@ -15,6 +15,7 @@ interface SidebarProps {
  * ナビゲーションリンクの定義
  */
 const navigationLinks = [
+  { path: "/", label: "ホーム", Icon: Home },
   { path: "/videos", label: "ビデオをみる", Icon: Film },
   { path: "/captures", label: "キャプチャ", Icon: Image },
   { path: "/mylist", label: "マイリスト", Icon: ListMusic },
@@ -25,6 +26,9 @@ export default function Sidebar({ iconOnly = true }: SidebarProps) {
   const location = useLocation();
 
   const isLinkActive = (linkPath: string): boolean => {
+    if (linkPath === "/") {
+      return location.pathname === "/";
+    }
     return location.pathname.startsWith(linkPath);
   };
 

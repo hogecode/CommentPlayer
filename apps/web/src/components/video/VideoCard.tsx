@@ -1,8 +1,9 @@
 'use client'
 
 import { EntityVideo } from '@/generated'
-import { MoreVertical, Heart, Download, Trash2, Plus, RefreshCw } from 'lucide-react'
+import { MoreVertical, Heart, Download, Trash2, Plus, RefreshCw, CheckSquare } from 'lucide-react'
 import { useState } from 'react'
+import { useSettingsStore } from '@/stores/settings-store'
 import { formatFileSize, formatDuration, formatDateTimeJP, formatVideoDateTimeWithDuration } from '@/lib/format'
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader } from '@/components/ui/item'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,8 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
   const regenerateThumbnailMutation = useRegenerateThumbnailMutation()
   const [isDownloading, setIsDownloading] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
+  const settingsStore = useSettingsStore()
+  const isInMylist = settingsStore.settings.mylist.some(item => item.id === video.id)
 
   const handleDownload = async () => {
     Message.info('ビデオをダウンロードしています。しばらくお待ちください...')
@@ -108,14 +111,32 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
       {/* アクション */}
       <ItemActions>
         {/* お気に入りボタン */}
-        {/* TODO: ロジック追加 */}
         <Button
           variant="ghost"
           size="icon-sm"
-          className={video.liked ? 'text-red-500' : 'text-muted-foreground'}
-          aria-label="お気に入り"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            
+            if (!isInMylist) {
+              // 追加する場合
+              const newMylist = [...settingsStore.settings.mylist, { id: video.id, created_at: Date.now() }]
+              settingsStore.updateSettings({ mylist: newMylist })
+              Message.success('マイリストに追加しました')
+            } else {
+              // 削除する場合
+              const newMylist = settingsStore.settings.mylist.filter(item => item.id !== video.id)
+              settingsStore.updateSettings({ mylist: newMylist })
+            }
+          }}
+          className={isInMylist ? 'text-blue-500' : 'text-muted-foreground'}
+          aria-label="マイリストに追加"
         >
-          <Plus size={18} fill={video.liked ? 'currentColor' : 'none'} />
+          {isInMylist ? (
+            <CheckSquare size={18} fill="currentColor" />
+          ) : (
+            <Plus size={18} />
+          )}
         </Button>
 
         {/* メニュー */}
