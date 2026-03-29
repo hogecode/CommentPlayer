@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, ReactNode } from "react";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,8 +9,9 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { Search, Download } from "lucide-react";
+import { Search, Download, LogOut, User } from "lucide-react";
 import { pwaInstallHandler } from "pwa-install-handler";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface HeaderProps {
   children?: ReactNode;
@@ -22,6 +23,8 @@ interface HeaderProps {
  */
 export function Header({ children }: HeaderProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { accessToken, removeAccessToken } = useAuthStore();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,15 +82,17 @@ export function Header({ children }: HeaderProps) {
     );
   })();
 
-  // タイムテーブルページかどうか判定
-  const isTimeTablePage = (() => {
+  // アカウント関連のUIを表示するかどうか（settingsページのみ）
+  const showAccount = (() => {
     const path = location.pathname;
-    return (
-      path.startsWith("/timetable") ||
-      path.startsWith("/schedule") ||
-      path.startsWith("/guide")
-    );
+    return path.startsWith("/settings");
   })();
+
+  // ログアウト処理
+  const handleLogout = () => {
+    removeAccessToken();
+    navigate({ to: "/" });
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 flex items-center w-full h-16 px-4 bg-[#1e1310] z-40">
@@ -135,7 +140,7 @@ export function Header({ children }: HeaderProps) {
       )}{" "}
 
       {/* PWAインストールボタン */}
-      {isButtonDisplay && !isTimeTablePage && (
+      {isButtonDisplay && (
         <Button
           onClick={() => pwaInstallHandler.install()}
           variant="default"
@@ -145,6 +150,42 @@ export function Header({ children }: HeaderProps) {
           <Download size={20} className="mr-1" />
           アプリとしてインストール
         </Button>
+      )}
+
+      {/* アカウント関連UI（settingsページのみ） */}
+      {showAccount && (
+        <div className="flex items-center gap-2 ml-4">
+          {accessToken ? (
+            // ログイン済み：ログアウトボタン
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1"
+              aria-label="ログアウト"
+            >
+              <LogOut size={18} />
+              ログアウト
+            </Button>
+          ) : (
+            // 未ログイン：ログインボタンとアカウント作成リンク
+            <>
+              <a
+                href="/login"
+                className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-foreground hover:bg-black rounded-lg transition-colors"
+              >
+                <User size={18} />
+                ログイン
+              </a>
+              <a
+                href="/register"
+                className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-primary hover:bg-black transition-colors"
+              >
+                アカウント作成
+              </a>
+            </>
+          )}
+        </div>
       )}
     </header>
   );

@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useRegisterSW } from "@/hooks/useRegisterSW";
 import { useSettingsStore } from "@/stores/settings-store";
-import { useSettingsQuery, useUpdateSettingsMutation } from "@/services/useSettings";
+import { useAuthStore } from "@/stores/auth-store";
+import {
+  useSettingsQuery,
+  useUpdateSettingsMutation,
+} from "@/services/useSettings";
 import Message from "@/message";
 import { sleep } from "@/lib/utils";
 import { hashClientSettings } from "@/lib/settings";
@@ -27,14 +31,22 @@ export function App() {
   const initializeSettings = useSettingsStore(
     (state) => state.initializeSettings,
   );
+
   const updateSettings = useSettingsStore((state) => state.updateSettings);
-  
+
   // React Query を使用した設定の同期
-  const updateSettingsMutation = useUpdateSettingsMutation();
-  const { refetch: refetchSettings } = useSettingsQuery();
+  const updateSettingsMutation = useUpdateSettingsMutation({
+    enabled: useAuthStore.getState().isAuthenticated(), // ログインしている場合のみ有効
+  });
+
+  const { refetch: refetchSettings } = useSettingsQuery({
+    enabled: useAuthStore.getState().isAuthenticated(), // ログインしている場合のみ有効
+  });
 
   const isUpdatingWatchedHistoryRef = useRef(false);
   const previousSettingsHashRef = useRef("");
+  const settingsSyncTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialMountRef = useRef(true);
 
   // ──────────────────────────────────────────────────────────────
   // 視聴履歴管理用の状態
@@ -76,7 +88,6 @@ export function App() {
     initializeSettings();
   }, [initializeSettings]);
 
-  
   // 設定データの変更を監視して LocalStorage に保存しサーバーに同期する
   useEffect(() => {
     // 視聴履歴の保持件数を変更した際に、既存の視聴履歴件数が上限を超えている場合は削除する
@@ -115,14 +126,33 @@ export function App() {
     }
 
     // 設定データが変更されている場合は、サーバーに同期する
-    // NOTE: persist ミドルウェアが自動的にローカルストレージに保存するため、
-    // setLocalStorageSettings() の呼び出しは不要
     const currentHash = hashClientSettings(settings);
-    if (previousSettingsHashRef.current !== currentHash) {
-      console.log("Client Settings Changed");
-      // ローカル設定をサーバーに同期する
-      updateSettingsMutation.mutate(settings as any);
+
+    if (isInitialMountRef.current) {
+      // 初回マウント時は currentHash を記録するだけで同期処理は実行しない
       previousSettingsHashRef.current = currentHash;
+      isInitialMountRef.current = false;
+      return;
+    }
+
+    if (
+      previousSettingsHashRef.current !== currentHash &&
+      useAuthStore.getState().isAuthenticated() &&
+      settings.sync_settings === true
+    ) {
+      console.log("Client Settings Changed");
+
+      // 前のタイマーをクリア（debounce処理）
+      if (settingsSyncTimerRef.current) {
+        clearTimeout(settingsSyncTimerRef.current);
+      }
+
+      // 5秒後にサーバーに同期する
+      settingsSyncTimerRef.current = setTimeout(() => {
+        updateSettingsMutation.mutate(settings as any);
+        previousSettingsHashRef.current = currentHash;
+        settingsSyncTimerRef.current = null;
+      }, 5000);
     }
   }, [settings, updateSettings, updateSettingsMutation]);
 
@@ -166,7 +196,7 @@ export function App() {
 
         // 視聴履歴から該当の動画を検索
         const historyIndex = watchedHistory.findIndex(
-          (history: any) => history.video_id === videoIdToAdd
+          (history: any) => history.video_id === videoIdToAdd,
         );
 
         // まだ視聴履歴に存在しない場合のみ追加
@@ -185,7 +215,7 @@ export function App() {
                   ? idx
                   : oldestIdx;
               },
-              0
+              0,
             );
             updatedHistory.splice(oldestIndex, 1);
           }
@@ -204,30 +234,34 @@ export function App() {
           isUpdatingWatchedHistoryRef.current = false;
 
           console.log(
-            `[App] Watched history added. (Video ID: ${videoIdToAdd})`
+            `[App] Watched history added. (Video ID: ${videoIdToAdd})`,
           );
         }
       }, WATCHED_HISTORY_THRESHOLD_SECONDS * 1000);
     };
 
-    window.addEventListener('dplayer-video-play-start', handleVideoPlayStart);
+    window.addEventListener("dplayer-video-play-start", handleVideoPlayStart);
 
     return () => {
-      window.removeEventListener('dplayer-video-play-start', handleVideoPlayStart);
+      window.removeEventListener(
+        "dplayer-video-play-start",
+        handleVideoPlayStart,
+      );
       if (watchHistoryThresholdTimerRef.current) {
         clearTimeout(watchHistoryThresholdTimerRef.current);
       }
     };
   }, []);
 
-  // ログイン時かつ設定の同期が有効な場合、30秒おきにサーバーから設定を取得する
+  // ログイン時かつ設定の同期が有効な場合、60秒おきにサーバーから設定を取得する
   useEffect(() => {
     const intervalId = window.setInterval(() => {
-      if (settings.sync_settings === true) {
+      const isAuthenticated = useAuthStore.getState().isAuthenticated();
+      if (isAuthenticated && settings.sync_settings === true) {
         // サーバーから設定を再フェッチする
         void refetchSettings();
       }
-    }, 30 * 1000);
+    }, 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, [settings.sync_settings, refetchSettings]);
