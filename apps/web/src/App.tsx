@@ -253,7 +253,7 @@ export function App() {
     };
   }, []);
 
-  // ログイン時かつ設定の同期が有効な場合、60秒おきにサーバーから設定を取得する
+  // ログイン時かつ設定の同期が有効な場合、3分おきにサーバーから設定を取得する
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       const isAuthenticated = useAuthStore.getState().isAuthenticated();
@@ -261,7 +261,7 @@ export function App() {
         // サーバーから設定を再フェッチする
         void refetchSettings();
       }
-    }, 60 * 1000);
+    }, 60 * 3 * 1000); // 3分おきにチェック
 
     return () => clearInterval(intervalId);
   }, [settings.sync_settings, refetchSettings]);
