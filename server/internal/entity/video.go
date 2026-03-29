@@ -22,6 +22,7 @@ type Video struct {
 	FileName           string          `json:"file_name"`
 	FolderID           int             `json:"folder_id"` // Folderテーブルへの外部キー
 	SeriesID           *int            `json:"series_id"` // Seriesテーブルへの外部キー
+	Series             *Series         `json:"series,omitempty" gorm:"foreignKey:SeriesID"` // Series関連付け
 	Episode            *int            `json:"episode"`   // エピソード番号
 	Subtitle           *string         `json:"subtitle"`  // エピソードサブタイトル
 	FilePath           string          `json:"-"`

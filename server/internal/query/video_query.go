@@ -36,7 +36,7 @@ func NewVideoQuery(db *gorm.DB) *VideoQuery {
 
 // GetVideoList - ビデオ一覧を取得（任意の互換リクエスト型を受け入れる）
 func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit int, sort, order string) ([]entity.Video, int64, error) {
-	query := q.db
+	query := q.db.Preload("Series")
 
 	// is_deletedフラグでフィルター
 	query = query.Where("is_deleted = 0")
@@ -80,7 +80,7 @@ func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit 
 
 // SearchVideos - ビデオを検索
 func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy string) ([]entity.Video, int64, error) {
-	query := q.db.Where("file_name LIKE ? OR description LIKE ?", "%"+q_str+"%", "%"+q_str+"%")
+	query := q.db.Preload("Series").Where("file_name LIKE ? OR description LIKE ?", "%"+q_str+"%", "%"+q_str+"%")
 
 	// FilterBy でフィルター
 	if filterBy != "" {
@@ -127,7 +127,7 @@ func (q *VideoQuery) GetVideoYears() ([]int, error) {
 // GetVideoByID - IDでビデオを取得
 func (q *VideoQuery) GetVideoByID(id int) (*entity.Video, error) {
 	var video entity.Video
-	if err := q.db.First(&video, id).Error; err != nil {
+	if err := q.db.Preload("Series").First(&video, id).Error; err != nil {
 		return nil, err
 	}
 	return &video, nil
