@@ -103,10 +103,10 @@ export function Header({ children }: HeaderProps) {
       >
         <img
           src="/assets/images/logo-light.svg"
-          height={100}
-          width={100}
+          height={45}
+          width={80}
           alt="CommentPlayer Logo"
-          className="block"
+          className="block object-conver"
         />
       </a>
       {/* スペーサー */}
