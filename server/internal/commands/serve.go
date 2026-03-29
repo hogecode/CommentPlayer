@@ -94,9 +94,12 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 	// API アプリケーションを初期化
 	app := handler.NewApp(db, cfg)
 
+	// シリーズサービスを初期化
+	seriesService := service.NewSeriesService(db, cfg)
+
 	// ファイルウォッチャーを初期化・開始
 	screenshotDir := filepath.Join(".", "public", "screenshots")
-	watcher, err := service.NewFileWatcher(db, screenshotDir)
+	watcher, err := service.NewFileWatcher(db, screenshotDir, seriesService)
 	if err != nil {
 		log.Printf("Warning: Failed to initialize file watcher: %v\n", err)
 	} else {

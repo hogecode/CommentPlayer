@@ -4,6 +4,7 @@ api.ts
 apis/captures-api.ts
 apis/debug-api.ts
 apis/folders-api.ts
+apis/series-api.ts
 apis/settings-api.ts
 apis/static-files-api.ts
 apis/users-api.ts
@@ -13,6 +14,7 @@ common.ts
 configuration.ts
 docs/CapturesApi.md
 docs/DebugApi.md
+docs/DtoApiComment.md
 docs/DtoCaptureListResponse.md
 docs/DtoClientSettingsDTO.md
 docs/DtoErrorResponse.md
@@ -23,6 +25,9 @@ docs/DtoFolderResponse.md
 docs/DtoMutedCommentKeyword.md
 docs/DtoMylistItem.md
 docs/DtoPagination.md
+docs/DtoSeriesListResponse.md
+docs/DtoSeriesResponse.md
+docs/DtoSeriesWithVideosResponse.md
 docs/DtoSuccessResponse.md
 docs/DtoThumbnailRegenerateRequest.md
 docs/DtoThumbnailRegenerateResponse.md
@@ -30,6 +35,7 @@ docs/DtoUserAccessToken.md
 docs/DtoUserAccessTokenRequest.md
 docs/DtoUserCreateRequest.md
 docs/DtoVideoListResponse.md
+docs/DtoVideoResponse.md
 docs/DtoVideoYearsResponse.md
 docs/DtoWatchedHistoryItem.md
 docs/EntityCapture.md
@@ -37,12 +43,14 @@ docs/EntityThumbnailInfo.md
 docs/EntityUser.md
 docs/EntityVideo.md
 docs/FoldersApi.md
+docs/SeriesApi.md
 docs/SettingsApi.md
 docs/StaticFilesApi.md
 docs/UsersApi.md
 docs/VideosApi.md
 git_push.sh
 index.ts
+models/dto-api-comment.ts
 models/dto-capture-list-response.ts
 models/dto-client-settings-dto.ts
 models/dto-error-response.ts
@@ -53,6 +61,9 @@ models/dto-folder-response.ts
 models/dto-muted-comment-keyword.ts
 models/dto-mylist-item.ts
 models/dto-pagination.ts
+models/dto-series-list-response.ts
+models/dto-series-response.ts
+models/dto-series-with-videos-response.ts
 models/dto-success-response.ts
 models/dto-thumbnail-regenerate-request.ts
 models/dto-thumbnail-regenerate-response.ts
@@ -60,6 +71,7 @@ models/dto-user-access-token-request.ts
 models/dto-user-access-token.ts
 models/dto-user-create-request.ts
 models/dto-video-list-response.ts
+models/dto-video-response.ts
 models/dto-video-years-response.ts
 models/dto-watched-history-item.ts
 models/entity-capture.ts

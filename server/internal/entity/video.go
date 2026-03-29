@@ -21,6 +21,7 @@ type Video struct {
 	ID                 int             `gorm:"primaryKey" json:"id"`
 	FileName           string          `json:"file_name"`
 	FolderID           int             `json:"folder_id"` // Folderテーブルへの外部キー
+	SeriesID           *int            `json:"series_id"` // Seriesテーブルへの外部キー
 	FilePath           string          `json:"-"`
 	Description        *string         `json:"description"`
 	Status             string          `json:"status"` // ready, processing, error

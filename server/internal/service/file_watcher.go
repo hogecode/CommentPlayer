@@ -21,10 +21,11 @@ type FileWatcher struct {
 	watcher             *fsnotify.Watcher
 	done                chan bool
 	screenshotOutputDir string
+	seriesService       *SeriesService
 }
 
 // NewFileWatcher - FileWatcherを新規作成
-func NewFileWatcher(db *gorm.DB, screenshotOutputDir string) (*FileWatcher, error) {
+func NewFileWatcher(db *gorm.DB, screenshotOutputDir string, seriesService *SeriesService) (*FileWatcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create watcher: %w", err)
@@ -36,6 +37,7 @@ func NewFileWatcher(db *gorm.DB, screenshotOutputDir string) (*FileWatcher, erro
 		watcher:             watcher,
 		done:                make(chan bool),
 		screenshotOutputDir: screenshotOutputDir,
+		seriesService:       seriesService,
 	}, nil
 }
 
@@ -241,6 +243,17 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 			slog.Info("Created video record",
 				"file_name", fileName,
 				"file_hash", metadata.FileHash)
+
+			// シリーズを抽出して同期
+			if fw.seriesService != nil {
+				if err := fw.seriesService.ExtractAndSyncSeriesForVideo(&video); err != nil {
+					slog.Error("createVideoRecord: Failed to sync series",
+						"file_path", filePath,
+						"file_name", fileName,
+						"error", err.Error())
+				}
+			}
+
 			return
 		}
 
@@ -335,6 +348,15 @@ func (fw *FileWatcher) SyncFoldersWithDB() error {
 
 	// 削除されたフォルダの処理
 	fw.markDeletedFoldersVideos()
+
+	// シリーズを再同期
+	if fw.seriesService != nil {
+		if err := fw.seriesService.SyncAllVideosWithSeries(); err != nil {
+			slog.Error("SyncFoldersWithDB: Failed to sync all videos with series",
+				"error", err.Error())
+			// エラーがあってもフォルダ監視は継続
+		}
+	}
 
 	return nil
 }

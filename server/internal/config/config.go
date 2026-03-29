@@ -23,12 +23,18 @@ type Config struct {
 	DB          DBConfig
 	Log         LogConfig
 	Storage     StorageConfig
+	Series      SeriesConfig
 }
 
 // StorageConfig - ストレージ設定
 type StorageConfig struct {
 	CapturesDir   string `mapstructure:"captures_dir"`
 	ScreenshotsDir string `mapstructure:"screenshots_dir"`
+}
+
+// SeriesConfig - シリーズ設定
+type SeriesConfig struct {
+	Patterns []string `mapstructure:"patterns"` // ファイル名パターン例: "{title}{episode}", "{title}-{episode}"
 }
 
 // ServerConfig - サーバー設定
@@ -116,4 +122,5 @@ func setDefaults() {
 	viper.SetDefault("log.use_color", true)
 	viper.SetDefault("storage.captures_dir", "captures")
 	viper.SetDefault("storage.screenshots_dir", "public/screenshots")
+	viper.SetDefault("series.patterns", []string{"{title}{episode}", "{title}-{episode}"})
 }

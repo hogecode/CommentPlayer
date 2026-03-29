@@ -45,3 +45,7 @@ localhost:8000/screenshots/zsBPJrEqtKbF3jM9.jpg
 http://localhost:8000/captures/5_screenshot_1774659740886.png
 
 ----------------------------------------------------
+
+### Resync Series
+POST {{baseUrl}}/series/resync
+

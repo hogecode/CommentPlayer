@@ -1,4 +1,40 @@
 definitions:
+  dto.ApiComment:
+    properties:
+      author:
+        description: コメント投稿者ID（匿名の場合はnil）
+        type: string
+      color:
+        description: コメント色（16進数カラーコード）
+        type: string
+      size:
+        description: コメントサイズ
+        enum:
+        - big
+        - medium
+        - small
+        type: string
+      text:
+        description: コメント本文
+        type: string
+      time:
+        description: コメント表示時刻（秒）
+        minimum: 0
+        type: number
+      type:
+        description: コメント位置
+        enum:
+        - right
+        - top
+        - bottom
+        type: string
+    required:
+    - color
+    - size
+    - text
+    - time
+    - type
+    type: object
   dto.CaptureListResponse:
     properties:
       data:
@@ -134,6 +170,53 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.SeriesListResponse:
+    properties:
+      series:
+        items:
+          $ref: '#/definitions/dto.SeriesResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.SeriesResponse:
+    properties:
+      comment:
+        type: string
+      created_at:
+        type: string
+      first_end_month:
+        type: integer
+      first_end_year:
+        type: integer
+      first_month:
+        type: integer
+      first_year:
+        type: integer
+      id:
+        type: integer
+      series_name_file:
+        type: string
+      subtitles:
+        type: string
+      syobocal_title_id:
+        type: integer
+      syobocal_title_name:
+        type: string
+      syobocal_title_name_en:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.SeriesWithVideosResponse:
+    properties:
+      series:
+        $ref: '#/definitions/dto.SeriesResponse'
+      videos:
+        items:
+          $ref: '#/definitions/dto.VideoResponse'
+        type: array
+    type: object
   dto.SuccessResponse:
     properties:
       message:
@@ -201,6 +284,52 @@ definitions:
         type: array
       pagination:
         $ref: '#/definitions/dto.Pagination'
+    type: object
+  dto.VideoResponse:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/dto.ApiComment'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      duration:
+        type: number
+      file_name:
+        type: string
+      file_size:
+        type: integer
+      folder_id:
+        description: Folderテーブルへの外部キー
+        type: integer
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      jikkyo_comment_count:
+        type: integer
+      jikkyo_date:
+        type: string
+      liked:
+        type: boolean
+      screenshot_file_path:
+        type: string
+      series_id:
+        description: Seriesテーブルへの外部キー
+        type: integer
+      src:
+        type: string
+      status:
+        description: ready, processing, error
+        type: string
+      thumbnail_info:
+        $ref: '#/definitions/entity.ThumbnailInfo'
+      updated_at:
+        type: string
+      views:
+        type: integer
     type: object
   dto.VideoYearsResponse:
     properties:
@@ -294,6 +423,9 @@ definitions:
         type: boolean
       screenshot_file_path:
         type: string
+      series_id:
+        description: Seriesテーブルへの外部キー
+        type: integer
       status:
         description: ready, processing, error
         type: string
@@ -303,6 +435,9 @@ definitions:
         type: string
       views:
         type: integer
+    type: object
+  gin.H:
+    additionalProperties: {}
     type: object
 host: 100.72.160.115
 info:
@@ -530,6 +665,71 @@ paths:
       summary: 監視対象フォルダを削除
       tags:
       - Folders
+  /api/v1/series:
+    get:
+      description: 全てのシリーズの一覧を取得します
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SeriesListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: シリーズ一覧を取得
+      tags:
+      - Series
+  /api/v1/series/{id}:
+    get:
+      description: 指定されたシリーズIDに関連する全てのビデオを取得します
+      parameters:
+      - description: シリーズID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SeriesWithVideosResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: シリーズとそのビデオを取得
+      tags:
+      - Series
+  /api/v1/series/resync:
+    post:
+      description: 全てのビデオをシリーズと再同期します。ファイル名パターンからシリーズを抽出し、ビデオに割り当てます。
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: すべてのビデオをシリーズと同期
+      tags:
+      - Series
   /api/v1/settings/client:
     get:
       description: ログイン中のユーザーアカウントのクライアント設定を取得する

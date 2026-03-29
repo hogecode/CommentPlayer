@@ -28,6 +28,11 @@ func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 	foldersGroup := v1.Group("/folders")
 	a.RegisterFolderRoutes(foldersGroup)
 
+	// シリーズ関連ルートを登録
+	seriesHandler := NewSeriesHandler(a.DB, a.Config)
+	seriesGroup := v1.Group("/series")
+	RegisterSeriesRoutes(seriesGroup, seriesHandler)
+
 	// 静的ファイルダウンロード API ルートを登録
 	filesGroup := v1.Group("/files")
 	a.GetFileFromFolder(filesGroup)

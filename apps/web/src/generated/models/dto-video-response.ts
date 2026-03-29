@@ -15,9 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { DtoApiComment } from './dto-api-comment';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { EntityThumbnailInfo } from './entity-thumbnail-info';
 
-export interface EntityVideo {
+export interface DtoVideoResponse {
+    'comments'?: Array<DtoApiComment>;
     'created_at'?: string;
     'description'?: string;
     'duration'?: number;
@@ -37,6 +41,7 @@ export interface EntityVideo {
      * Seriesテーブルへの外部キー
      */
     'series_id'?: number;
+    'src'?: string;
     /**
      * ready, processing, error
      */

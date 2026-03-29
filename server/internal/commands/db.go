@@ -86,6 +86,7 @@ func migrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&entity.Folder{},
 		&entity.Video{},
+		&entity.Series{},
 		&entity.Capture{},
 		&entity.User{},
 	)
