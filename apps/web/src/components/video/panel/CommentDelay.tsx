@@ -101,50 +101,50 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
       <div className="flex gap-2 justify-center">
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleCommentDelay(commentDelay + 60)}
           title="60秒減少"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-6 h-6" />
         </Button>
 
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleCommentDelay(commentDelay + 5)}
           title="5秒減少"
         >
-          <ArrowDown className="w-4 h-4" />
+          <ArrowDown className="w-6 h-6" />
         </Button>
 
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleCommentDelay(commentDelay - 5)}
           title="5秒増加"
         >
-          <ArrowUp className="w-4 h-4" />
+          <ArrowUp className="w-6 h-6" />
         </Button>
 
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleCommentDelay(commentDelay - 60)}
           title="60秒増加"
         >
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-6 h-6" />
         </Button>
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={handleReset}
           title="遅延をリセット"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-6 h-6" />
         </Button>
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleSetDelayFromPatternComment(/^キタ/)}
           title="キタコメントへ遷移"
           className={
@@ -157,7 +157,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
         </Button>
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleSetDelayFromComment("A")}
           title="Aコメントへ遷移"
           className={
@@ -169,7 +169,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
 
         <Button
           variant="default"
-          size="sm"
+          size="lg"
           onClick={() => handleSetDelayFromComment("B")}
           title="Bコメントへ遷移"
           className={

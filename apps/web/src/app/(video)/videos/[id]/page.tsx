@@ -4,7 +4,7 @@ import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { config } from "@/lib/config";
 import { RootLayout } from "@/components/common/RootLayout";
 import { PageBreadcrumb } from "@/components/common/PageBreadcrumb";
-import DPlayerVideo from "@/components/video";
+import DPlayer from "@/components/video/DPlayer";
 import VideoPanel from "@/components/video/panel/VideoPanel";
 import { useVideoQuery } from "@/services/useVideos";
 import { sampleDanmaku } from "@/misc/sampleDanmaku";
@@ -20,7 +20,7 @@ import { ChevronLeft } from "lucide-react";
  * ビデオページコンポーネント
  *
  * URLパラメータから動画IDを取得し、useVideoQueryでビデオデータを取得
- * ビデオデータ（src + コメント）をDPlayerVideoに渡す
+ * ビデオデータ（src + コメント）をDPlayerに渡す
  *
  * CommentUtilsを使用してコメント設定に基づいてコメントをフィルタリング
  */
@@ -134,7 +134,7 @@ export default function VideoPage() {
   return (
     <RootLayout>
       <div className="page-container ">
-        <div className="px-8 flex gap-3 ">
+        <div className="px-8 flex gap-3 pt-3">
           {/* バック矢印ボタン */}
           <button
             className=" flex transition-colors hover:bg-white/10 active:bg-white/20"
@@ -153,11 +153,11 @@ export default function VideoPage() {
         </div>
         {/* ビデオプレイヤーとタイトル */}
         <div className="overflow-hidden px-8 pb-4">
-          <DPlayerVideo
+          <DPlayer
             src={videoSrc}
             commentList={commentList}
             videoId={videoId}
-            commentDelay={commentDelay}
+            delayOffset={commentDelay}
             onCurrentTimeChange={setCurrentTime}
             videoTitle={videoTitle}
           />

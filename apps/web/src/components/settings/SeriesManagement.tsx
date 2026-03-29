@@ -421,7 +421,7 @@ function SyobocalSearchCell({
         disabled={
           !rowState.selectedTid || rowState.isSaving || saveMutation.isPending
         }
-        className="bg-green-600 hover:bg-green-700" text-xs
+        className="bg-green-600 hover:bg-green-700 text-xs"
       >
         {rowState.isSaving ? (
           <>
