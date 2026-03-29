@@ -59,6 +59,9 @@ export default function VideoPage() {
     const defaultColor = settings.default_comment_color || "white";
     const maxCommentsCount = settings.max_comments_display_count || 5000;
 
+    // ビデオの配信開始時刻を取得
+    const videoJikkyoDate = (videoData as any)?.jikkyo_date;
+
     // 変換とフィルタリング
     const filteredComments = comments
       .map((comment: any, index: number) => ({
@@ -75,6 +78,7 @@ export default function VideoPage() {
         ),
         type: comment.type || "right",
         size: comment.size || "medium",
+        jikkyo_date: videoJikkyoDate, // ビデオの配信開始時刻を全コメントに使用
       }))
       .filter((comment: Comment) => {
         // CommentUtilsを使用してコメント設定に基づいてミュート判定
@@ -89,7 +93,7 @@ export default function VideoPage() {
       });
 
     // ランダムに選択して、元の時間順序を保つ
-    return CommentUtils.selectRandomComments(
+    return CommentUtils.selectRandomOrderedComments(
       filteredComments,
       maxCommentsCount,
     );

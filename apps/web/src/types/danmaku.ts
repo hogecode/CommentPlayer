@@ -33,4 +33,5 @@ export interface Comment {
   color: string;
   type: 'top' | 'right' | 'bottom';
   size: 'big' | 'medium' | 'small';
+  jikkyo_date?: number; // コメントの実時刻（UnixタイムスタンプまたはUTC時刻）
 }

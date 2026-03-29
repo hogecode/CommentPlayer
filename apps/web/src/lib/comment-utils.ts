@@ -214,7 +214,7 @@ export class CommentUtils {
    * @param count 抽出する要素の数
    * @return 抽出した要素を元の順序で返す
    */
-  static selectRandomComments<T>(array: T[], count: number): T[] {
+  static selectRandomOrderedComments<T>(array: T[], count: number): T[] {
     if (array.length <= count) {
       return array;
     }

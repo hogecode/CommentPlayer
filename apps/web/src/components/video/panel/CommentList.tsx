@@ -1,29 +1,33 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Comment } from '@/types/danmaku';
-import { useSettingsStore } from '@/stores/settings-store';
-import { CommentUtils } from '@/lib/comment-utils';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { Comment } from "@/types/danmaku";
+import { useSettingsStore } from "@/stores/settings-store";
+import { CommentUtils } from "@/lib/comment-utils";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import Message from '@/message';
-import { MoreVertical, Copy, User, Ban, Filter, ArrowDown } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import Message from "@/message";
+import { MoreVertical, Copy, User, Ban, Filter, ArrowDown } from "lucide-react";
+import { Video } from "dplayer/dist/d.ts/types";
+import { EntityVideo } from "@/generated";
 
 interface CommentListProps {
   /** コメント一覧 */
   comments: Comment[];
   /** 再生モード ('Live' または 'Video') */
-  playbackMode: 'Live' | 'Video';
+  playbackMode: "Live" | "Video";
   /** ビデオの現在の再生位置（秒） */
   currentPlaybackPosition?: number;
   /** ユーザーがコメントをクリック時のコールバック */
   onCommentClick?: (comment: Comment) => void;
+  /** ビデオデータ */
+  video: EntityVideo;
 }
 
 interface CommentItemWithId extends Comment {
@@ -39,12 +43,17 @@ export default function CommentList({
   playbackMode,
   currentPlaybackPosition = 0,
   onCommentClick,
+  video,
 }: CommentListProps) {
   const { settings } = useSettingsStore();
-  const [displayedComments, setDisplayedComments] = useState<CommentItemWithId[]>([]);
+  const [displayedComments, setDisplayedComments] = useState<
+    CommentItemWithId[]
+  >([]);
   const [isManualScroll, setIsManualScroll] = useState(false);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
-  const [contextMenuComment, setContextMenuComment] = useState<CommentItemWithId | null>(null);
+  const [contextMenuComment, setContextMenuComment] =
+    useState<CommentItemWithId | null>(null);
+  const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrollingRef = useRef(false);
   const lastScrollTimeRef = useRef(0);
@@ -58,7 +67,7 @@ export default function CommentList({
         comment.color,
         comment.type,
         comment.size,
-        settings
+        settings,
       );
     });
   }, [comments, settings]);
@@ -80,10 +89,10 @@ export default function CommentList({
     estimateSize: () => 30, // コメント行の推定高さ（px）
     overscan: 10,
     measureElement:
-      typeof window !== 'undefined' && navigator.userAgent?.includes('Mac')
+      typeof window !== "undefined" && navigator.userAgent?.includes("Mac")
         ? undefined
         : (element) => element?.getBoundingClientRect().height ?? 30,
-  }); 
+  });
 
   const virtualItems = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
@@ -103,54 +112,62 @@ export default function CommentList({
     }
   }, []);
 
-  // ユーザーホイールスクロール検出
-  const handleWheel = useCallback(() => {
-    isUserScrollingRef.current = true;
-    setTimeout(() => {
-      isUserScrollingRef.current = false;
-    }, 100);
-  }, []);
-
-  // タッチスクロール検出
-  const handleTouchStart = useCallback(() => {
-    isUserScrollingRef.current = true;
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    isUserScrollingRef.current = false;
-  }, []);
-
-  // 再生時間に応じた自動スクロール（ビデオモード専用）
+  // 動画の再生時間に基づいて表示するコメントインデックスを計算
   useEffect(() => {
-    if (playbackMode !== 'Video' || !parentRef.current) return;
-    if (displayedComments.length === 0) return;
+    if (playbackMode !== "Video" || displayedComments.length === 0) return;
 
-    // 現在の再生時間に最も近いコメントのインデックスを見つける
-    let targetIndex = 0;
-    for (let i = 0; i < displayedComments.length; i++) {
-      if (displayedComments[i].time <= currentPlaybackPosition) {
-        targetIndex = i;
-      } else {
-        break;
+    const findCurrentCommentIndex = (fixedVideoTime: number) => {
+      let index = 0;
+
+      // コメントの再生時間が現在の再生時間より小さい最大のインデックスを探す
+      for (let i = currentCommentIndex; i < displayedComments.length; i++) {
+        if (displayedComments[i].time <= fixedVideoTime) {
+          index = i;
+        } else {
+          break; // 条件を満たさない場合はループを抜ける
+        }
       }
+
+      // currentCommentIndex以降で満たさないコメントがあった場合、二分探索を実行
+      // シークで移動した場合用
+      if (displayedComments[index].time > fixedVideoTime) {
+        let low = 0;
+        let high = displayedComments.length - 1;
+        while (low <= high) {
+          const mid = Math.floor((low + high) / 2);
+          if (displayedComments[mid].time <= fixedVideoTime) {
+            index = mid;
+            low = mid + 1; // 満たすインデックスを見つけたので、次のインデックスを調べる
+          } else {
+            high = mid - 1;
+          }
+        }
+      }
+
+      return index;
+    };
+
+    const index = findCurrentCommentIndex(currentPlaybackPosition);
+    setCurrentCommentIndex(index);
+
+    // 再生時間に合わせてスクロール
+    if (parentRef.current) {
+      virtualizer.scrollToIndex(index, {
+        align: "end",
+        behavior: "auto",
+      });
     }
-    
-    // スクロール位置を更新（毎回実行）
-    virtualizer.scrollToIndex(targetIndex, {
-      align: 'end',
-      behavior: 'auto',
-    });
   }, [currentPlaybackPosition, playbackMode, displayedComments, virtualizer]);
 
-  // ライブ時の自動スクロール
+  // 自動スクロール
   useEffect(() => {
-    if (playbackMode !== 'Live' || isManualScroll || !parentRef.current) return;
+    if (isManualScroll || !parentRef.current) return;
 
     // 最新のコメントまでスクロール
     if (displayedComments.length > 0) {
       virtualizer.scrollToIndex(displayedComments.length - 1, {
-        align: 'end',
-        behavior: 'auto',
+        align: "end",
+        behavior: "auto",
       });
     }
   }, [displayedComments.length, playbackMode, isManualScroll, virtualizer]);
@@ -158,40 +175,35 @@ export default function CommentList({
   // ビデオ再生時のコメントクリック処理
   const handleCommentClick = useCallback(
     (comment: Comment) => {
-      if (playbackMode === 'Video' && onCommentClick) {
+      if (playbackMode === "Video" && onCommentClick) {
         onCommentClick(comment);
       }
     },
-    [playbackMode, onCommentClick]
+    [playbackMode, onCommentClick],
   );
 
-  // ドロップダウンメニュー処理
-  const handleCopyText = useCallback((comment: CommentItemWithId) => {
-    navigator.clipboard.writeText(comment.text);
-    Message.success('クリップボードにコピーしました');
-    setContextMenuOpen(false);
-  }, []);
-
-  const handleCopyUserId = useCallback((comment: CommentItemWithId) => {
-    if (comment.author) {
-      navigator.clipboard.writeText(comment.author);
-      Message.success('ユーザーIDをコピーしました');
-    }
-    setContextMenuOpen(false);
-  }, []);
-
   const handleMuteKeyword = useCallback((comment: CommentItemWithId) => {
-    const { settings: currentSettings, updateSettings } = useSettingsStore.getState();
-    CommentUtils.addMutedKeywords(comment.text, currentSettings, updateSettings);
-    Message.success('このコメントをミュートしました');
+    const { settings: currentSettings, updateSettings } =
+      useSettingsStore.getState();
+    CommentUtils.addMutedKeywords(
+      comment.text,
+      currentSettings,
+      updateSettings,
+    );
+    Message.success("このコメントをミュートしました");
     setContextMenuOpen(false);
   }, []);
 
   const handleMuteUser = useCallback((comment: CommentItemWithId) => {
     if (comment.author) {
-      const { settings: currentSettings, updateSettings } = useSettingsStore.getState();
-      CommentUtils.addMutedNiconicoUserIDs(comment.author, currentSettings, updateSettings);
-      Message.success('このユーザーをミュートしました');
+      const { settings: currentSettings, updateSettings } =
+        useSettingsStore.getState();
+      CommentUtils.addMutedNiconicoUserIDs(
+        comment.author,
+        currentSettings,
+        updateSettings,
+      );
+      Message.success("このユーザーをミュートしました");
     }
     setContextMenuOpen(false);
   }, []);
@@ -199,20 +211,30 @@ export default function CommentList({
   const handleAutoScrollButtonClick = useCallback(() => {
     setIsManualScroll(false);
     if (displayedComments.length > 0) {
-      virtualizer.scrollToIndex(displayedComments.length - 1, {
-        align: 'end',
-        behavior: 'smooth',
+      // 現在の再生位置に最も近いコメントを見つける
+      let targetIndex = 0;
+      for (let i = 0; i < displayedComments.length; i++) {
+        if (displayedComments[i].time <= currentPlaybackPosition) {
+          targetIndex = i;
+        } else {
+          break;
+        }
+      }
+      virtualizer.scrollToIndex(targetIndex, {
+        align: "end",
+        behavior: "smooth",
       });
     }
-  }, [displayedComments.length, virtualizer]);
+  }, [displayedComments, currentPlaybackPosition, virtualizer]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between px-4 py-1 border-b border-border shrink-0">
+      <div className="flex items-center w-4/5 justify-between px-4 py-1 border-b border-border">
         <h4 className="font-bold flex items-center gap-2">
           <span>コメント</span>
         </h4>
+        {/* ミュート設定ボタン
         <Button
           variant="ghost"
           size="sm"
@@ -221,6 +243,7 @@ export default function CommentList({
           <Filter className="size-4" />
           <span>ミュート設定</span>
         </Button>
+         */}
       </div>
 
       {/* コメントリスト（仮想化） */}
@@ -228,29 +251,19 @@ export default function CommentList({
         ref={parentRef}
         className="flex-1 overflow-y-auto overflow-x-hidden"
         onScroll={handleScroll}
-        onWheel={handleWheel}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       >
         {displayedComments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full py-12 text-center">
+          <div className="flex flex-col items-center justify-center h-fulltext-center">
             <div className="text-sm font-semibold mb-2">
-              {playbackMode === 'Live'
-                ? 'まだコメントがありません。'
-                : 'コメントを読み込み中...'}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {playbackMode === 'Live'
-                ? 'このチャンネルに対応するニコニコ実況のコメントがリアルタイムで表示されます。'
-                : 'この録画番組に対応するニコニコ実況の過去ログコメントを取得しています...'}
+              'コメントを読み込み中...'
             </div>
           </div>
         ) : (
           <div
             style={{
               height: `${totalSize}px`,
-              width: '100%',
-              position: 'relative',
+              width: "100%",
+              position: "relative",
             }}
           >
             {virtualItems.map((virtualItem) => (
@@ -258,21 +271,21 @@ export default function CommentList({
                 key={displayedComments[virtualItem.index]._localId}
                 data-index={virtualItem.index}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
-                  width: '100%',
+                  width: "80%",
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
                 <CommentItem
                   comment={displayedComments[virtualItem.index]}
-                  playbackMode={playbackMode}
                   onCommentClick={handleCommentClick}
                   onContextMenu={(e) => {
                     setContextMenuComment(displayedComments[virtualItem.index]);
                     setContextMenuOpen(true);
                   }}
+                  video={video}
                 />
               </div>
             ))}
@@ -280,9 +293,9 @@ export default function CommentList({
         )}
       </div>
 
-      {/* 自動スクロールボタン */}
+      {/* 自動スクロールボタン
       {isManualScroll && displayedComments.length > 0 && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
           <Button
             variant="default"
             size="icon"
@@ -293,6 +306,7 @@ export default function CommentList({
           </Button>
         </div>
       )}
+       */}
 
       {/* コンテキストメニュー */}
       {contextMenuComment && (
@@ -300,8 +314,6 @@ export default function CommentList({
           comment={contextMenuComment}
           open={contextMenuOpen}
           onOpenChange={setContextMenuOpen}
-          onCopyText={handleCopyText}
-          onCopyUserId={handleCopyUserId}
           onMuteKeyword={handleMuteKeyword}
           onMuteUser={handleMuteUser}
         />
@@ -315,43 +327,64 @@ export default function CommentList({
  */
 interface CommentItemProps {
   comment: CommentItemWithId;
-  playbackMode: 'Live' | 'Video';
   onCommentClick: (comment: Comment) => void;
   onContextMenu: (e: React.MouseEvent) => void;
+  video: EntityVideo;
+}
+
+/**
+ * コメントの実時刻を計算し、MM/DD HH:mm:ss 形式でフォーマット
+ */
+function formatCommentTime(
+  comment: CommentItemWithId,
+  video: EntityVideo,
+): string {
+  // jikkyo_date がある場合はそれを使用
+  if (video.jikkyo_date) {
+    // video.jikkyo_dateはISO 8601形式の文字列（例: "2025-06-07T15:00:00Z"）
+    const startDate = new Date(video.jikkyo_date);
+    // comment.timeは秒単位なので、ミリ秒に変換してを加算
+    const commentDate = new Date(startDate.getTime() + (comment.time || 0) * 1000);
+    const month = String(commentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(commentDate.getDate()).padStart(2, "0");
+    const hours = String(commentDate.getHours()).padStart(2, "0");
+    const minutes = String(commentDate.getMinutes()).padStart(2, "0");
+    const seconds = String(commentDate.getSeconds()).padStart(2, "0");
+    return `${month}/${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  // jikkyo_date がない場合は秒単位で表示（フォールバック）
+  return `${comment.time?.toFixed(0)}s`;
 }
 
 function CommentItem({
   comment,
-  playbackMode,
   onCommentClick,
   onContextMenu,
+  video,
 }: CommentItemProps) {
-  const isVideoMode = playbackMode === 'Video';
-
   return (
     <div
-      className={`px-4 py-2 text-sm  flex items-center justify-between group hover:bg-muted/50 transition-colors border-b border-border/50 ${
-        isVideoMode ? 'cursor-pointer' : ''
-      }`}
-      onClick={() => isVideoMode && onCommentClick(comment)}
+      className={`px-4 py-2 text-sm  flex items-center justify-between group transition-colors  `}
+      onClick={() => onCommentClick(comment)}
     >
       <span
-        className="flex-1 break-words overflow-hidden text-ellipsis"
-        style={{ color: comment.color || '#FFEAEA' }}
+        className="truncate flex-1 break-words overflow-hidden text-ellipsis"
+        style={{ color: comment.color || "#FFEAEA" }}
         title={comment.text}
       >
         {comment.text}
       </span>
       <div className="flex items-center gap-2 ml-2 shrink-0">
         <span className="text-xs text-muted-foreground opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          {comment.time?.toFixed(0)}s
+          {formatCommentTime(comment, video)}
         </span>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onContextMenu(e);
           }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded"
+          className="transition-opacity p-1 hover:bg-muted rounded"
         >
           <MoreVertical className="w-4 h-4" />
         </button>
@@ -367,8 +400,6 @@ interface CommentContextMenuProps {
   comment: CommentItemWithId;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCopyText: (comment: CommentItemWithId) => void;
-  onCopyUserId: (comment: CommentItemWithId) => void;
   onMuteKeyword: (comment: CommentItemWithId) => void;
   onMuteUser: (comment: CommentItemWithId) => void;
 }
@@ -377,37 +408,31 @@ function CommentContextMenu({
   comment,
   open,
   onOpenChange,
-  onCopyText,
-  onCopyUserId,
   onMuteKeyword,
   onMuteUser,
 }: CommentContextMenuProps) {
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <div style={{ display: 'none' }} />
+        <MoreVertical size={18} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => onCopyText(comment)} className="gap-2">
-          <Copy className="w-4 h-4" />
-          <span>クリップボードにコピー</span>
-        </DropdownMenuItem>
-
         {comment.author && (
           <>
-            <DropdownMenuItem onClick={() => onCopyUserId(comment)} className="gap-2">
-              <User className="w-4 h-4" />
-              <span>このコメントのユーザー ID をコピー</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={() => onMuteUser(comment)} className="gap-2">
+            <DropdownMenuItem
+              onClick={() => onMuteUser(comment)}
+              className="gap-2"
+            >
               <Ban className="w-4 h-4" />
               <span>このコメントの投稿者をミュート</span>
             </DropdownMenuItem>
           </>
         )}
 
-        <DropdownMenuItem onClick={() => onMuteKeyword(comment)} className="gap-2">
+        <DropdownMenuItem
+          onClick={() => onMuteKeyword(comment)}
+          className="gap-2"
+        >
           <Ban className="w-4 h-4" />
           <span>このコメントをミュート</span>
         </DropdownMenuItem>

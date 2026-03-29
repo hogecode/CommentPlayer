@@ -74,6 +74,7 @@ export default function VideoPanel({
           playbackMode={playbackMode}
           currentPlaybackPosition={currentTime}
           onCommentClick={onCommentClick}
+          video={video} 
         />
       </TabsContent>
       {/* コメント遅延設定タブ */}
