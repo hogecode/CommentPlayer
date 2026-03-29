@@ -27,7 +27,7 @@ interface CommentListProps {
   /** ユーザーがコメントをクリック時のコールバック */
   onCommentClick?: (comment: Comment) => void;
   /** ビデオデータ */
-  video: EntityVideo;
+  video?: EntityVideo;
 }
 
 interface CommentItemWithId extends Comment {
@@ -329,7 +329,7 @@ interface CommentItemProps {
   comment: CommentItemWithId;
   onCommentClick: (comment: Comment) => void;
   onContextMenu: (e: React.MouseEvent) => void;
-  video: EntityVideo;
+  video?: EntityVideo;
 }
 
 /**
@@ -377,7 +377,7 @@ function CommentItem({
       </span>
       <div className="flex items-center gap-2 ml-2 shrink-0">
         <span className="text-xs text-muted-foreground opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          {formatCommentTime(comment, video)}
+          {video ? formatCommentTime(comment, video) : `${comment.time?.toFixed(0)}s`}
         </span>
         <button
           onClick={(e) => {
