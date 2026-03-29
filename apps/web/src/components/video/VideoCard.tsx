@@ -30,6 +30,7 @@ interface VideoCardProps {
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
   const thumbnailUrl = `${import.meta.env.VITE_API_BASE_URL}/screenshots/${video.screenshot_file_path}`
+  const channelLogoUrl = video.channel_id ? `/assets/images/logos/ch${video.channel_id}.png` : null
   const downloadMutation = useVideoDownloadMutation()
   const regenerateThumbnailMutation = useRegenerateThumbnailMutation()
   const [isDownloading, setIsDownloading] = useState(false)
@@ -82,94 +83,131 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
   }
 
   return (
-    <a href={`/videos/${video.id}`} >
-    <Item variant="default"className="transition-colors hover:bg-gray-800 rounded-md">
-      {/* サムネイル */}
-      <ItemMedia variant="image" className="h-27 w-48">
+    <a href={`/videos/${video.id}`}>
+      <Item
+        variant="default"
+        className="transition-colors hover:bg-gray-800 rounded-md"
+      >
+        {/* サムネイル */}
+        <ItemMedia variant="image" className="h-27 w-48">
           <img
             src={thumbnailUrl}
             alt={video.file_name}
             loading="lazy"
             className="w-full h-full object-contain hover:opacity-80 transition-opacity"
           />
-      </ItemMedia>
+        </ItemMedia>
 
-      {/* メインコンテンツ */}
-      <ItemContent>
-        <ItemHeader>
-          <ItemTitle className="text-xs">
-              {video.series ? `${video.series.syobocal_title_name} #${video.episode} ${video.subtitle ?? ''}` : `${video.file_name}`}
-          </ItemTitle>
-        </ItemHeader>
+        {/* メインコンテンツ */}
+        <ItemContent>
+          <ItemHeader>
+            <ItemTitle className="text-xs">
+              {video.series?.syobocal_title_id
+                ? `${video.series.syobocal_title_name ?? ""} #${video.episode} ${video.subtitle ?? ""}`
+                : `${video.file_name}`}
+            </ItemTitle>
+          </ItemHeader>
 
-        <ItemDescription>
-          <div className="gap-2 text-[10px] text-muted-foreground min-h-16">
-            <div></div>
-            <div>{CHANNEL_ID_TO_NAME[video.channel_id as number]}</div>
-            <div>{formatVideoDateTimeWithDuration(video.jikkyo_date as string, video.duration ?? 0)}</div>
-          </div>
-        </ItemDescription>
-      </ItemContent>
+          <ItemDescription>
+            <div className="gap-2 text-[10px] text-muted-foreground min-h-16">
+              <div className="flex items-end mb-1">
+                {video.series?.syobocal_title_name && (
+                  <>
+                    {channelLogoUrl !== null && (
+                      <img
+                        src={channelLogoUrl}
+                        alt={`Channel ${video.channel_id} logo`}
+                        className="h-4.5 w-8"
+                      />
+                    )}
+                    <span>&nbsp;&nbsp;</span>
+                    <div>{video.channel_id ? CHANNEL_ID_TO_NAME[video.channel_id] : ''}</div>
+                  </>
+                )}
+              </div>
+              <div>
+                {formatVideoDateTimeWithDuration(
+                  video.jikkyo_date as string,
+                  video.duration ?? 0,
+                )}
+              </div>
+            </div>
+          </ItemDescription>
+        </ItemContent>
 
-      {/* アクション */}
-      <ItemActions>
-        {/* お気に入りボタン */}
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            
-            if (!isInMylist) {
-              // 追加する場合
-              const newMylist = [...settingsStore.settings.mylist, { id: video.id, created_at: Date.now() }]
-              settingsStore.updateSettings({ mylist: newMylist })
-              Message.success('マイリストに追加しました')
-            } else {
-              // 削除する場合
-              const newMylist = settingsStore.settings.mylist.filter(item => item.id !== video.id)
-              settingsStore.updateSettings({ mylist: newMylist })
-            }
-          }}
-          className={isInMylist ? 'text-blue-500' : 'text-muted-foreground'}
-          aria-label="マイリストに追加"
-        >
-          {isInMylist ? (
-            <CheckSquare size={18} fill="currentColor" />
-          ) : (
-            <Plus size={18} />
-          )}
-        </Button>
+        {/* アクション */}
+        <ItemActions>
+          {/* お気に入りボタン */}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-        {/* メニュー */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm">
-              <MoreVertical size={18} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-35">
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={(e) => {
-              e.preventDefault()
-              handleDownload()
-            }}>
-              <Download size={32} className="mr-2" />
-              <p className="text-xs">ダウンロード ({formatFileSize(video.file_size ?? 0)})</p>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => {
-              e.preventDefault()
-              handleRegenerateThumbnail()
-            }} disabled={isRegenerating}>
-              <RefreshCw size={32} className="mr-2" />
-              <p className="text-xs">{isRegenerating ? '再生成中...' : 'サムネイル再生成'}</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </ItemActions>
-    </Item>
+              if (!isInMylist) {
+                // 追加する場合
+                const newMylist = [
+                  ...settingsStore.settings.mylist,
+                  { id: video.id, created_at: Date.now() },
+                ];
+                settingsStore.updateSettings({ mylist: newMylist });
+                Message.success("マイリストに追加しました");
+              } else {
+                // 削除する場合
+                const newMylist = settingsStore.settings.mylist.filter(
+                  (item) => item.id !== video.id,
+                );
+                settingsStore.updateSettings({ mylist: newMylist });
+              }
+            }}
+            className={isInMylist ? "text-blue-500" : "text-muted-foreground"}
+            aria-label="マイリストに追加"
+          >
+            {isInMylist ? (
+              <CheckSquare size={18} fill="currentColor" />
+            ) : (
+              <Plus size={18} />
+            )}
+          </Button>
+
+          {/* メニュー */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon-sm">
+                <MoreVertical size={18} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-35">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDownload();
+                }}
+              >
+                <Download size={32} className="mr-2" />
+                <p className="text-xs">
+                  ダウンロード ({formatFileSize(video.file_size ?? 0)})
+                </p>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleRegenerateThumbnail();
+                }}
+                disabled={isRegenerating}
+              >
+                <RefreshCw size={32} className="mr-2" />
+                <p className="text-xs">
+                  {isRegenerating ? "再生成中..." : "サムネイル再生成"}
+                </p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </ItemActions>
+      </Item>
     </a>
-  )
+  );
 }
