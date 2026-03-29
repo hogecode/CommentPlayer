@@ -354,7 +354,7 @@ export default function DPlayer({
         programTime={programTime}
       />*/}
       {/* DPlayer はこの div に直接マウントされる */}
-      <div ref={containerRef} className="dplayer-container transition-transform scale-108" />
+      <div ref={containerRef} className="dplayer-container" />
     </div>
   );
 }

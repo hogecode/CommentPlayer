@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { DtoSeriesListResponse } from "@/generated";
+import type { DtoSeriesListResponse, DtoSeriesWithVideosResponse } from "@/generated";
 import { SeriesApi } from "@/generated";
 import Message from "@/message";
 
@@ -23,6 +23,31 @@ export function useSeriesQuery(options?: any) {
     },
     staleTime: 1000 * 60 * 5,
     retry: 1,
+    ...options,
+  });
+}
+
+/**
+ * シリーズの詳細情報と関連動画を取得
+ */
+export function useSeriesDetailQuery(seriesId: number | null, options?: any) {
+  return useQuery<DtoSeriesWithVideosResponse, Error>({
+    queryKey: ["series", seriesId],
+    queryFn: async () => {
+      if (!seriesId) {
+        throw new Error("Series ID is required");
+      }
+      try {
+        const response = await seriesApi.apiV1SeriesIdGet(seriesId);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching series detail:', error);
+        throw error;
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+    enabled: !!seriesId,
     ...options,
   });
 }

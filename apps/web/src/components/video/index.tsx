@@ -28,16 +28,17 @@ interface Props {
  * 動画再生とコメント遅延コントロールの機能を提供します。
  * CommentDelayは A、B、C コメント遷移機能を備えています。
  */
-export default function DPlayerVideo({ 
-  src = '', 
-  videoId, 
-  commentList = [], 
-  onCurrentTimeChange, 
+export default function DPlayerVideo({
+  src = "",
+  videoId,
+  commentList = [],
+  onCurrentTimeChange,
   commentDelay = 0,
   videoTitle,
   programTime,
 }: Props) {
   return (
+    <div className="dplayer-video-wrapper space-y-4">
       <DPlayer
         src={src}
         videoId={videoId}
@@ -47,5 +48,6 @@ export default function DPlayerVideo({
         videoTitle={videoTitle}
         programTime={programTime}
       />
+    </div>
   );
 }

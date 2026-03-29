@@ -62,3 +62,8 @@ Accept-Language: ja
 {
   "timestamp": 10.5
 }
+
+
+###
+## /series/{id}
+GET {{baseUrl}}/series/12
