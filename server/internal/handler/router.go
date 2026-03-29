@@ -33,6 +33,10 @@ func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 	seriesGroup := v1.Group("/series")
 	RegisterSeriesRoutes(seriesGroup, seriesHandler)
 
+	// Syobocal 関連ルートを登録
+	syobocalGroup := v1.Group("/syobocal")
+	a.RegisterSyobocalRoutesHandler(syobocalGroup)
+
 	// 静的ファイルダウンロード API ルートを登録
 	filesGroup := v1.Group("/files")
 	a.GetFileFromFolder(filesGroup)
