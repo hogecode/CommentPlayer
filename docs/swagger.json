@@ -529,6 +529,91 @@
                 }
             }
         },
+        "/api/v1/syobocal": {
+            "get": {
+                "description": "指定されたタイトルを Syobocal から検索し、複数候補を返す",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Syobocal"
+                ],
+                "summary": "Syobocal からタイトル候補を検索",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "検索するタイトル",
+                        "name": "title",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalTitleSearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "選択したタイトル情報を Series テーブルに保存または更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Syobocal"
+                ],
+                "summary": "Syobocal タイトル情報を Series に保存",
+                "parameters": [
+                    {
+                        "description": "保存するタイトル情報",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalSaveTitleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalSaveTitleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
             "post": {
                 "description": "新しいユーザーアカウントを作成します",
@@ -1267,6 +1352,119 @@
                 }
             }
         },
+        "dto.SyobocalErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalSaveTitleRequest": {
+            "type": "object",
+            "required": [
+                "syobocal_title_id",
+                "syobocal_title_name"
+            ],
+            "properties": {
+                "comment": {
+                    "description": "コメント",
+                    "type": "string"
+                },
+                "first_month": {
+                    "description": "初回放送月",
+                    "type": "integer"
+                },
+                "first_year": {
+                    "description": "初回放送年",
+                    "type": "integer"
+                },
+                "syobocal_title_id": {
+                    "description": "Syobocal Title ID",
+                    "type": "integer"
+                },
+                "syobocal_title_name": {
+                    "description": "Syobocal Title Name",
+                    "type": "string"
+                },
+                "title_name_en": {
+                    "description": "英語タイトル",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalSaveTitleResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "series_id": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.SyobocalTitleResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "description": "コメント",
+                    "type": "string"
+                },
+                "first_end_month": {
+                    "description": "最終放送月",
+                    "type": "integer"
+                },
+                "first_end_year": {
+                    "description": "最終放送年",
+                    "type": "integer"
+                },
+                "first_month": {
+                    "description": "初回放送月",
+                    "type": "string"
+                },
+                "first_year": {
+                    "description": "初回放送年",
+                    "type": "string"
+                },
+                "short_title": {
+                    "description": "短いタイトル",
+                    "type": "string"
+                },
+                "tid": {
+                    "description": "Title ID",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "タイトル名",
+                    "type": "string"
+                },
+                "title_en": {
+                    "description": "英語タイトル",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalTitleSearchResponse": {
+            "type": "object",
+            "properties": {
+                "titles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SyobocalTitleResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ThumbnailRegenerateRequest": {
             "type": "object",
             "properties": {
@@ -1378,6 +1576,10 @@
                 "duration": {
                     "type": "number"
                 },
+                "episode": {
+                    "description": "エピソード番号",
+                    "type": "integer"
+                },
                 "file_name": {
                     "type": "string"
                 },
@@ -1415,6 +1617,10 @@
                 },
                 "status": {
                     "description": "ready, processing, error",
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "エピソードサブタイトル",
                     "type": "string"
                 },
                 "thumbnail_info": {
@@ -1539,6 +1745,10 @@
                 "duration": {
                     "type": "number"
                 },
+                "episode": {
+                    "description": "エピソード番号",
+                    "type": "integer"
+                },
                 "file_name": {
                     "type": "string"
                 },
@@ -1573,6 +1783,10 @@
                 },
                 "status": {
                     "description": "ready, processing, error",
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "エピソードサブタイトル",
                     "type": "string"
                 },
                 "thumbnail_info": {

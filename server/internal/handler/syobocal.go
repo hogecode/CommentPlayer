@@ -9,6 +9,12 @@ import (
 	"github.com/hogecode/commentPlayer/internal/service"
 )
 
+// RegisterSyobocalRoutesHandler - App から呼び出し用のラッパー（App.go に定義された構造を使用）
+func (a *App) RegisterSyobocalRoutesHandler(syobocalGroup *gin.RouterGroup) {
+	syobocalService := service.NewSyobocalService(a.DB)
+	RegisterSyobocalRoutes(syobocalGroup, syobocalService)
+}
+
 // RegisterSyobocalRoutes - Syobocal ルートを登録
 func RegisterSyobocalRoutes(syobocalGroup *gin.RouterGroup, syobocalService *service.SyobocalService) {
 	syobocalGroup.GET("", SearchTitles(syobocalService))
@@ -97,8 +103,4 @@ func SaveTitle(syobocalService *service.SyobocalService) gin.HandlerFunc {
 	}
 }
 
-// RegisterSyobocalRoutesHandler - App から呼び出し用のラッパー（App.go に定義された構造を使用）
-func (a *App) RegisterSyobocalRoutesHandler(syobocalGroup *gin.RouterGroup) {
-	syobocalService := service.NewSyobocalService(a.DB)
-	RegisterSyobocalRoutes(syobocalGroup, syobocalService)
-}
+

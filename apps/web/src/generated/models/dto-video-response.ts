@@ -25,6 +25,10 @@ export interface DtoVideoResponse {
     'created_at'?: string;
     'description'?: string;
     'duration'?: number;
+    /**
+     * エピソード番号
+     */
+    'episode'?: number;
     'file_name'?: string;
     'file_size'?: number;
     /**
@@ -46,6 +50,10 @@ export interface DtoVideoResponse {
      * ready, processing, error
      */
     'status'?: string;
+    /**
+     * エピソードサブタイトル
+     */
+    'subtitle'?: string;
     'thumbnail_info'?: EntityThumbnailInfo;
     'updated_at'?: string;
     'views'?: number;

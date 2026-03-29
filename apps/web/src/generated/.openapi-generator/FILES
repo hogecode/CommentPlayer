@@ -7,6 +7,7 @@ apis/folders-api.ts
 apis/series-api.ts
 apis/settings-api.ts
 apis/static-files-api.ts
+apis/syobocal-api.ts
 apis/users-api.ts
 apis/videos-api.ts
 base.ts
@@ -29,6 +30,11 @@ docs/DtoSeriesListResponse.md
 docs/DtoSeriesResponse.md
 docs/DtoSeriesWithVideosResponse.md
 docs/DtoSuccessResponse.md
+docs/DtoSyobocalErrorResponse.md
+docs/DtoSyobocalSaveTitleRequest.md
+docs/DtoSyobocalSaveTitleResponse.md
+docs/DtoSyobocalTitleResponse.md
+docs/DtoSyobocalTitleSearchResponse.md
 docs/DtoThumbnailRegenerateRequest.md
 docs/DtoThumbnailRegenerateResponse.md
 docs/DtoUserAccessToken.md
@@ -46,6 +52,7 @@ docs/FoldersApi.md
 docs/SeriesApi.md
 docs/SettingsApi.md
 docs/StaticFilesApi.md
+docs/SyobocalApi.md
 docs/UsersApi.md
 docs/VideosApi.md
 git_push.sh
@@ -65,6 +72,11 @@ models/dto-series-list-response.ts
 models/dto-series-response.ts
 models/dto-series-with-videos-response.ts
 models/dto-success-response.ts
+models/dto-syobocal-error-response.ts
+models/dto-syobocal-save-title-request.ts
+models/dto-syobocal-save-title-response.ts
+models/dto-syobocal-title-response.ts
+models/dto-syobocal-title-search-response.ts
 models/dto-thumbnail-regenerate-request.ts
 models/dto-thumbnail-regenerate-response.ts
 models/dto-user-access-token-request.ts

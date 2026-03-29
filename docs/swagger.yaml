@@ -222,6 +222,85 @@ definitions:
       message:
         type: string
     type: object
+  dto.SyobocalErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.SyobocalSaveTitleRequest:
+    properties:
+      comment:
+        description: コメント
+        type: string
+      first_month:
+        description: 初回放送月
+        type: integer
+      first_year:
+        description: 初回放送年
+        type: integer
+      syobocal_title_id:
+        description: Syobocal Title ID
+        type: integer
+      syobocal_title_name:
+        description: Syobocal Title Name
+        type: string
+      title_name_en:
+        description: 英語タイトル
+        type: string
+    required:
+    - syobocal_title_id
+    - syobocal_title_name
+    type: object
+  dto.SyobocalSaveTitleResponse:
+    properties:
+      message:
+        type: string
+      series_id:
+        type: integer
+      success:
+        type: boolean
+    type: object
+  dto.SyobocalTitleResponse:
+    properties:
+      comment:
+        description: コメント
+        type: string
+      first_end_month:
+        description: 最終放送月
+        type: integer
+      first_end_year:
+        description: 最終放送年
+        type: integer
+      first_month:
+        description: 初回放送月
+        type: string
+      first_year:
+        description: 初回放送年
+        type: string
+      short_title:
+        description: 短いタイトル
+        type: string
+      tid:
+        description: Title ID
+        type: string
+      title:
+        description: タイトル名
+        type: string
+      title_en:
+        description: 英語タイトル
+        type: string
+    type: object
+  dto.SyobocalTitleSearchResponse:
+    properties:
+      titles:
+        items:
+          $ref: '#/definitions/dto.SyobocalTitleResponse'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.ThumbnailRegenerateRequest:
     properties:
       height:
@@ -297,6 +376,9 @@ definitions:
         type: string
       duration:
         type: number
+      episode:
+        description: エピソード番号
+        type: integer
       file_name:
         type: string
       file_size:
@@ -323,6 +405,9 @@ definitions:
         type: string
       status:
         description: ready, processing, error
+        type: string
+      subtitle:
+        description: エピソードサブタイトル
         type: string
       thumbnail_info:
         $ref: '#/definitions/entity.ThumbnailInfo'
@@ -404,6 +489,9 @@ definitions:
         type: string
       duration:
         type: number
+      episode:
+        description: エピソード番号
+        type: integer
       file_name:
         type: string
       file_size:
@@ -428,6 +516,9 @@ definitions:
         type: integer
       status:
         description: ready, processing, error
+        type: string
+      subtitle:
+        description: エピソードサブタイトル
         type: string
       thumbnail_info:
         $ref: '#/definitions/entity.ThumbnailInfo'
@@ -786,6 +877,62 @@ paths:
       summary: クライアント設定更新 API
       tags:
       - Settings
+  /api/v1/syobocal:
+    get:
+      description: 指定されたタイトルを Syobocal から検索し、複数候補を返す
+      parameters:
+      - description: 検索するタイトル
+        in: query
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SyobocalTitleSearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.SyobocalErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.SyobocalErrorResponse'
+      summary: Syobocal からタイトル候補を検索
+      tags:
+      - Syobocal
+    post:
+      consumes:
+      - application/json
+      description: 選択したタイトル情報を Series テーブルに保存または更新
+      parameters:
+      - description: 保存するタイトル情報
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SyobocalSaveTitleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SyobocalSaveTitleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.SyobocalErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.SyobocalErrorResponse'
+      summary: Syobocal タイトル情報を Series に保存
+      tags:
+      - Syobocal
   /api/v1/users:
     post:
       description: 新しいユーザーアカウントを作成します

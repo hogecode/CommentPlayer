@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **created_at** | **string** |  | [optional] [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
 **duration** | **number** |  | [optional] [default to undefined]
+**episode** | **number** | エピソード番号 | [optional] [default to undefined]
 **file_name** | **string** |  | [optional] [default to undefined]
 **file_size** | **number** |  | [optional] [default to undefined]
 **folder_id** | **number** | Folderテーブルへの外部キー | [optional] [default to undefined]
@@ -21,6 +22,7 @@ Name | Type | Description | Notes
 **series_id** | **number** | Seriesテーブルへの外部キー | [optional] [default to undefined]
 **src** | **string** |  | [optional] [default to undefined]
 **status** | **string** | ready, processing, error | [optional] [default to undefined]
+**subtitle** | **string** | エピソードサブタイトル | [optional] [default to undefined]
 **thumbnail_info** | [**EntityThumbnailInfo**](EntityThumbnailInfo.md) |  | [optional] [default to undefined]
 **updated_at** | **string** |  | [optional] [default to undefined]
 **views** | **number** |  | [optional] [default to undefined]
@@ -35,6 +37,7 @@ const instance: DtoVideoResponse = {
     created_at,
     description,
     duration,
+    episode,
     file_name,
     file_size,
     folder_id,
@@ -47,6 +50,7 @@ const instance: DtoVideoResponse = {
     series_id,
     src,
     status,
+    subtitle,
     thumbnail_info,
     updated_at,
     views,

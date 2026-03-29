@@ -14,13 +14,8 @@
 
 
 
-export * from './apis/captures-api';
-export * from './apis/debug-api';
-export * from './apis/folders-api';
-export * from './apis/series-api';
-export * from './apis/settings-api';
-export * from './apis/static-files-api';
-export * from './apis/syobocal-api';
-export * from './apis/users-api';
-export * from './apis/videos-api';
+export interface DtoSyobocalErrorResponse {
+    'error'?: string;
+    'message'?: string;
+}
 
