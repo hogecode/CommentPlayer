@@ -24,11 +24,21 @@ export const useSnackbarStore = create<SnackbarStoreState>((set, get) => ({
 
   /**
    * 指定されたレベルとテキストでスナックバーを表示する
+   * 同じレベルとテキストの表示中のスナックバーがある場合は追加しない
    * @param level スナックバーのレベル
    * @param text スナックバーに表示するテキスト
    * @param timeout スナックバーを表示する秒数（デフォルトは 5 秒）
    */
   show: async (level: SnackbarLevel, text: string, timeout: number = 5.0) => {
+    // 同じレベルとテキストで既に表示されているスナックバーがあるかチェック
+    const isDuplicate = get().snackbars.some(
+      (s) => s.level === level && s.text === text && s.showing
+    )
+
+    if (isDuplicate) {
+      return // 重複している場合は何もしない
+    }
+
     // スナックバーを一意のIDで作成
     const id = crypto.getRandomValues(new Uint8Array(16)).reduce((acc, v) => acc + v.toString(16), '')
 

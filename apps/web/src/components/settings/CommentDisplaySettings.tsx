@@ -12,7 +12,7 @@ export function CommentDisplaySettings() {
 
   const handleMaxCommentsChange = (value: string) => {
     const num = parseInt(value, 10)
-    if (!isNaN(num) && num > 0) {
+    if (!isNaN(num) && num >= 0) {
       updateSettings({ max_comments_display_count: num })
     }
   }
@@ -57,7 +57,6 @@ export function CommentDisplaySettings() {
           <Input
             id="max-comments"
             type="number"
-            min="1"
             value={settings.max_comments_display_count}
             onChange={(e) => handleMaxCommentsChange(e.target.value)}
             className="max-w-xs"

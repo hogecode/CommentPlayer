@@ -89,13 +89,13 @@ export function MutedKeywordsSettings() {
               value={matchType}
               onChange={(e) => setMatchType(e.target.value as any)}
               disabled={isAdding}
-              className="px-3 py-2 border rounded-md border-input bg-background text-sm"
+              className="px-3 py-2 border rounded-md border-input text-sm"
             >
-              <option value="partial">部分一致</option>
-              <option value="forward">前方一致</option>
-              <option value="backward">後方一致</option>
-              <option value="exact">完全一致</option>
-              <option value="regex">正規表現</option>
+              <option value="partial" className='bg-black/40'>部分一致</option>
+              <option value="forward" className='bg-black/40'>前方一致</option>
+              <option value="backward" className='bg-black/40'>後方一致</option>
+              <option value="exact" className='bg-black/40'>完全一致</option>
+              <option value="regex" className='bg-black/40'>正規表現</option>
             </select>
             <Button
               type="submit"

@@ -130,7 +130,7 @@ export default function CapturePage() {
           {/* ナビゲーションボタン */}
           <div className="flex justify-center gap-4 mt-8">
             <Button
-              variant="outline"
+              variant="default"
               size="lg"
               onClick={handlePreviousClick}
               disabled={!previousCapture}
@@ -141,7 +141,7 @@ export default function CapturePage() {
             </Button>
 
             <Button
-              variant="outline"
+              variant="default"
               size="lg"
               onClick={handleNextClick}
               disabled={!nextCapture && !canLoadMore}

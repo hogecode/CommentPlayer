@@ -168,7 +168,7 @@ export default function CapturesPage() {
                       />
 
                       {/* Overlay with info on hover */}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
+                      <div className="absolute inset-0 bg-black/50 opacity-60 transition-opacity duration-200 flex flex-col justify-end p-3">
                         <div className="flex justify-end items-end" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
