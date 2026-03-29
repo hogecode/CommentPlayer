@@ -109,7 +109,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
           </ItemHeader>
 
           <ItemDescription>
-            <div className="gap-2 text-[10px] text-muted-foreground min-h-16">
+            <div className="gap-2 text-[10px] text-muted-foreground">
               <div className="flex items-end mb-1">
                 {video.series?.syobocal_title_name && (
                   <>
@@ -117,15 +117,15 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
                       <img
                         src={channelLogoUrl}
                         alt={`Channel ${video.channel_id} logo`}
-                        className="h-4.5 w-8"
+                        className="h-4.5 w-8 shrink-0"
                       />
                     )}
                     <span>&nbsp;&nbsp;</span>
-                    <div>{video.channel_id ? CHANNEL_ID_TO_NAME[video.channel_id] : ''}</div>
+                    <div className="line-clamp-1">{video.channel_id ? CHANNEL_ID_TO_NAME[video.channel_id] : ''}</div>
                   </>
                 )}
               </div>
-              <div>
+              <div className="line-clamp-2">
                 {formatVideoDateTimeWithDuration(
                   video.jikkyo_date as string,
                   video.duration ?? 0,
