@@ -37,6 +37,9 @@ type Video struct {
 	Duration           float64         `json:"duration"`
 	ThumbnailInfoJSON  json.RawMessage `gorm:"type:json" json:"-"`
 	ThumbnailInfo      *ThumbnailInfo  `gorm:"-" json:"thumbnail_info"`
+	ChannelID          *int            `json:"channel_id"`           // Syobocal チャンネルID（ChID）
+	ProgStartTime      *time.Time      `json:"prog_start_time"`      // 放送開始時刻
+	ProgEndTime        *time.Time      `json:"prog_end_time"`        // 放送終了時刻
 	IsDeleted          bool            `json:"is_deleted"`
 	CreatedAt          time.Time       `json:"created_at"`
 	UpdatedAt          time.Time       `json:"updated_at"`

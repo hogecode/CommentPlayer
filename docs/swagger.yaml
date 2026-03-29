@@ -356,6 +356,9 @@ definitions:
     type: object
   dto.VideoResponse:
     properties:
+      channel_id:
+        description: Syobocal チャンネルID（ChID）
+        type: integer
       comments:
         items:
           $ref: '#/definitions/dto.ApiComment'
@@ -386,6 +389,12 @@ definitions:
         type: string
       liked:
         type: boolean
+      prog_end_time:
+        description: 放送終了時刻
+        type: string
+      prog_start_time:
+        description: 放送開始時刻
+        type: string
       screenshot_file_path:
         type: string
       series_id:
@@ -473,6 +482,9 @@ definitions:
     type: object
   entity.Video:
     properties:
+      channel_id:
+        description: Syobocal チャンネルID（ChID）
+        type: integer
       created_at:
         type: string
       description:
@@ -499,6 +511,12 @@ definitions:
         type: string
       liked:
         type: boolean
+      prog_end_time:
+        description: 放送終了時刻
+        type: string
+      prog_start_time:
+        description: 放送開始時刻
+        type: string
       screenshot_file_path:
         type: string
       series_id:

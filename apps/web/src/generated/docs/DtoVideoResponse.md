@@ -5,6 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**channel_id** | **number** | Syobocal チャンネルID（ChID） | [optional] [default to undefined]
 **comments** | [**Array&lt;DtoApiComment&gt;**](DtoApiComment.md) |  | [optional] [default to undefined]
 **created_at** | **string** |  | [optional] [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
@@ -18,6 +19,8 @@ Name | Type | Description | Notes
 **jikkyo_comment_count** | **number** |  | [optional] [default to undefined]
 **jikkyo_date** | **string** |  | [optional] [default to undefined]
 **liked** | **boolean** |  | [optional] [default to undefined]
+**prog_end_time** | **string** | 放送終了時刻 | [optional] [default to undefined]
+**prog_start_time** | **string** | 放送開始時刻 | [optional] [default to undefined]
 **screenshot_file_path** | **string** |  | [optional] [default to undefined]
 **series_id** | **number** | Seriesテーブルへの外部キー | [optional] [default to undefined]
 **src** | **string** |  | [optional] [default to undefined]
@@ -33,6 +36,7 @@ Name | Type | Description | Notes
 import { DtoVideoResponse } from './api';
 
 const instance: DtoVideoResponse = {
+    channel_id,
     comments,
     created_at,
     description,
@@ -46,6 +50,8 @@ const instance: DtoVideoResponse = {
     jikkyo_comment_count,
     jikkyo_date,
     liked,
+    prog_end_time,
+    prog_start_time,
     screenshot_file_path,
     series_id,
     src,

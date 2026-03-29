@@ -38,18 +38,17 @@ func (c *Client) TitleSearch(searchQuery string) (*models.TitleSearchResponse, e
 
 // ProgLookup calls the Syoboi ProgLookup API
 // chIDs can be a single ID (e.g., "1") or multiple IDs (e.g., "1,2,3,4,5,6,7,8,9,10")
-func (c *Client) ProgLookup(tid string, chIDs string, count int) (*models.ProgLookupResponse, error) {
+func (c *Client) ProgLookup(tid string, chIDs string) (*models.ProgLookupResponse, error) {
 	c.logger.Debug("ProgLookup API called",
 		slog.String("TID", tid),
-		slog.String("ChIDs", chIDs),
-		slog.Int("count", count))
+		slog.String("ChIDs", chIDs))
 
+	// http://cal.syoboi.jp/db?Command=ProgLookup&TID=7297&JOIN=SubTitles
 	resp, err := c.R().
 		SetQueryParams(map[string]string{
 			"Command": "ProgLookup",
 			"TID":     tid,
 			"ChID":    chIDs,
-			"Count":   fmt.Sprintf("%d", count),
 			"JOIN":    "SubTitles",
 		}).
 		Get(config.SyoboiProgLookupURL)

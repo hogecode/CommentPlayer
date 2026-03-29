@@ -1550,6 +1550,10 @@ const docTemplate = `{
         "dto.VideoResponse": {
             "type": "object",
             "properties": {
+                "channel_id": {
+                    "description": "Syobocal チャンネルID（ChID）",
+                    "type": "integer"
+                },
                 "comments": {
                     "type": "array",
                     "items": {
@@ -1593,6 +1597,14 @@ const docTemplate = `{
                 },
                 "liked": {
                     "type": "boolean"
+                },
+                "prog_end_time": {
+                    "description": "放送終了時刻",
+                    "type": "string"
+                },
+                "prog_start_time": {
+                    "description": "放送開始時刻",
+                    "type": "string"
                 },
                 "screenshot_file_path": {
                     "type": "string"
@@ -1725,6 +1737,10 @@ const docTemplate = `{
         "entity.Video": {
             "type": "object",
             "properties": {
+                "channel_id": {
+                    "description": "Syobocal チャンネルID（ChID）",
+                    "type": "integer"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1762,6 +1778,14 @@ const docTemplate = `{
                 },
                 "liked": {
                     "type": "boolean"
+                },
+                "prog_end_time": {
+                    "description": "放送終了時刻",
+                    "type": "string"
+                },
+                "prog_start_time": {
+                    "description": "放送開始時刻",
+                    "type": "string"
                 },
                 "screenshot_file_path": {
                     "type": "string"

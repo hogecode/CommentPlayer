@@ -18,6 +18,10 @@
 import type { EntityThumbnailInfo } from './entity-thumbnail-info';
 
 export interface EntityVideo {
+    /**
+     * Syobocal チャンネルID（ChID）
+     */
+    'channel_id'?: number;
     'created_at'?: string;
     'description'?: string;
     'duration'?: number;
@@ -36,6 +40,14 @@ export interface EntityVideo {
     'jikkyo_comment_count'?: number;
     'jikkyo_date'?: string;
     'liked'?: boolean;
+    /**
+     * 放送終了時刻
+     */
+    'prog_end_time'?: string;
+    /**
+     * 放送開始時刻
+     */
+    'prog_start_time'?: string;
     'screenshot_file_path'?: string;
     /**
      * Seriesテーブルへの外部キー

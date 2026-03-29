@@ -67,11 +67,62 @@ CREATE TABLE `series` (
 
 #### フェーズ2
 
-**APIリクエスト後の動作**
+**APIリクエストの動作の続き**
 
-以下のような非同期処理を実装する。
 先ほど、しょぼいカレンダーのTIDとシリーズテーブルのIDを受け取るリクエストが来た。
-そのTIDを使い、
+その後、しょぼいカレンダーに以下のリクエストを送る。
+このクエリやDTOは既にinternal/syobocal内で実装してある。
+http://cal.syoboi.jp/db?Command=ProgLookup&TID={number}&JOIN=SubTitles
+
+レスポンスは以下の形式。
+```xml
+<ProgLookupResponse>
+<ProgItems>
+<ProgItem id="157950">
+<LastUpdate>2010-01-06 10:48:07</LastUpdate>
+<PID>157950</PID>
+<TID>1853</TID>
+<StTime>2010-02-07 08:30:00</StTime>
+<StOffset>0</StOffset>
+<EdTime>2010-02-07 09:00:00</EdTime>
+<Count>1</Count>
+<SubTitle/>
+<ProgComment/>
+<Flag>2</Flag>
+<Deleted>0</Deleted>
+<Warn>1</Warn>
+<ChID>67</ChID>
+<Revision>0</Revision>
+<STSubTitle>私、変わります！変わってみせます!!</STSubTitle>
+</ProgItem>
+<ProgItem id="157951">
+<LastUpdate>2010-01-06 10:48:07</LastUpdate>
+<PID>157951</PID>
+<TID>1853</TID>
+<StTime>2010-02-14 08:30:00</StTime>
+<StOffset>0</StOffset>
+<EdTime>2010-02-14 09:00:00</EdTime>
+<Count>2</Count>
+<SubTitle/>
+<ProgComment/>
+<Flag>0</Flag>
+<Deleted>0</Deleted>
+<Warn>0</Warn>
+<ChID>67</ChID>
+<Revision>0</Revision>
+<STSubTitle>私って史上最弱のプリキュアですか??</STSubTitle>
+</ProgItem>
+```
+
+ProgItemは配列だが、videoテーブルレコードのうち、series_id=req.シリーズIDのレコードを対象に以下のようなUPDATE文を実行する。
+```sql
+update video description=progitem.stsubtitle, channel_id=progitem.chid,
+       prog_start_time=progitem.sttime, prog_end_time=progitem.edtime
+       where episode=progitem.count
+```
+
+ビデオテーブルの形式は以下。
+prog_start_time, prog_end_timeカラムは新たにGORMエンティティに追加する。
 
 ```sql
 CREATE TABLE `video` (

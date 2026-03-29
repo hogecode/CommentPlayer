@@ -21,6 +21,10 @@ import type { DtoApiComment } from './dto-api-comment';
 import type { EntityThumbnailInfo } from './entity-thumbnail-info';
 
 export interface DtoVideoResponse {
+    /**
+     * Syobocal チャンネルID（ChID）
+     */
+    'channel_id'?: number;
     'comments'?: Array<DtoApiComment>;
     'created_at'?: string;
     'description'?: string;
@@ -40,6 +44,14 @@ export interface DtoVideoResponse {
     'jikkyo_comment_count'?: number;
     'jikkyo_date'?: string;
     'liked'?: boolean;
+    /**
+     * 放送終了時刻
+     */
+    'prog_end_time'?: string;
+    /**
+     * 放送開始時刻
+     */
+    'prog_start_time'?: string;
     'screenshot_file_path'?: string;
     /**
      * Seriesテーブルへの外部キー

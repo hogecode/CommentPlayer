@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"time"
 
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/entity"
@@ -89,6 +90,7 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 
 // SaveTitleToSeries - Syobocal タイトル情報を Series に保存（UPDATE のみ）
 // フロント → バックエンドAPI → Syobocal API(TitleLookup) → バックエンド → フロント
+// TODO: トランザクションで実行したい
 func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) (*dto.SyobocalSaveTitleResponse, error) {
 	slog.Info("Saving Syobocal title to Series",
 		slog.String("tid", req.TID),
@@ -175,9 +177,126 @@ func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) 
 		slog.Int("series_id", req.SeriesID),
 		slog.Int("syobocal_title_id", tid))
 
+	// ProgLookup API を呼び出して Video テーブルを更新
+	// エラーは記録するが、Series 更新は成功しているため、エラーを返さない
+	if err := ss.UpdateVideosFromProgLookup(req.SeriesID, req.TID); err != nil {
+		slog.Error("Failed to update videos from ProgLookup",
+			slog.Int("series_id", req.SeriesID),
+			slog.String("tid", req.TID),
+			slog.String("error", err.Error()))
+		// Series の更新は成功しているため、エラーを返さずに継続
+	}
+
 	return &dto.SyobocalSaveTitleResponse{
 		Success:  true,
 		Message:  "Series updated successfully",
 		SeriesID: req.SeriesID,
 	}, nil
+}
+
+// UpdateVideosFromProgLookup - ProgLookup API を呼び出して Video テーブルを更新
+func (ss *SyobocalService) UpdateVideosFromProgLookup(seriesID int, tid string) error {
+	slog.Info("Updating videos from ProgLookup API",
+		slog.Int("series_id", seriesID),
+		slog.String("tid", tid))
+
+	// ProgLookup API を呼び出す
+	// サブタイトル取得API
+	chIDsParam := "1,2,3,4,5,6,7,8,9,19" 
+	// Using 1-9 and 19 (TOKYO MX) as they are the main channels with good Jikkyo support
+	progLookup, err := ss.client.ProgLookup(tid, chIDsParam)
+	if err != nil {
+		slog.Error("Failed to call ProgLookup API",
+			slog.String("tid", tid),
+			slog.String("error", err.Error()))
+		return fmt.Errorf("failed to call ProgLookup API: %w", err)
+	}
+
+	if progLookup == nil || len(progLookup.ProgItems) == 0 {
+		slog.Warn("No ProgItems found in ProgLookup response",
+			slog.String("tid", tid))
+		return nil
+	}
+
+	// ProgItem をループして Video を更新
+	updatedCount := 0
+	for _, progItem := range progLookup.ProgItems {
+
+		// Count（エピソード番号）がない場合はスキップ
+		if progItem.Count == "" {
+			slog.Debug("Skipping ProgItem without Count",
+				slog.String("pid", progItem.PID))
+			continue
+		}
+
+		// Count を int に変換
+		episode, err := strconv.Atoi(progItem.Count)
+		if err != nil {
+			slog.Warn("Failed to convert Count to int",
+				slog.String("pid", progItem.PID),
+				slog.String("count", progItem.Count),
+				slog.String("error", err.Error()))
+			continue
+		}
+
+		// StTime と EdTime をパース
+		const timeLayout = "2006-01-02 15:04:05"
+		progStartTime, err := time.Parse(timeLayout, progItem.StTime)
+		if err != nil {
+			slog.Warn("Failed to parse StTime",
+				slog.String("pid", progItem.PID),
+				slog.String("st_time", progItem.StTime),
+				slog.String("error", err.Error()))
+			progStartTime = time.Time{} // Default value
+		}
+
+		progEndTime, err := time.Parse(timeLayout, progItem.EdTime)
+		if err != nil {
+			slog.Warn("Failed to parse EdTime",
+				slog.String("pid", progItem.PID),
+				slog.String("ed_time", progItem.EdTime),
+				slog.String("error", err.Error()))
+			progEndTime = time.Time{} // Default value
+		}
+
+		// ChID を int に変換
+		chIDInt, err := strconv.Atoi(progItem.ChID)
+		if err != nil {
+			slog.Warn("Failed to convert ChID to int",
+				slog.String("pid", progItem.PID),
+				slog.String("ch_id", progItem.ChID),
+				slog.String("error", err.Error()))
+			continue
+		}
+
+		// Video を更新
+		updates := map[string]interface{}{
+			"subtitle":     progItem.STSubTitle,
+			"channel_id":      chIDInt,
+			"prog_start_time": progStartTime,
+			"prog_end_time":   progEndTime,
+		}
+
+		if err := ss.db.Model(&entity.Video{}).
+			Where("series_id = ? AND episode = ?", seriesID, episode).
+			Updates(updates).Error; err != nil {
+			slog.Error("Failed to update Video",
+				slog.Int("series_id", seriesID),
+				slog.Int("episode", episode),
+				slog.String("error", err.Error()))
+			continue
+		}
+
+		updatedCount++
+		slog.Debug("Video updated successfully",
+			slog.Int("series_id", seriesID),
+			slog.Int("episode", episode),
+			slog.String("st_subtitle", progItem.STSubTitle))
+	}
+
+	slog.Info("ProgLookup video update completed",
+		slog.Int("series_id", seriesID),
+		slog.Int("updated_count", updatedCount))
+
+	return nil
 }
