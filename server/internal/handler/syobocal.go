@@ -61,13 +61,13 @@ func SearchTitles(service *service.SyobocalService) gin.HandlerFunc {
 	}
 }
 
-// SaveTitle - Syobocal タイトルを Series に保存
-// @Summary Syobocal タイトル情報を Series に保存
-// @Description 選択したタイトル情報を Series テーブルに保存または更新
+// SaveTitle - Syobocal タイトル情報を Series に更新
+// @Summary Syobocal タイトル情報を Series に更新
+// @Description TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
 // @Tags Syobocal
 // @Accept json
 // @Produce json
-// @Param request body dto.SyobocalSaveTitleRequest true "保存するタイトル情報"
+// @Param request body dto.SyobocalSaveTitleRequest true "保存するタイトル情報（tid, title, series_id）"
 // @Success 200 {object} dto.SyobocalSaveTitleResponse
 // @Failure 400 {object} dto.SyobocalErrorResponse
 // @Failure 500 {object} dto.SyobocalErrorResponse
@@ -86,11 +86,11 @@ func SaveTitle(syobocalService *service.SyobocalService) gin.HandlerFunc {
 			return
 		}
 
-		// Series に保存
+		// Series を更新（TitleLookup API を呼び出して詳細情報を取得）
 		response, err := syobocalService.SaveTitleToSeries(&req)
 		if err != nil {
 			slog.Error("Failed to save title",
-				slog.Int("syobocal_title_id", req.SyobocalTitleID),
+				slog.String("tid", req.TID),
 				slog.String("error", err.Error()))
 			c.JSON(http.StatusInternalServerError, dto.SyobocalErrorResponse{
 				Error:   "internal_error",

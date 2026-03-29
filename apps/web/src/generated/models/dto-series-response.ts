@@ -15,7 +15,7 @@
 
 
 export interface DtoSeriesResponse {
-    'comment'?: string;
+    'comment'?: object;
     'created_at'?: string;
     'first_end_month'?: number;
     'first_end_year'?: number;
@@ -23,7 +23,7 @@ export interface DtoSeriesResponse {
     'first_year'?: number;
     'id'?: number;
     'series_name_file'?: string;
-    'subtitles'?: string;
+    'subtitles'?: object;
     'syobocal_title_id'?: number;
     'syobocal_title_name'?: string;
     'syobocal_title_name_en'?: string;

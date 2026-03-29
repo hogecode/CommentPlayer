@@ -87,12 +87,13 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 	}, nil
 }
 
-// SaveTitleToSeries - 選択したタイトル情報を Series に保存（TitleLookup APIを呼び出す）
+// SaveTitleToSeries - Syobocal タイトル情報を Series に保存（UPDATE のみ）
+// フロント → バックエンドAPI → Syobocal API(TitleLookup) → バックエンド → フロント
 func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) (*dto.SyobocalSaveTitleResponse, error) {
 	slog.Info("Saving Syobocal title to Series",
-		slog.Int("syobocal_title_id", req.SyobocalTitleID),
-		slog.String("syobocal_title_name", req.SyobocalTitleName),
-		slog.String("tid", req.TID))
+		slog.String("tid", req.TID),
+		slog.String("title", req.Title),
+		slog.Int("series_id", req.SeriesID))
 
 	// TitleLookup API を呼び出して詳細情報を取得
 	titleLookup, err := ss.client.TitleLookup(req.TID)
@@ -100,113 +101,83 @@ func (ss *SyobocalService) SaveTitleToSeries(req *dto.SyobocalSaveTitleRequest) 
 		slog.Error("Failed to call TitleLookup API",
 			slog.String("tid", req.TID),
 			slog.String("error", err.Error()))
-		// エラーでもリクエストのデータで続行
+		return nil, fmt.Errorf("failed to call TitleLookup API: %w", err)
 	}
+
+	if titleLookup == nil || len(titleLookup.TitleItems) == 0 {
+		slog.Error("No title items found in TitleLookup response",
+			slog.String("tid", req.TID))
+		return nil, fmt.Errorf("no title items found in TitleLookup response")
+	}
+
+	item := titleLookup.TitleItems[0]
 
 	// Comment と Subtitles をパース
 	commentJSON := make(entity.JSONMap)
 	subtitlesJSON := make(entity.JSONArray, 0)
 
-	if titleLookup != nil && len(titleLookup.TitleItems) > 0 {
-		item := titleLookup.TitleItems[0]
-		if item.Comment != "" {
-			commentJSON = entity.JSONMap(ParseCommentStructure(item.Comment))
-		}
-		if item.SubTitles != "" {
-			subtitlesJSON = entity.JSONArray(ParseSubtitles(item.SubTitles))
-		}
+	if item.Comment != "" {
+		commentJSON = entity.JSONMap(ParseCommentStructure(item.Comment))
+	}
+	if item.SubTitles != "" {
+		subtitlesJSON = entity.JSONArray(ParseSubtitles(item.SubTitles))
 	}
 
-	// Series を作成または更新
+	// TID を int に変換
+	tid, err := strconv.Atoi(req.TID)
+	if err != nil {
+		slog.Error("Failed to convert TID to int",
+			slog.String("tid", req.TID),
+			slog.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to convert TID to int: %w", err)
+	}
+
+	// Series を更新
 	updates := map[string]interface{}{
-		"syobocal_title_id":     req.SyobocalTitleID,
-		"syobocal_title_name":   req.SyobocalTitleName,
-		"syobocal_title_name_en": req.TitleNameEN,
-		"comment":               commentJSON,
-		"subtitles":             subtitlesJSON,
+		"syobocal_title_id":      tid,
+		"syobocal_title_name":    item.Title,
+		"syobocal_title_name_en": item.TitleEN,
+		"comment":                commentJSON,
+		"subtitles":              subtitlesJSON,
 	}
 
 	// FirstYear, FirstMonth, FirstEndYear, FirstEndMonth を追加
-	if req.FirstYear != nil {
-		updates["first_year"] = req.FirstYear
+	if item.FirstYear != "" {
+		if y, err := strconv.Atoi(item.FirstYear); err == nil {
+			updates["first_year"] = y
+		}
 	}
-	if req.FirstMonth != nil {
-		updates["first_month"] = req.FirstMonth
+	if item.FirstMonth != "" {
+		if m, err := strconv.Atoi(item.FirstMonth); err == nil {
+			updates["first_month"] = m
+		}
 	}
-	if req.FirstEndYear != nil {
-		updates["first_end_year"] = req.FirstEndYear
+	if item.FirstEndYear != "" {
+		if y, err := strconv.Atoi(item.FirstEndYear); err == nil {
+			updates["first_end_year"] = y
+		}
 	}
-	if req.FirstEndMonth != nil {
-		updates["first_end_month"] = req.FirstEndMonth
-	}
-
-	// 既存チェック
-	var existingSeries entity.Series
-	result := ss.db.Where("syobocal_title_id = ?", req.SyobocalTitleID).First(&existingSeries)
-
-	if result.Error == nil {
-		// 既存レコード更新
-		if err := ss.db.Model(&existingSeries).Updates(updates).Error; err != nil {
-			slog.Error("Failed to update Series",
-				slog.Int("syobocal_title_id", req.SyobocalTitleID),
-				slog.String("error", err.Error()))
-			return nil, fmt.Errorf("failed to update series: %w", err)
+	if item.FirstEndMonth != "" {
+		if m, err := strconv.Atoi(item.FirstEndMonth); err == nil {
+			updates["first_end_month"] = m
 		}
-
-		slog.Info("Series updated successfully",
-			slog.Int("series_id", existingSeries.ID),
-			slog.Int("syobocal_title_id", req.SyobocalTitleID))
-
-		return &dto.SyobocalSaveTitleResponse{
-			Success:  true,
-			Message:  "Series updated successfully",
-			SeriesID: existingSeries.ID,
-		}, nil
-	} else if result.Error == gorm.ErrRecordNotFound {
-		// 新規作成
-		series := entity.Series{
-			SeriesNameFile:      req.SyobocalTitleName,
-			SyobocalTitleID:     &req.SyobocalTitleID,
-			SyobocalTitleName:   &req.SyobocalTitleName,
-			SyobocalTitleNameEn: req.TitleNameEN,
-			Comment:             commentJSON,
-			Subtitles:           subtitlesJSON,
-		}
-
-		// FirstYear, FirstMonth, FirstEndYear, FirstEndMonth をセット
-		if req.FirstYear != nil {
-			series.FirstYear = req.FirstYear
-		}
-		if req.FirstMonth != nil {
-			series.FirstMonth = req.FirstMonth
-		}
-		if req.FirstEndYear != nil {
-			series.FirstEndYear = req.FirstEndYear
-		}
-		if req.FirstEndMonth != nil {
-			series.FirstEndMonth = req.FirstEndMonth
-		}
-
-		if err := ss.db.Create(&series).Error; err != nil {
-			slog.Error("Failed to create Series",
-				slog.String("series_name", req.SyobocalTitleName),
-				slog.String("error", err.Error()))
-			return nil, fmt.Errorf("failed to create series: %w", err)
-		}
-
-		slog.Info("Series created successfully",
-			slog.Int("series_id", series.ID),
-			slog.Int("syobocal_title_id", req.SyobocalTitleID))
-
-		return &dto.SyobocalSaveTitleResponse{
-			Success:  true,
-			Message:  "Series created successfully",
-			SeriesID: series.ID,
-		}, nil
 	}
 
-	// 予期しないエラー
-	slog.Error("Unexpected error when querying Series",
-		slog.String("error", result.Error.Error()))
-	return nil, fmt.Errorf("unexpected error: %w", result.Error)
+	// 既存シリーズを UPDATE
+	if err := ss.db.Model(&entity.Series{}).Where("id = ?", req.SeriesID).Updates(updates).Error; err != nil {
+		slog.Error("Failed to update Series",
+			slog.Int("series_id", req.SeriesID),
+			slog.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to update series: %w", err)
+	}
+
+	slog.Info("Series updated successfully",
+		slog.Int("series_id", req.SeriesID),
+		slog.Int("syobocal_title_id", tid))
+
+	return &dto.SyobocalSaveTitleResponse{
+		Success:  true,
+		Message:  "Series updated successfully",
+		SeriesID: req.SeriesID,
+	}, nil
 }

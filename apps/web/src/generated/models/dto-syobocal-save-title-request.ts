@@ -16,28 +16,16 @@
 
 export interface DtoSyobocalSaveTitleRequest {
     /**
-     * コメント
+     * シリーズID
      */
-    'comment'?: string;
+    'series_id': number;
     /**
-     * 初回放送月
+     * Syobocal TID (Title ID)
      */
-    'first_month'?: number;
+    'tid': string;
     /**
-     * 初回放送年
+     * タイトル名
      */
-    'first_year'?: number;
-    /**
-     * Syobocal Title ID
-     */
-    'syobocal_title_id': number;
-    /**
-     * Syobocal Title Name
-     */
-    'syobocal_title_name': string;
-    /**
-     * 英語タイトル
-     */
-    'title_name_en'?: string;
+    'title': string;
 }
 

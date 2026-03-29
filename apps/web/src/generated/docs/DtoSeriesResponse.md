@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**comment** | **string** |  | [optional] [default to undefined]
+**comment** | **object** |  | [optional] [default to undefined]
 **created_at** | **string** |  | [optional] [default to undefined]
 **first_end_month** | **number** |  | [optional] [default to undefined]
 **first_end_year** | **number** |  | [optional] [default to undefined]
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **first_year** | **number** |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **series_name_file** | **string** |  | [optional] [default to undefined]
-**subtitles** | **string** |  | [optional] [default to undefined]
+**subtitles** | **object** |  | [optional] [default to undefined]
 **syobocal_title_id** | **number** |  | [optional] [default to undefined]
 **syobocal_title_name** | **string** |  | [optional] [default to undefined]
 **syobocal_title_name_en** | **string** |  | [optional] [default to undefined]

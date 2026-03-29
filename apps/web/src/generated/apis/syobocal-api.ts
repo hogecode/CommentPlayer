@@ -72,9 +72,9 @@ export const SyobocalApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * 選択したタイトル情報を Series テーブルに保存または更新
-         * @summary Syobocal タイトル情報を Series に保存
-         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報
+         * TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
+         * @summary Syobocal タイトル情報を Series に更新
+         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報（tid, title, series_id）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -129,9 +129,9 @@ export const SyobocalApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 選択したタイトル情報を Series テーブルに保存または更新
-         * @summary Syobocal タイトル情報を Series に保存
-         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報
+         * TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
+         * @summary Syobocal タイトル情報を Series に更新
+         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報（tid, title, series_id）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -161,9 +161,9 @@ export const SyobocalApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.apiV1SyobocalGet(title, options).then((request) => request(axios, basePath));
         },
         /**
-         * 選択したタイトル情報を Series テーブルに保存または更新
-         * @summary Syobocal タイトル情報を Series に保存
-         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報
+         * TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
+         * @summary Syobocal タイトル情報を Series に更新
+         * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報（tid, title, series_id）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -189,9 +189,9 @@ export class SyobocalApi extends BaseAPI {
     }
 
     /**
-     * 選択したタイトル情報を Series テーブルに保存または更新
-     * @summary Syobocal タイトル情報を Series に保存
-     * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報
+     * TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
+     * @summary Syobocal タイトル情報を Series に更新
+     * @param {DtoSyobocalSaveTitleRequest} request 保存するタイトル情報（tid, title, series_id）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */

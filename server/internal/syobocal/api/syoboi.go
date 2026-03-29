@@ -81,12 +81,13 @@ func (c *Client) TitleLookup(tid string) (*models.TitleLookupResponse, error) {
 	c.logger.Debug("TitleLookup API called",
 		slog.String("TID", tid))
 
+	// http://cal.syoboi.jp/db?Command=TitleLookup&TID=1853
 	resp, err := c.R().
 		SetQueryParams(map[string]string{
 			"Command": "TitleLookup",
 			"TID":     tid,
 		}).
-		Get(config.SyoboiTitleSearchURL)
+		Get(config.SyoboiProgLookupURL)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to call TitleLookup API: %w", err)

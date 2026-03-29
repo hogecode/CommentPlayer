@@ -574,7 +574,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "選択したタイトル情報を Series テーブルに保存または更新",
+                "description": "TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新",
                 "consumes": [
                     "application/json"
                 ],
@@ -584,10 +584,10 @@ const docTemplate = `{
                 "tags": [
                     "Syobocal"
                 ],
-                "summary": "Syobocal タイトル情報を Series に保存",
+                "summary": "Syobocal タイトル情報を Series に更新",
                 "parameters": [
                     {
-                        "description": "保存するタイトル情報",
+                        "description": "保存するタイトル情報（tid, title, series_id）",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -1293,9 +1293,7 @@ const docTemplate = `{
         "dto.SeriesResponse": {
             "type": "object",
             "properties": {
-                "comment": {
-                    "type": "string"
-                },
+                "comment": {},
                 "created_at": {
                     "type": "string"
                 },
@@ -1317,9 +1315,7 @@ const docTemplate = `{
                 "series_name_file": {
                     "type": "string"
                 },
-                "subtitles": {
-                    "type": "string"
-                },
+                "subtitles": {},
                 "syobocal_title_id": {
                     "type": "integer"
                 },
@@ -1370,32 +1366,21 @@ const docTemplate = `{
         "dto.SyobocalSaveTitleRequest": {
             "type": "object",
             "required": [
-                "syobocal_title_id",
-                "syobocal_title_name"
+                "series_id",
+                "tid",
+                "title"
             ],
             "properties": {
-                "comment": {
-                    "description": "コメント",
+                "series_id": {
+                    "description": "シリーズID",
+                    "type": "integer"
+                },
+                "tid": {
+                    "description": "Syobocal TID (Title ID)",
                     "type": "string"
                 },
-                "first_month": {
-                    "description": "初回放送月",
-                    "type": "integer"
-                },
-                "first_year": {
-                    "description": "初回放送年",
-                    "type": "integer"
-                },
-                "syobocal_title_id": {
-                    "description": "Syobocal Title ID",
-                    "type": "integer"
-                },
-                "syobocal_title_name": {
-                    "description": "Syobocal Title Name",
-                    "type": "string"
-                },
-                "title_name_en": {
-                    "description": "英語タイトル",
+                "title": {
+                    "description": "タイトル名",
                     "type": "string"
                 }
             }

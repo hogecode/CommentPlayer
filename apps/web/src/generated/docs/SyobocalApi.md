@@ -5,7 +5,7 @@ All URIs are relative to *https://100.72.160.115*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**apiV1SyobocalGet**](#apiv1syobocalget) | **GET** /api/v1/syobocal | Syobocal からタイトル候補を検索|
-|[**apiV1SyobocalPost**](#apiv1syobocalpost) | **POST** /api/v1/syobocal | Syobocal タイトル情報を Series に保存|
+|[**apiV1SyobocalPost**](#apiv1syobocalpost) | **POST** /api/v1/syobocal | Syobocal タイトル情報を Series に更新|
 
 # **apiV1SyobocalGet**
 > DtoSyobocalTitleSearchResponse apiV1SyobocalGet()
@@ -63,7 +63,7 @@ No authorization required
 # **apiV1SyobocalPost**
 > DtoSyobocalSaveTitleResponse apiV1SyobocalPost(request)
 
-選択したタイトル情報を Series テーブルに保存または更新
+TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新
 
 ### Example
 
@@ -77,7 +77,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new SyobocalApi(configuration);
 
-let request: DtoSyobocalSaveTitleRequest; //保存するタイトル情報
+let request: DtoSyobocalSaveTitleRequest; //保存するタイトル情報（tid, title, series_id）
 
 const { status, data } = await apiInstance.apiV1SyobocalPost(
     request
@@ -88,7 +88,7 @@ const { status, data } = await apiInstance.apiV1SyobocalPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **request** | **DtoSyobocalSaveTitleRequest**| 保存するタイトル情報 | |
+| **request** | **DtoSyobocalSaveTitleRequest**| 保存するタイトル情報（tid, title, series_id） | |
 
 
 ### Return type

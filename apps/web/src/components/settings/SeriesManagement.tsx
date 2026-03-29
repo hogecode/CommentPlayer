@@ -99,13 +99,15 @@ export function SeriesManagement() {
         ),
       }),
       columnHelper.accessor('syobocal_title_id', {
-        header: 'Syobocal ID',
-        cell: (info) => <span className="text-sm">{info.getValue() ?? '-'}</span>,
+        header: 'SID',
+        cell: (info) => <span className="text-xs">{info.getValue() ?? '-'}</span>,
       }),
       columnHelper.accessor('syobocal_title_name', {
         header: 'シリーズ名',
         cell: (info) => (
-          <span className="text-sm">{info.getValue() ?? '-'}</span>
+          <span className="text-xs truncate max-w-5" title={info.getValue() ?? ''}>
+            {info.getValue() ?? '-'}
+          </span>
         ),
       }),
       columnHelper.display({
@@ -204,7 +206,7 @@ export function SeriesManagement() {
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
-                        className="cursor-pointer select-none hover:bg-muted/50 transition-colors"
+                        className="cursor-pointer text-xs select-none bg-muted/50 transition-colors"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <div className="flex items-center gap-2">
@@ -230,13 +232,12 @@ export function SeriesManagement() {
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={
-                          cell.column.id === 'series_name_file'
-                            ? 'break-all'
-                            : cell.column.id === 'syobocal_title_name'
-                              ? 'break-all'
-                              : ''
-                        }
+                        className={cn(
+                          cell.column.id === 'series_name_file' && 'max-w-12 break-all',
+                          cell.column.id === 'syobocal_title_id' && 'max-w-10',
+                          cell.column.id === 'syobocal_title_name' && 'max-w-30 truncate',
+                          cell.column.id === 'syobocal-search' && ' truncate',
+                        )}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
@@ -325,8 +326,9 @@ function SyobocalSearchCell({
 
     try {
       await saveMutation.mutateAsync({
-        syobocal_title_id: parseInt(rowState.selectedTid),
-        syobocal_title_name: rowState.selectedTitle,
+        tid: rowState.selectedTid,
+        title: rowState.selectedTitle,
+        series_id: rowId,
       })
     } finally {
       setRowStates((prev) => ({
@@ -338,24 +340,32 @@ function SyobocalSearchCell({
 
   return (
     <div className="flex items-center gap-2">
-      <Popover open={rowState.isOpen} onOpenChange={(open) => {
-        setRowStates((prev) => ({
-          ...prev,
-          [rowId]: { ...prev[rowId], isOpen: open },
-        }))
-      }}>
-        <PopoverTrigger asChild>
+      <Popover
+        open={rowState.isOpen}
+        onOpenChange={(open) => {
+          setRowStates((prev) => ({
+            ...prev,
+            [rowId]: { ...prev[rowId], isOpen: open },
+          }));
+        }}
+      >
+        <PopoverTrigger asChild className="flex align-between">
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={rowState.isOpen}
-            className="w-[200px] justify-between text-black"
           >
-            {rowState.selectedTitle || rowState.searchQuery || 'タイトルを検索...'}
+            {/* タイトル*/}
+            <span className="w-25 text-black text-xs flex justify-start truncate">
+              {rowState.selectedTitle ||
+                rowState.searchQuery ||
+                "タイトルを検索..."}
+            </span>
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        {/* オートフィル - Syobocal タイトル検索 */}
+        <PopoverContent className="p-0">
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="タイトルを検索..."
@@ -369,38 +379,36 @@ function SyobocalSearchCell({
                     <Spinner className="h-4 w-4" />
                   </div>
                 ) : titles.length === 0 ? (
-                  'タイトルが見つかりません'
+                  "タイトルが見つかりません"
                 ) : null}
               </CommandEmpty>
               {titles.length > 0 && (
-              <CommandGroup>
-                {titles.map((title) => (
-                  <CommandItem
-                    key={title.tid}
-                    value={title.tid as string}
-                    onSelect={() =>
-                      handleSelect(title.tid as string, title.title as string)
-                    }
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        rowState.selectedTid === title.tid
-                          ? 'opacity-100'
-                          : 'opacity-70'
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm">{title.title}</span>
-                      {title.short_title && (
-                        <span className="text-xs">
-                          {title.short_title}
-                        </span>
-                      )}
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                <CommandGroup>
+                  {titles.map((title) => (
+                    <CommandItem
+                      key={title.tid}
+                      value={title.tid as string}
+                      onSelect={() =>
+                        handleSelect(title.tid as string, title.title as string)
+                      }
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          rowState.selectedTid === title.tid
+                            ? "opacity-100"
+                            : "opacity-70",
+                        )}
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm">{title.title}</span>
+                        {title.short_title && (
+                          <span className="text-xs">{title.short_title}</span>
+                        )}
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               )}
             </CommandList>
           </Command>
@@ -410,8 +418,10 @@ function SyobocalSearchCell({
       <Button
         size="sm"
         onClick={handleSave}
-        disabled={!rowState.selectedTid || rowState.isSaving || saveMutation.isPending}
-        className="bg-green-600 hover:bg-green-700"
+        disabled={
+          !rowState.selectedTid || rowState.isSaving || saveMutation.isPending
+        }
+        className="bg-green-600 hover:bg-green-700" text-xs
       >
         {rowState.isSaving ? (
           <>
@@ -419,9 +429,9 @@ function SyobocalSearchCell({
             保存中
           </>
         ) : (
-          '保存'
+          "保存"
         )}
       </Button>
     </div>
-  )
+  );
 }
