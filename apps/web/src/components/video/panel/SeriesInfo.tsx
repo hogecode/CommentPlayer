@@ -85,7 +85,7 @@ const SeriesInfo: React.FC<SeriesInfoProps> = ({ video }) => {
       {videos.length > 0 && (
         <div className="space-y-1">
           <h3 className="font-semibold text-xs">このシリーズの動画 ({videos.length})</h3>
-          <div className="space-y-1 max-h-96 overflow-y-auto mb-10">
+          <div className="space-y-1 overflow-y-auto mb-10">
             {videos.map((v) => (
               <Button
                 key={v.id}
