@@ -28,7 +28,7 @@ type Config struct {
 
 // StorageConfig - ストレージ設定
 type StorageConfig struct {
-	CapturesDir   string `mapstructure:"captures_dir"`
+	CapturesDir    string `mapstructure:"captures_dir"`
 	ScreenshotsDir string `mapstructure:"screenshots_dir"`
 }
 

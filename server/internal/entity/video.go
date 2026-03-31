@@ -20,11 +20,11 @@ type ThumbnailInfo struct {
 type Video struct {
 	ID                 int             `gorm:"primaryKey" json:"id"`
 	FileName           string          `json:"file_name"`
-	FolderID           int             `json:"folder_id"` // Folderテーブルへの外部キー
-	SeriesID           *int            `json:"series_id"` // Seriesテーブルへの外部キー
+	FolderID           int             `json:"folder_id"`                                   // Folderテーブルへの外部キー
+	SeriesID           *int            `json:"series_id"`                                   // Seriesテーブルへの外部キー
 	Series             *Series         `json:"series,omitempty" gorm:"foreignKey:SeriesID"` // Series関連付け
-	Episode            *int            `json:"episode"`   // エピソード番号
-	Subtitle           *string         `json:"subtitle"`  // エピソードサブタイトル
+	Episode            *int            `json:"episode"`                                     // エピソード番号
+	Subtitle           *string         `json:"subtitle"`                                    // エピソードサブタイトル
 	FilePath           string          `json:"-"`
 	Description        *string         `json:"description"`
 	Status             string          `json:"status"` // ready, processing, error
@@ -38,9 +38,9 @@ type Video struct {
 	Duration           float64         `json:"duration"`
 	ThumbnailInfoJSON  json.RawMessage `gorm:"type:json" json:"-"`
 	ThumbnailInfo      *ThumbnailInfo  `gorm:"-" json:"thumbnail_info"`
-	ChannelID          *int            `json:"channel_id"`           // Syobocal チャンネルID（ChID）
-	ProgStartTime      *time.Time      `json:"prog_start_time"`      // 放送開始時刻
-	ProgEndTime        *time.Time      `json:"prog_end_time"`        // 放送終了時刻
+	ChannelID          *int            `json:"channel_id"`      // Syobocal チャンネルID（ChID）
+	ProgStartTime      *time.Time      `json:"prog_start_time"` // 放送開始時刻
+	ProgEndTime        *time.Time      `json:"prog_end_time"`   // 放送終了時刻
 	IsDeleted          bool            `json:"is_deleted"`
 	CreatedAt          time.Time       `json:"created_at"`
 	UpdatedAt          time.Time       `json:"updated_at"`

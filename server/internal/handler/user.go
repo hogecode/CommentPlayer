@@ -149,10 +149,10 @@ func (a *App) GetAccessToken(ctx *gin.Context, jwtSecret string) {
 
 	// JWT トークンを生成
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, middleware.JWTClaims{
-		Issuer:   "commentPlayer Server",
-		Type:     "AccessToken",
-		Subject:  strconv.Itoa(user.ID),
-		ID:       "jti",
+		Issuer:  "commentPlayer Server",
+		Type:    "AccessToken",
+		Subject: strconv.Itoa(user.ID),
+		ID:      "jti",
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			ExpiresAt: jwt.NewNumericDate(time.Now().AddDate(0, 0, 180)),

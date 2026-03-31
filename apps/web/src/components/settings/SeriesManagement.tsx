@@ -278,7 +278,8 @@ function SyobocalSearchCell({
   }
 
   const { data: searchResults, isLoading: isSearching } = useSearchSyobocalQuery(
-    rowState.searchQuery
+    rowState.searchQuery,
+    { enabled: rowState.isOpen && rowState.searchQuery.length > 0 }
   )
 
   const titles = searchResults?.titles ?? []

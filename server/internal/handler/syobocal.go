@@ -45,6 +45,9 @@ func SearchTitles(service *service.SyobocalService) gin.HandlerFunc {
 		}
 
 		// タイトル検索実行
+		slog.Debug("Starting title search",
+			slog.String("title", title))
+
 		response, err := service.SearchTitles(title)
 		if err != nil {
 			slog.Error("Search failed",
@@ -52,7 +55,7 @@ func SearchTitles(service *service.SyobocalService) gin.HandlerFunc {
 				slog.String("error", err.Error()))
 			c.JSON(http.StatusInternalServerError, dto.SyobocalErrorResponse{
 				Error:   "internal_error",
-				Message: "Failed to search titles",
+				Message: "Failed to search titles: " + err.Error(),
 			})
 			return
 		}
@@ -102,5 +105,3 @@ func SaveTitle(syobocalService *service.SyobocalService) gin.HandlerFunc {
 		c.JSON(http.StatusOK, response)
 	}
 }
-
-

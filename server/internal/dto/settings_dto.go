@@ -12,11 +12,11 @@ type MylistItem struct {
 
 // WatchedHistoryItem - 動画視聴履歴
 type WatchedHistoryItem struct {
-	VideoID              int   `json:"video_id"`
-	LastPlaybackPosition float64   `json:"last_playback_position"` // ミリ秒
-	JikkyoCommentOffset  int   `json:"jikkyo_comment_offset"`
-	CreatedAt            int64 `json:"created_at"`
-	UpdatedAt            int64 `json:"updated_at"`
+	VideoID              int     `json:"video_id"`
+	LastPlaybackPosition float64 `json:"last_playback_position"` // ミリ秒
+	JikkyoCommentOffset  int     `json:"jikkyo_comment_offset"`
+	CreatedAt            int64   `json:"created_at"`
+	UpdatedAt            int64   `json:"updated_at"`
 }
 
 // MutedCommentKeyword - ミュートキーワード
@@ -42,15 +42,15 @@ type ClientSettingsDTO struct {
 	DefaultCommentColor          string  `json:"default_comment_color"`
 
 	// コメントNG設定
-	MuteFixedComments                               bool                     `json:"mute_fixed_comments"`
-	MuteColoredComments                             bool                     `json:"mute_colored_comments"`
-	MuteBigSizeComments                             bool                     `json:"mute_big_size_comments"`
-	MuteVulgarComments                              bool                     `json:"mute_vulgar_comments"`
-	MuteAbusiveDiscriminatoryPrejudicedComments     bool                     `json:"mute_abusive_discriminatory_prejudiced_comments"`
-	MuteConsecutiveSameCharactersComments           bool                     `json:"mute_consecutive_same_characters_comments"`
-	MutedCommentKeywords                            []MutedCommentKeyword    `json:"muted_comment_keywords"`
-	MutedNiconicoUserIds                            []string                 `json:"muted_niconico_user_ids"`
-	MuteCommentKeywordsNormalizeAlphanumericWidthCase bool                    `json:"mute_comment_keywords_normalize_alphanumeric_width_case"`
+	MuteFixedComments                                 bool                  `json:"mute_fixed_comments"`
+	MuteColoredComments                               bool                  `json:"mute_colored_comments"`
+	MuteBigSizeComments                               bool                  `json:"mute_big_size_comments"`
+	MuteVulgarComments                                bool                  `json:"mute_vulgar_comments"`
+	MuteAbusiveDiscriminatoryPrejudicedComments       bool                  `json:"mute_abusive_discriminatory_prejudiced_comments"`
+	MuteConsecutiveSameCharactersComments             bool                  `json:"mute_consecutive_same_characters_comments"`
+	MutedCommentKeywords                              []MutedCommentKeyword `json:"muted_comment_keywords"`
+	MutedNiconicoUserIds                              []string              `json:"muted_niconico_user_ids"`
+	MuteCommentKeywordsNormalizeAlphanumericWidthCase bool                  `json:"mute_comment_keywords_normalize_alphanumeric_width_case"`
 
 	// マイリスト情報
 	Mylist []MylistItem `json:"mylist"`

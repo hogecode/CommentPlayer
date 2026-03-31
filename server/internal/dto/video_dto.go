@@ -5,20 +5,20 @@ import "github.com/hogecode/commentPlayer/internal/entity"
 // ---ApiComment---
 // DPlayer形式のコメント（ニコニコ形式をDPlayer形式に変換）
 type ApiComment struct {
-	Time   float64 `json:"time" validate:"required,min=0"`   // コメント表示時刻（秒）
+	Time   float64 `json:"time" validate:"required,min=0"`                  // コメント表示時刻（秒）
 	Type   string  `json:"type" validate:"required,oneof=right top bottom"` // コメント位置
 	Size   string  `json:"size" validate:"required,oneof=big medium small"` // コメントサイズ
-	Color  string  `json:"color" validate:"required"`         // コメント色（16進数カラーコード）
-	Author *string `json:"author"`                            // コメント投稿者ID（匿名の場合はnil）
-	Text   string  `json:"text" validate:"required"`          // コメント本文
+	Color  string  `json:"color" validate:"required"`                       // コメント色（16進数カラーコード）
+	Author *string `json:"author"`                                          // コメント投稿者ID（匿名の場合はnil）
+	Text   string  `json:"text" validate:"required"`                        // コメント本文
 }
 
 // ---VideoList---
 // VideoListRequest - ビデオ一覧取得リクエスト
 type VideoListRequest struct {
-	IDs      string `form:"ids"`  // コンマ区切りまたは&で区切られた複数ID（例："103,102" または "103&102"）
+	IDs      string `form:"ids"` // コンマ区切りまたは&で区切られた複数ID（例："103,102" または "103&102"）
 	FilterBy string `form:"filterBy"`
-	Year     *int   `form:"year"`  // 年フィルター（例：2023）
+	Year     *int   `form:"year"` // 年フィルター（例：2023）
 	Page     int    `form:"page" validate:"min=1"`
 	Limit    int    `form:"limit" validate:"min=1,max=100"`
 	Sort     string `form:"sort" validate:"oneof=created_at views file_name duration jikkyo_date"`

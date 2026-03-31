@@ -277,7 +277,7 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 
 	var lastErr error
 	var stderrOutput strings.Builder
-	
+
 	for attempt := 0; attempt < maxRetries; attempt++ {
 		cmd := exec.Command(
 			ffmpegPath,
@@ -288,7 +288,7 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 			"-y", // 上書き許可
 			screenshotPath,
 		)
-		
+
 		// stderrをキャプチャして詳細なエラー情報を取得
 		stderrOutput.Reset()
 		cmd.Stderr = &stderrOutput
@@ -310,7 +310,7 @@ func CaptureScreenshot(videoPath string, outputDir string) (*string, error) {
 					"stat_error", statErr.Error(),
 					"ffmpeg_error", stderrOutput.String())
 				lastErr = statErr
-				
+
 				// 最後の試行でない場合はリトライ
 				if attempt < maxRetries-1 {
 					slog.Debug("CaptureScreenshot: Retrying ffmpeg command",

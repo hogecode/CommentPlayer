@@ -221,7 +221,7 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 		// ファイル名形式: {videoFileName}_{captureID}_{ext}
 		ext := filepath.Ext(file.Filename)
 		videoFileNameWithoutExt := video.FileName[:len(video.FileName)-len(filepath.Ext(video.FileName))]
-		saveFileName := fmt.Sprintf("%s_%d%s",  videoFileNameWithoutExt, capture.ID,  ext)
+		saveFileName := fmt.Sprintf("%s_%d%s", videoFileNameWithoutExt, capture.ID, ext)
 		savePath := filepath.Join(capturesDir, saveFileName)
 
 		// ファイルを保存
@@ -247,9 +247,9 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-	// 作成した情報でレスポンスを返す
-	ctx.JSON(http.StatusCreated, capture)
-})
+		// 作成した情報でレスポンスを返す
+		ctx.JSON(http.StatusCreated, capture)
+	})
 }
 
 // DeleteCapture - キャプチャを削除

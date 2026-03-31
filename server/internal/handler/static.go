@@ -73,7 +73,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
 			c.File(filepath.Join(capturesDir, c.Param("filepath")))
 		})
-		
+
 		// OPTIONSリクエストにも対応
 		engine.OPTIONS("/captures/*filepath", func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
@@ -83,7 +83,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			c.Header("Access-Control-Max-Age", "86400")
 			c.Status(http.StatusNoContent)
 		})
-		
+
 		slog.Info("RegisterStaticRoutes: Captures directory route registered with CORS support",
 			"captures_dir", capturesDir,
 			"route", "/captures")
@@ -96,7 +96,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 	if err != nil {
 		absScreenshotsDir = screenshotsDir
 	}
-	
+
 	if err := os.MkdirAll(absScreenshotsDir, 0755); err != nil {
 		slog.Warn("RegisterStaticRoutes: Failed to create screenshots directory",
 			"screenshots_dir", absScreenshotsDir,
@@ -110,7 +110,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			c.Header("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges")
 			c.File(filepath.Join(absScreenshotsDir, c.Param("filepath")))
 		})
-		
+
 		// OPTIONSリクエストにも対応
 		engine.OPTIONS("/screenshots/*filepath", func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
@@ -120,7 +120,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			c.Header("Access-Control-Max-Age", "86400")
 			c.Status(http.StatusNoContent)
 		})
-		
+
 		slog.Info("RegisterStaticRoutes: Screenshots directory route registered with CORS support",
 			"screenshots_dir", absScreenshotsDir,
 			"route", "/screenshots")

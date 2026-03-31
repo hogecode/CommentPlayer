@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/hogecode/commentPlayer/internal/dto"
@@ -14,22 +15,36 @@ import (
 
 // SyobocalService - Syobocal タイトル検索サービス
 type SyobocalService struct {
-	db     *gorm.DB
-	client *api.Client
+	db               *gorm.DB
+	client           *api.Client
+	searchCacheMutex sync.RWMutex
+	searchCache      map[string]*dto.SyobocalTitleSearchResponse
 }
 
 // NewSyobocalService - SyobocalService を新規作成
 func NewSyobocalService(db *gorm.DB) *SyobocalService {
 	return &SyobocalService{
-		db:     db,
-		client: api.NewClient(),
+		db:          db,
+		client:      api.NewClient(),
+		searchCache: make(map[string]*dto.SyobocalTitleSearchResponse),
 	}
 }
 
-// SearchTitles - タイトルを検索して複数候補を返す
+// SearchTitles - タイトルを検索して複数候補を返す（インメモリキャッシュ対応）
 func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSearchResponse, error) {
 	slog.Info("Syobocal title search started",
 		slog.String("query", titleQuery))
+
+	// キャッシュからの読み込みを試みる
+	ss.searchCacheMutex.RLock()
+	if cachedResult, exists := ss.searchCache[titleQuery]; exists {
+		ss.searchCacheMutex.RUnlock()
+		slog.Info("Syobocal title search completed (cache hit)",
+			slog.String("query", titleQuery),
+			slog.Int("result_count", cachedResult.Total))
+		return cachedResult, nil
+	}
+	ss.searchCacheMutex.RUnlock()
 
 	// API から検索実行
 	resp, err := ss.client.TitleSearch(titleQuery)
@@ -40,10 +55,15 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 	}
 
 	if resp == nil || resp.Titles == nil {
-		return &dto.SyobocalTitleSearchResponse{
+		result := &dto.SyobocalTitleSearchResponse{
 			Total:  0,
 			Titles: []dto.SyobocalTitleResponse{},
-		}, nil
+		}
+		// キャッシュに保存
+		ss.searchCacheMutex.Lock()
+		ss.searchCache[titleQuery] = result
+		ss.searchCacheMutex.Unlock()
+		return result, nil
 	}
 
 	// レスポンス変換
@@ -52,7 +72,7 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 		// FirstYear と FirstMonth を int に変換
 		firstYear, _ := strconv.Atoi(title.FirstYear)
 		firstMonth, _ := strconv.Atoi(title.FirstMonth)
-		
+
 		// FirstEndYear と FirstEndMonth を int に変換（nullableなため）
 		var firstEndYear, firstEndMonth *int
 		if title.FirstEndYear != nil && *title.FirstEndYear != "" {
@@ -79,13 +99,21 @@ func (ss *SyobocalService) SearchTitles(titleQuery string) (*dto.SyobocalTitleSe
 		})
 	}
 
-	slog.Info("Syobocal title search completed",
-		slog.Int("result_count", len(titles)))
-
-	return &dto.SyobocalTitleSearchResponse{
+	result := &dto.SyobocalTitleSearchResponse{
 		Total:  len(titles),
 		Titles: titles,
-	}, nil
+	}
+
+	// キャッシュに保存
+	ss.searchCacheMutex.Lock()
+	ss.searchCache[titleQuery] = result
+	ss.searchCacheMutex.Unlock()
+
+	slog.Info("Syobocal title search completed (cache miss, API called)",
+		slog.String("query", titleQuery),
+		slog.Int("result_count", len(titles)))
+
+	return result, nil
 }
 
 // SaveTitleToSeries - Syobocal タイトル情報を Series に保存（UPDATE のみ）
@@ -202,7 +230,7 @@ func (ss *SyobocalService) UpdateVideosFromProgLookup(seriesID int, tid string) 
 
 	// ProgLookup API を呼び出す
 	// サブタイトル取得API
-	chIDsParam := "1,2,3,4,5,6,7,8,9,19" 
+	chIDsParam := "1,2,3,4,5,6,7,8,9,19"
 	// Using 1-9 and 19 (TOKYO MX) as they are the main channels with good Jikkyo support
 	progLookup, err := ss.client.ProgLookup(tid, chIDsParam)
 	if err != nil {
@@ -271,7 +299,7 @@ func (ss *SyobocalService) UpdateVideosFromProgLookup(seriesID int, tid string) 
 
 		// Video を更新
 		updates := map[string]interface{}{
-			"subtitle":     progItem.STSubTitle,
+			"subtitle":        progItem.STSubTitle,
 			"channel_id":      chIDInt,
 			"prog_start_time": progStartTime,
 			"prog_end_time":   progEndTime,

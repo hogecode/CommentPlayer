@@ -8,19 +8,19 @@ import (
 
 // Series - シリーズエンティティ
 type Series struct {
-	ID                int            `gorm:"primaryKey" json:"id"`
-	SeriesNameFile    string         `json:"series_name_file" gorm:"uniqueIndex"` // {title} 部分
-	SyobocalTitleID   *int           `json:"syobocal_title_id"`
-	SyobocalTitleName *string        `json:"syobocal_title_name"`
-	SyobocalTitleNameEn *string      `json:"syobocal_title_name_en"`
-	Comment           JSONMap        `json:"comment" gorm:"type:json"`
-	FirstYear         *int           `json:"first_year"`
-	FirstMonth        *int           `json:"first_month"`
-	FirstEndYear      *int           `json:"first_end_year"`
-	FirstEndMonth     *int           `json:"first_end_month"`
-	Subtitles         JSONArray      `json:"subtitles" gorm:"type:json"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
+	ID                  int       `gorm:"primaryKey" json:"id"`
+	SeriesNameFile      string    `json:"series_name_file" gorm:"uniqueIndex"` // {title} 部分
+	SyobocalTitleID     *int      `json:"syobocal_title_id"`
+	SyobocalTitleName   *string   `json:"syobocal_title_name"`
+	SyobocalTitleNameEn *string   `json:"syobocal_title_name_en"`
+	Comment             JSONMap   `json:"comment" gorm:"type:json"`
+	FirstYear           *int      `json:"first_year"`
+	FirstMonth          *int      `json:"first_month"`
+	FirstEndYear        *int      `json:"first_end_year"`
+	FirstEndMonth       *int      `json:"first_end_month"`
+	Subtitles           JSONArray `json:"subtitles" gorm:"type:json"`
+	CreatedAt           time.Time `json:"created_at"`
+	UpdatedAt           time.Time `json:"updated_at"`
 }
 
 // JSONMap - JSON型を表すカスタム型（map用）

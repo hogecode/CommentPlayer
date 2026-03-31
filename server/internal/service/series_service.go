@@ -249,8 +249,8 @@ func (ss *SeriesService) GetSeriesWithVideos(seriesID int) (*SeriesWithVideos, e
 
 // SeriesWithVideos - シリーズとそのビデオ
 type SeriesWithVideos struct {
-	Series *entity.Series   `json:"series"`
-	Videos []entity.Video   `json:"videos"`
+	Series *entity.Series `json:"series"`
+	Videos []entity.Video `json:"videos"`
 }
 
 // GetAllSeries - すべてのシリーズを取得

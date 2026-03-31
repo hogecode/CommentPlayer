@@ -34,11 +34,11 @@ type UserUpdateRequestForAdmin struct {
 
 // UserResponse - ユーザーレスポンス
 type UserResponse struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	IsAdmin      int    `json:"is_admin"`
-	CreatedAt    string `json:"created_at"`
-	UpdatedAt    string `json:"updated_at"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	IsAdmin   int    `json:"is_admin"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 // UsersResponse - ユーザー一覧レスポンス

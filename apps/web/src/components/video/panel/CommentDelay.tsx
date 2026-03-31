@@ -89,7 +89,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
   };
 
   return (
-    <div className="flex flex-col justify-start  gap-4 p-4">
+    <div className="flex flex-col justify-start gap-4 p-4">
       {/* ヘッダー */}
       <div className="flex justify-center">
         <Label className="text-base font-medium">
@@ -105,7 +105,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           onClick={() => handleCommentDelay(commentDelay + 60)}
           title="60秒減少"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-10 h-10" />
         </Button>
 
         <Button
@@ -114,7 +114,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           onClick={() => handleCommentDelay(commentDelay + 5)}
           title="5秒減少"
         >
-          <ArrowDown className="w-6 h-6" />
+          <ArrowDown className="w-10 h-10" />
         </Button>
 
         <Button
@@ -123,7 +123,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           onClick={() => handleCommentDelay(commentDelay - 5)}
           title="5秒増加"
         >
-          <ArrowUp className="w-6 h-6" />
+          <ArrowUp className="w-10 h-10" />
         </Button>
 
         <Button
@@ -132,7 +132,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           onClick={() => handleCommentDelay(commentDelay - 60)}
           title="60秒増加"
         >
-          <ArrowRight className="w-6 h-6" />
+          <ArrowRight className="w-10 h-10" />
         </Button>
         <Button
           variant="default"
@@ -140,7 +140,7 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           onClick={handleReset}
           title="遅延をリセット"
         >
-          <RotateCcw className="w-6 h-6" />
+          <RotateCcw className="w-10 h-10" />
         </Button>
         <Button
           variant="default"
