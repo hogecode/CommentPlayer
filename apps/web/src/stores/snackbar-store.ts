@@ -50,10 +50,17 @@ export const useSnackbarStore = create<SnackbarStoreState>((set, get) => ({
       destroying: false,
     }
 
-    // スナックバーをスタックに追加
-    set((state) => ({
-      snackbars: [...state.snackbars, newSnackbar],
-    }))
+    // スナックバーをスタックに追加し、5個を超える場合は最も古いものを削除
+    set((state) => {
+      let newSnackbars = [...state.snackbars, newSnackbar]
+      // 最大 5 個までに制限
+      if (newSnackbars.length > 5) {
+        newSnackbars = newSnackbars.slice(-5)
+      }
+      return {
+        snackbars: newSnackbars,
+      }
+    })
 
     // 少し待ってからすぐに表示する
     await sleep(0.05) // 少し待たないと表示時の CSS アニメーションが発生しない
