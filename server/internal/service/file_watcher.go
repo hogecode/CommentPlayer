@@ -173,16 +173,30 @@ func (fw *FileWatcher) handleFileEvent(event fsnotify.Event) {
 func (fw *FileWatcher) handleVideoFileCreated(filePath string, folderID int) {
 	fileName := filepath.Base(filePath)
 
-	// DBに既存レコードがあるか確認
+	// DBに既存レコードがあるか確認（同じフォルダ内）
 	var video entity.Video
 	result := fw.db.Where("file_name = ? AND folder_id = ?", fileName, folderID).First(&video)
 
 	if result.Error == gorm.ErrRecordNotFound {
-		// 新規レコードを作成
-		fw.createVideoRecord(filePath, folderID)
+		// 別のフォルダで同じファイル名が存在するか確認
+		var existingVideo entity.Video
+		existingResult := fw.db.Where("file_name = ?", fileName).First(&existingVideo)
+
+		if existingResult.Error == gorm.ErrRecordNotFound {
+			// 全フォルダで同じファイル名が存在しない場合のみ新規レコードを作成
+			fw.createVideoRecord(filePath, folderID)
+		}
+		// 別のフォルダに同じファイル名が存在する場合は何もしない
 	} else if result.Error == nil && video.IsDeleted {
-		// 削除済みレコードの復旧
-		fw.restoreVideoRecord(&video)
+		// 別のフォルダで同じファイル名が存在するか確認
+		var existingVideo entity.Video
+		existingResult := fw.db.Where("file_name = ? AND folder_id != ?", fileName, folderID).First(&existingVideo)
+
+		if existingResult.Error == gorm.ErrRecordNotFound {
+			// 別のフォルダに同じファイル名が存在しない場合のみ復旧
+			fw.restoreVideoRecord(&video)
+		}
+		// 別のフォルダに同じファイル名が存在する場合は何もしない
 	}
 }
 
@@ -204,7 +218,7 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 
 	// ファイルが別プロセスで使用中の可能性があるため、リトライロジックを実装
 	const maxRetries = 3
-	const retryDelay = 2 * time.Second
+	const retryDelay = 3 * time.Second
 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {

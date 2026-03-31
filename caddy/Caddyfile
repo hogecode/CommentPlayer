@@ -22,7 +22,7 @@ localhost {
 	reverse_proxy localhost:8000
 }
 
-https://{$VPN_IP}{
+https://{$VPN_IP} {
     reverse_proxy localhost:8000
     tls internal
 }

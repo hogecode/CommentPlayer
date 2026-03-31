@@ -33,7 +33,7 @@ func (a *App) GetFolders(foldersGroup *gin.RouterGroup) {
 		slog.Debug("GetFolders: Starting to fetch all watched folders")
 
 		var folders []entity.Folder
-		if err := a.DB.Where("is_watched = ?", true).Find(&folders).Error; err != nil {
+		if err := a.DB.Where("is_watched = ?", true).Order("path ASC").Find(&folders).Error; err != nil {
 			slog.Error("GetFolders: Database error while fetching folders",
 				"error", err.Error(),
 				"locale", locale)

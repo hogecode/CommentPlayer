@@ -30,6 +30,9 @@ func (q *CaptureQuery) GetCaptureList(videoID, page, limit int) ([]entity.Captur
 		return nil, 0, err
 	}
 
+    // ソート（逆順）
+	query = query.Order("created_at DESC")
+
 	// ページネーション
 	offset := (page - 1) * limit
 	query = query.Offset(offset).Limit(limit)
