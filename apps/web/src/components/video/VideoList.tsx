@@ -102,14 +102,15 @@ export function VideoList({
               {/* 年フィルタ */}
               {yearList.length > 0 && (
                 <NativeSelect
+                  
                   value={year ?? ''}
                   onChange={(e) =>
                     onYearChange?.(e.target.value ? parseInt(e.target.value, 10) : null)
                   }
                 >
-                  <option value="">全年度</option>
+                  <option value="" className="bg-black/90">全年度</option>
                   {yearList.map((y) => (
-                    <option key={y} value={y}>
+                    <option key={y} value={y} className="bg-black/90">
                       {y}年
                     </option>
                   ))}
@@ -124,8 +125,8 @@ export function VideoList({
                     onSortFieldChange?.(e.target.value as "jikkyo_date" | "file_name")
                   }
                 >
-                  <option value="jikkyo_date">作成日</option>
-                  <option value="file_name">ファイル名</option>
+                  <option value="jikkyo_date" className="bg-black/90">作成日</option>
+                  <option value="file_name" className="bg-black/90">ファイル名</option>
                 </NativeSelect>
               )}
               
@@ -137,8 +138,8 @@ export function VideoList({
                     onSortChange?.(e.target.value as "asc" | "desc")
                   }
                 >
-                  <option value="desc">降順</option>
-                  <option value="asc">昇順</option>
+                  <option value="desc" className="bg-black/90">降順</option>
+                  <option value="asc" className="bg-black/90">昇順</option>
                 </NativeSelect>
               )}
             </div>

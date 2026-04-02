@@ -582,7 +582,7 @@ definitions:
   gin.H:
     additionalProperties: {}
     type: object
-host: localhost:8000
+host: 100.72.160.115:8000
 info:
   contact: {}
   description: Watch commentPlayer API documentation
