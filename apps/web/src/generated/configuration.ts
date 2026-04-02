@@ -1,7 +1,7 @@
 /* tslint:disable */
 /**
  * commentPlayer API
- * ビデオ管理アプリケーションのREST API
+ * Watch commentPlayer API documentation
  *
  * The version of the OpenAPI document: 1.0.0
  * 

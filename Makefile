@@ -118,9 +118,9 @@ goimports-check: ## goimportsでimport文をチェック（差分があればエ
 ## ========================
 
 generate-yaml-win: ## swagger.yaml を生成
-	powershell -ExecutionPolicy Bypass -File scripts/gen-swagger.ps1
+	powershell -ExecutionPolicy Bypass -File scripts/update-swagger-host.ps1
 
-generate-client-win: ## React Query TypeScriptクライアント生成
+generate-client-win: ## Axios TypeScriptクライアント生成
 	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g typescript-axios -o /local/apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=apis"
 
 generate-all-win: generate-yaml-win generate-client-win ## swagger.yaml から全コード生成

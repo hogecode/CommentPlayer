@@ -1,10 +1,4 @@
-# CommentVideo サーバー設定
-
-# サーバー設定
-server:
-  host: "0.0.0.0"
-  port: 8000
-  jwt_secret: "your_jwt_secret_key_here"
+# CommentPlayer サーバー設定
 
 # データベース設定
 db:
@@ -18,6 +12,26 @@ log:
   level: "info"
   format: "json"
 
-# ストレージ設定
+
+# --------------------------------
+# 以下ユーザー設定
+# --------------------------------
+
+# サーバー設定
+server:
+  host: "0.0.0.0" # Tailscale等を使う場合はそのIPアドレスにする
+  port: 8000
+  jwt_secret: "your_jwt_secret_key_here" # Openssl等でJWTシークレットを生成する
+  schemes: "https"  # Caddyを使う場合はHTTPにする、デフォルトはHTTP
+
+# スクリーンショット保存先
 storage:
   captures_dir: "C:\\Users\\user\\Pictures\\Screenshots"
+
+# 動画ファイル名(拡張子抜き)の名前パターン
+series:
+  patterns:
+    - "{title}{episode}" # ex. frielen01.mp4の場合
+    - "{title}-{episode}" # ex. frielen2-01.mp4の場合
+    
+    # 以下にパターンを追加

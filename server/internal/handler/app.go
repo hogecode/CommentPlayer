@@ -1,4 +1,4 @@
-package handler
+﻿package handler
 
 import (
 	"github.com/go-playground/validator/v10"
@@ -7,15 +7,19 @@ import (
 	"github.com/hogecode/commentPlayer/internal/service"
 	"gorm.io/gorm"
 
-	_ "github.com/gin-gonic/gin" // Swagger用のインポート
+	_ "github.com/gin-gonic/gin" 
 )
 
-// App - API アプリケーションコンテナ
+// Please write comments in English only.
+// Do not write non-Ascii(japanese) comments in this file, 
+// because it is used for generating Swagger documentation and non-Ascii characters may cause issues in the generated JSON. 
+
+// App - CommentPlayer API
 // @title commentPlayer API
 // @version 1.0.0
-// @description ビデオ管理アプリケーションのREST API
-// @host 100.72.160.115
-// @schemes https
+// @description Watch commentPlayer API documentation
+// @host localhost:8000
+// @schemes http
 type App struct {
 	DB           *gorm.DB
 	VideoQuery   *query.VideoQuery
@@ -25,7 +29,7 @@ type App struct {
 	Config       *config.Config
 }
 
-// NewApp - App を初期化
+// NewApp - Initialize a new App
 func NewApp(db *gorm.DB, cfg *config.Config) *App {
 	return &App{
 		DB:           db,

@@ -582,10 +582,10 @@ definitions:
   gin.H:
     additionalProperties: {}
     type: object
-host: 100.72.160.115
+host: localhost:8000
 info:
   contact: {}
-  description: ビデオ管理アプリケーションのREST API
+  description: Watch commentPlayer API documentation
   title: commentPlayer API
   version: 1.0.0
 paths:
@@ -1255,5 +1255,5 @@ paths:
       tags:
       - Debug
 schemes:
-- https
+- http
 swagger: "2.0"

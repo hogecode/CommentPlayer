@@ -1892,11 +1892,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0.0",
-	Host:             "100.72.160.115",
+	Host:             "localhost:8000",
 	BasePath:         "",
-	Schemes:          []string{"https"},
+	Schemes:          []string{"http"},
 	Title:            "commentPlayer API",
-	Description:      "ビデオ管理アプリケーションのREST API",
+	Description:      "Watch commentPlayer API documentation",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
