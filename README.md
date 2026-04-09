@@ -2,7 +2,7 @@
 
 ローカルにある動画をブラウザ上でコメント付きで再生できるアプリケーションです。外部API を利用して過去ログコメントや動画メタデータを取得し、快適な視聴体験を提供します。以前作成した[動画アプリ](https://github.com/hogecode/video-app)の後継的な位置づけです。
 
-![CommePlayer - 視聴画面](docs/photos/video.jpeg)
+<img src="docs/photos/video.jpeg" alt="CommePlayer - 視聴画面" style="max-width: 75%; height: auto;" />
 
 ## 目次
 
@@ -32,7 +32,7 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 - **サムネイル機能**: 動画のサムネイル表示と再生成
 - **動画ダウンロード機能**: ローカルへの動画保存
 
-![一覧画面](docs/photos/videos.jpeg)
+<img src="docs/photos/videos.jpeg" alt="一覧画面" style="max-width: 75%; height: auto;" />
 
 ### 🎬 視聴画面
 - **スクリーンショット機能**: 特定のタイミングでキャプチャ撮影、キャプチャ一覧で確認可能
@@ -51,12 +51,33 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 - **コメント表示設定**: 最大コメント数、色、NG キーワード機能
 - **シリーズ管理**: 外部API を利用して動画ファイル名とタイトルを自動対応
 
-![コメント表示設定](docs/photos/comment-display.jpeg)
-![コメントNG設定](docs/photos/comment-ng.jpeg)
+<img src="docs/photos/comment-display.jpeg" alt="コメント表示設定" style="max-width: 75%; height: auto;" />
+<img src="docs/photos/comment-ng.jpeg" alt="コメントNG設定" style="max-width: 75%; height: auto;" />
 
 ### ⚙️ ユーザー登録、ログイン画面
 - **設定同期機能**: 視聴履歴、コメント設定等のローカルの設定を複数のデバイスで同期
 
+## デモンストレーション
+
+### ホーム画面
+<video width="640" height="360" controls style="max-width: 75%; height: auto;">
+  <source src="docs/videos/home.mp4" type="video/mp4">
+  お使いのブラウザはビデオタグをサポートしていません。
+</video>
+
+
+
+### 動画再生
+<video width="640" height="360" controls style="max-width: 75%; height: auto;">
+  <source src="docs/videos/video.mp4" type="video/mp4">
+  お使いのブラウザはビデオタグをサポートしていません。
+</video>
+
+### スクリーンショット機能
+<video width="640" height="360" controls style="max-width: 75%; height: auto;">
+  <source src="docs/videos/capture.mp4" type="video/mp4">
+  お使いのブラウザはビデオタグをサポートしていません。
+</video>
 
 
 ## 動作環境
@@ -70,15 +91,65 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 
 ## 事前準備
 
+GormのSQLite接続機能にCGOが必要なせいで、事前準備が結構面倒です。。。
+
+### ステップ1: Winget で基本ツールをインストール
+
 以下のツールを Winget でインストールしてください：
 
 ```powershell
 winget install FFmpeg
 winget install ffprobe
-winget install Docker.DockerDesktop
+winget install OpenJS.NodeJS.LTS
+winget install GoLang.Go
+# winget install Docker.DockerDesktop
 winget install Caddy
-winget install openssl
+winget install openssl # パスが自動で追加されない
+winget install GnuWin32.Make # 古いけど仕方がない
 ```
+
+### ステップ2: MSYS2 をダウンロード・インストール
+
+1. [MSYS2 公式サイト](https://www.msys2.org/)から `msys2-x86_64-xxxxxxx.exe` をダウンロード
+2. インストーラーを実行します（デフォルトパス: `C:\msys64`）
+3. インストール完了後、MSYS2 ターミナルを起動します
+
+### ステップ3: MSYS2 で GCC と Make をインストール
+
+MSYS2 ターミナルで以下を実行：
+
+```powershell
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make
+```
+
+### ステップ4: PATH と CC を永続的に設定
+
+**PowerShell を管理者権限で起動**し、以下を実行：
+
+```powershell
+# リポジトリルートから実行
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+.\scripts\setup-env.ps1
+```
+
+> スクリプト実行後、**必ず PowerShell を閉じて再起動してください**。新しい PATH 設定が有効になるには PowerShell の再起動が必須です。
+
+### ステップ5: インストール確認
+
+PowerShell を再起動した後、以下のコマンドで確認：
+
+```powershell
+gcc --version
+g++ --version
+make --version
+openssl version
+go version
+node --version
+npm --version
+```
+
+すべてのコマンドがバージョン情報を表示すれば、セットアップは成功です。
+
 
 ## インストール・セットアップ
 
@@ -144,6 +215,13 @@ openssl rand -base64 32
 
 生成されたキーを `config.yaml` の `jwt_secret` に設定してください。
 
+### 5. フロントのビルド
+
+```bash
+make setup-dev # 依存関係をインストール
+make web-build
+```
+
 ## 使用手順
 
 ### 基本的な使い方
@@ -151,7 +229,7 @@ openssl rand -base64 32
 #### 1. 開発サーバーの起動
 
 ```bash
-make server-dev
+make server-dev # サーバーを起動
 ```
 
 #### 2. ブラウザでアクセス
@@ -170,17 +248,23 @@ http://localhost:8000
    - ローカルの動画フォルダを指定
    - リアルタイムで DB に同期されます
 
-![フォルダ管理](docs/photos/folder.jpeg)
+<img src="docs/photos/folder.jpeg" alt="フォルダ管理" style="max-width: 75%; height: auto;" />
 
 2. **シリーズ管理**（オプション）:
    - ファイル名とシリーズ名のマッピングを設定
    - 外部API が動画を自動認識します
 
-![シリーズ管理](docs/photos/series.png)
+<img src="docs/photos/series.jpeg" alt="シリーズ管理" style="max-width: 75%; height: auto;" />
 
 #### 4. 動画の再生
 
 一覧画面で目的の動画を選択して再生します。
+
+#### セットアップ手順の動画
+<video width="640" height="360" controls style="max-width: 75%; height: auto;">
+  <source src="docs/videos/setup.mp4" type="video/mp4">
+  お使いのブラウザはビデオタグをサポートしていません。
+</video>
 
 ### 他のアクセス方法
 
@@ -194,10 +278,15 @@ server:
 ```
 
 2. フロントエンド設定 (`apps/web/.env.local`) を編集
-3. `make generate-all-win`でAPI設定を更新
-4. `make web-build`でフロントを再ビルド
-5. `make server-dev`コマンドで起動
-6. アクセスURL: `http://{tailscale-ip}:8000`
+```txt
+VITE_API_BASE_URL=http://{tailscale-ip}:8000
+```
+
+3. `make setup-dev`で依存関係をインストール
+4. `make generate-all-win`でAPI設定を更新
+5. `make web-build`でフロントを再ビルド
+6. `make server-dev`コマンドで起動
+7. アクセスURL: `http://{tailscale-ip}:8000`
 
 #### Caddy でHTTPS を使用する場合
 
@@ -209,18 +298,35 @@ server:
 ```
 
 2. フロントエンド設定を編集
-3. `make generate-all-win`でAPI設定を更新
-4. `make web-build`でフロントを再ビルド
-5. `make server-dev`コマンドで起動
-6. アクセスURL: `https://localhost`
+```txt
+VITE_API_BASE_URL=https://localhost:8000
+```
+
+3. `make setup-dev`で依存関係をインストール
+4. `make generate-all-win`でAPI設定を更新
+5. `make web-build`でフロントを再ビルド
+6. `make server-dev`コマンドで起動
+7. アクセスURL: `https://localhost`
 
 #### DNS masq でローカルドメインを使用する場合
 
 1. DNS masq を設定
-2. `make generate-all-win`でAPI設定を更新
-3. `make web-build`でフロントを再ビルド
-4. `make server-dev`コマンドで起動
-5. アクセスURL: `https://app.local`
+2. `config.yaml` を編集：
+```yaml
+server:
+  schemes: "https"
+```
+
+3. フロントエンド設定を編集
+```txt
+VITE_API_BASE_URL=http://app.local:8000
+```
+
+4. `make setup-dev`で依存関係をインストール
+5. `make generate-all-win`でAPI設定を更新
+6. `make web-build`でフロントを再ビルド
+7. `make server-dev`コマンドで起動
+8. アクセスURL: `https://app.local`
 
 詳細は [DNS_SETUP.md](dns/DNS_SETUP.md) を参照してください。
 

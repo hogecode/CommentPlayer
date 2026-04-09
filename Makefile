@@ -1,4 +1,7 @@
-.PHONY: help setup-dev dev web-dev web-build web-lint web-typecheck server-run server-build server-test server-fmt server-lint server-clean db-migrate db-setup-test db-rollback db-new db-dump db-migrate-test sqlc-generate seed goimports goimports-check generate-all swagger-gen-win generate-client-win up down
+# Do not write non-ascii characters in make task to avoid encoding issues. 
+
+.PHONY: help setup-dev dev web-dev web-build web-lint web-typecheck server-run server-build server-test server-fmt server-lint server-clean set-gcc-env db-migrate db-setup-test db-rollback db-new db-dump db-migrate-test sqlc-generate seed goimports goimports-check generate-all swagger-gen-win generate-client-win up down
+
 
 help: ## ヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -8,11 +11,11 @@ help: ## ヘルプを表示
 ## ========================
 
 setup-dev: ## 開発環境をセットアップ（DevContainer用）
-	@echo "📦 開発環境をセットアップしています..."
+	@echo "Installing dependencies..."
 	cd apps/web && yarn install
 	cd server && go mod download
 	go install github.com/air-verse/air@latest
-	@echo "✅ セットアップが完了しました。'make help' でコマンド一覧を表示します。"
+	@echo "✅ Setup complete. Run 'make help' to see the list of commands."
 
 
 ## ========================
@@ -64,7 +67,7 @@ web-preview: ## ビルド後のプレビュー
 ## ========================
 
 server-dev: ## サーバーを起動
-	cd server && go run cmd/main.go serve
+	powershell -Command "$$env:PATH=$$env:PATH + ';C:\Program Files (x86)\GnuWin32\bin;C:\msys64\mingw64\bin;C:\Program Files\OpenSSL\bin'; $$env:CC='C:\msys64\mingw64\bin\gcc.exe'; $$env:CXX='C:\msys64\mingw64\bin\g++.exe'; cd server; go run cmd/main.go serve"
 
 server-run-hot: ## サーバーをホットリロードで起動
 # 動作しない
@@ -94,7 +97,7 @@ server-clean: ## ビルド成果物をクリーン
 ## ========================
 
 seed: ## 開発環境用のシードデータを生成
-	@echo "シードデータを生成しています..."
+	@echo "Generating seed data..."
 	cd server && APP_ENV=dev op run --env-file=".env" -- go run cmd/seed/main.go
 
 goimports: ## goimportsでimport文を整理
@@ -120,8 +123,11 @@ goimports-check: ## goimportsでimport文をチェック（差分があればエ
 generate-yaml-win: ## swagger.yaml を生成
 	powershell -ExecutionPolicy Bypass -File scripts/update-swagger-host.ps1
 
-generate-client-win: ## Axios TypeScriptクライアント生成
+generate-client-docker-win: ## Axios TypeScriptクライアント生成
 	powershell -Command "docker run --rm -v \"$${PWD}:/local\" openapitools/openapi-generator-cli:latest generate -i /local/docs/swagger.yaml -g typescript-axios -o /local/apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=apis"
 
+generate-client-win: ## Axios TypeScriptクライアント生成
+	npx @openapitools/openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=apis
+
 generate-all-win: generate-yaml-win generate-client-win ## swagger.yaml から全コード生成
-	@echo "✅ Swagger とクライアントコードを生成しました"
+	@echo "✅ Swagger and client code generated"

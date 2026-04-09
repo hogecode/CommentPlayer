@@ -22,7 +22,7 @@ server:
   host: "0.0.0.0" # Tailscale等を使う場合はそのIPアドレスにする
   port: 8000
   jwt_secret: "your_jwt_secret_key_here" # Openssl等でJWTシークレットを生成する
-  schemes: "https"  # Caddyを使う場合はHTTPにする、デフォルトはHTTP
+  schemes: "http"  # Caddyを使う場合はHTTPにする、デフォルトはHTTP
 
 # スクリーンショット保存先
 storage:
