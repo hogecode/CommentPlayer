@@ -57,27 +57,18 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 ### ⚙️ ユーザー登録、ログイン画面
 - **設定同期機能**: 視聴履歴、コメント設定等のローカルの設定を複数のデバイスで同期
 
-## デモンストレーション
+## 動画
 
 ### ホーム画面
-<video width="640" height="360" controls style="max-width: 75%; height: auto;">
-  <source src="docs/videos/home.mp4" type="video/mp4">
-  お使いのブラウザはビデオタグをサポートしていません。
-</video>
+<video controls src="https://github.com/user-attachments/assets/05d5f4cd-15b2-4177-be72-11a67a62abe9
+"></video>
 
+### ビデオ画面
+<video controls src="https://github.com/user-attachments/assets/74bf69bb-7d6d-4494-8a50-70da50343178
+"></video>
 
-
-### 動画再生
-<video width="640" height="360" controls style="max-width: 75%; height: auto;">
-  <source src="docs/videos/video.mp4" type="video/mp4">
-  お使いのブラウザはビデオタグをサポートしていません。
-</video>
-
-### スクリーンショット機能
-<video width="640" height="360" controls style="max-width: 75%; height: auto;">
-  <source src="docs/videos/capture.mp4" type="video/mp4">
-  お使いのブラウザはビデオタグをサポートしていません。
-</video>
+### キャプチャ一覧画面
+<video controls src="https://github.com/user-attachments/assets/0d26c241-32a7-4959-a304-50034c8c25a0"></video>
 
 
 ## 動作環境
@@ -261,10 +252,8 @@ http://localhost:8000
 一覧画面で目的の動画を選択して再生します。
 
 #### セットアップ手順の動画
-<video width="640" height="360" controls style="max-width: 75%; height: auto;">
-  <source src="docs/videos/setup.mp4" type="video/mp4">
-  お使いのブラウザはビデオタグをサポートしていません。
-</video>
+<video controls src="https://github.com/user-attachments/assets/0465bd9e-299e-4a7a-8d53-b9c3e027ef60
+" ></video>
 
 ### 他のアクセス方法
 
