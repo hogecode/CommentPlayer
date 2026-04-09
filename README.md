@@ -88,15 +88,19 @@ GormのSQLite接続機能にCGOが必要なせいで、事前準備が結構面�
 
 以下のツールを Winget でインストールしてください：
 
+<!--
+opensslはパスが自動で追加されない
+wingetのmakeは古いけど仕方がない
+-->
 ```powershell
 winget install FFmpeg
 winget install ffprobe
 winget install OpenJS.NodeJS.LTS
 winget install GoLang.Go
-# winget install Docker.DockerDesktop
+winget install openssl 
+winget install GnuWin32.Make
+winget install Docker.DockerDesktop
 winget install Caddy
-winget install openssl # パスが自動で追加されない
-winget install GnuWin32.Make # 古いけど仕方がない
 ```
 
 ### ステップ2: MSYS2 をダウンロード・インストール
@@ -125,6 +129,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
 > スクリプト実行後、**必ず PowerShell を閉じて再起動してください**。新しい PATH 設定が有効になるには PowerShell の再起動が必須です。
 
+<!--
 ### ステップ5: インストール確認
 
 PowerShell を再起動した後、以下のコマンドで確認：
@@ -140,7 +145,7 @@ npm --version
 ```
 
 すべてのコマンドがバージョン情報を表示すれば、セットアップは成功です。
-
+-->
 
 ## インストール・セットアップ
 
@@ -166,28 +171,18 @@ cp apps/web/.env.local.example apps/web/.env.local
 `server/config.yaml` を開き、以下の項目を設定します：
 
 ```yaml
-# ================================
 # サーバー設定
-# ================================
-
 server:
-  host: "0.0.0.0"                          # Tailscale 使用時はそのIP を指定
-  port: 8000
-  jwt_secret: "your_jwt_secret_key_here"   # 後述の手順で生成
-  schemes: "http"                          # Caddy 使用時は "https"
+  host: "0.0.0.0"                # Tailscale 使用時はそのIP を指定
+  port: 8000　　　　　　　　　　　 # ポート番号を変更したい場合は変更
+  jwt_secret: "jwt_secret_key"   # 後述の手順で生成
+  schemes: "http"                # Caddy 使用時は "https"
 
-# ================================
 # スクリーンショット保存先
-# ================================
-
 storage:
-  captures_dir: "C:\\Users\\user\\Pictures\\Screenshots"
+  captures_dir: "C:\\Users\\user\\Pictures\\Screenshots" # 環境に合わせて変更
 
-# ================================
 # 動画ファイル名パターン
-# (このパターンを使用してシリーズを抽出します。)
-# ================================
-
 series:
   patterns:
     - "{title}{episode}"      # 例: frielen01.mp4

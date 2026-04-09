@@ -129,5 +129,5 @@ generate-client-docker-win: ## Axios TypeScriptクライアント生成
 generate-client-win: ## Axios TypeScriptクライアント生成
 	npx @openapitools/openapi-generator-cli generate -i docs/swagger.yaml -g typescript-axios -o apps/web/src/generated --additional-properties=typescriptThreePlus=true,supportsES6=true,hideGenerationTimestamp=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=apis
 
-generate-all-win: generate-yaml-win generate-client-win ## swagger.yaml から全コード生成
+generate-all-win: generate-yaml-win generate-client-docker-win ## swagger.yaml から全コード生成
 	@echo "✅ Swagger and client code generated"
