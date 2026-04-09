@@ -225,6 +225,28 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 		// ビデオメタデータを抽出
 		metadata, err := ExtractVideoMetadata(filePath, fw.screenshotOutputDir)
 		if err == nil {
+			// トランザクション内でDB操作を実行
+			tx := fw.db.Begin()
+
+			// 重複チェック：他のプロセスが同時に作成した場合に備える
+			var existingVideo entity.Video
+			checkResult := tx.Where("file_name = ? AND folder_id = ?", fileName, folderID).First(&existingVideo)
+			if checkResult.Error == nil {
+				// 既にレコードが存在する場合はコミットせずに終了
+				slog.Info("createVideoRecord: Video record already exists, skipping creation",
+					"file_name", fileName,
+					"folder_id", folderID)
+				tx.Rollback()
+				return
+			} else if checkResult.Error != gorm.ErrRecordNotFound {
+				// 予期しないエラー
+				slog.Error("createVideoRecord: Unexpected error checking duplicate",
+					"file_name", fileName,
+					"error", checkResult.Error.Error())
+				tx.Rollback()
+				return
+			}
+
 			// 成功時の処理
 			// コメントファイル情報を取得
 			commentData := fw.getCommentData(filePath)
@@ -246,8 +268,18 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 				Status:             "ready",
 			}
 
-			if err := fw.db.Create(&video).Error; err != nil {
+			if err := tx.Create(&video).Error; err != nil {
 				slog.Error("createVideoRecord: Error creating video record",
+					"file_path", filePath,
+					"file_name", fileName,
+					"error", err.Error())
+				tx.Rollback()
+				return
+			}
+
+			// ここで全ての重要な処理が完了してからコミット
+			if err := tx.Commit().Error; err != nil {
+				slog.Error("createVideoRecord: Error committing transaction",
 					"file_path", filePath,
 					"file_name", fileName,
 					"error", err.Error())
@@ -258,13 +290,14 @@ func (fw *FileWatcher) createVideoRecord(filePath string, folderID int) {
 				"file_name", fileName,
 				"file_hash", metadata.FileHash)
 
-			// シリーズを抽出して同期
+			// シリーズを抽出して同期（トランザクション外で実行）
 			if fw.seriesService != nil {
 				if err := fw.seriesService.ExtractAndSyncSeriesForVideo(&video); err != nil {
 					slog.Error("createVideoRecord: Failed to sync series",
 						"file_path", filePath,
 						"file_name", fileName,
 						"error", err.Error())
+					// シリーズ同期エラーはログするが、ビデオレコード作成自体は成功
 				}
 			}
 
