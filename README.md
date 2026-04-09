@@ -195,8 +195,9 @@ server:
 
 2. フロントエンド設定 (`apps/web/.env.local`) を編集
 3. `make generate-all-win`でAPI設定を更新
-4. `make server-dev`コマンドで起動
-5. アクセスURL: `http://{tailscale-ip}:8000`
+4. `make web-build`でフロントを再ビルド
+5. `make server-dev`コマンドで起動
+6. アクセスURL: `http://{tailscale-ip}:8000`
 
 #### Caddy でHTTPS を使用する場合
 
@@ -209,15 +210,17 @@ server:
 
 2. フロントエンド設定を編集
 3. `make generate-all-win`でAPI設定を更新
-4. `make server-dev`コマンドで起動
-5. アクセスURL: `https://localhost`
+4. `make web-build`でフロントを再ビルド
+5. `make server-dev`コマンドで起動
+6. アクセスURL: `https://localhost`
 
 #### DNS masq でローカルドメインを使用する場合
 
 1. DNS masq を設定
 2. `make generate-all-win`でAPI設定を更新
-3. `make server-dev`コマンドで起動
-4. アクセスURL: `https://app.local`
+3. `make web-build`でフロントを再ビルド
+4. `make server-dev`コマンドで起動
+5. アクセスURL: `https://app.local`
 
 詳細は [DNS_SETUP.md](dns/DNS_SETUP.md) を参照してください。
 

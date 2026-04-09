@@ -80,7 +80,7 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 
 	// CORS ミドルウェアを登録
 	engine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     []string{"*"}, // Tailscaleを使う場合を考慮してワイルドカードを許可
 		AllowMethods:     []string{"*"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
