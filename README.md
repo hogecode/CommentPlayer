@@ -60,11 +60,11 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 ## 動画
 
 ### ホーム画面
-<video controls src="https://github.com/user-attachments/assets/05d5f4cd-15b2-4177-be72-11a67a62abe9
+<video controls src="https://github.com/user-attachments/assets/857aa359-e8f8-418b-907b-9171d60bc2b2
 "></video>
 
 ### ビデオ画面
-<video controls src="https://github.com/user-attachments/assets/74bf69bb-7d6d-4494-8a50-70da50343178
+<video controls src="https://github.com/user-attachments/assets/382a5fb7-3b4b-4435-ac6e-9bae60a087bc
 "></video>
 
 ### キャプチャ一覧画面
@@ -247,7 +247,7 @@ http://localhost:8000
 一覧画面で目的の動画を選択して再生します。
 
 #### セットアップ手順の動画
-<video controls src="https://github.com/user-attachments/assets/0465bd9e-299e-4a7a-8d53-b9c3e027ef60
+<video controls src="https://github.com/user-attachments/assets/dfa45dc2-ad91-44c5-addb-3853b2f8f1f6
 " ></video>
 
 ### 他のアクセス方法
