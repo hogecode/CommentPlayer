@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	_ "modernc.org/sqlite"
 
 	"github.com/hogecode/commentPlayer/internal/config"
 	"github.com/hogecode/commentPlayer/internal/entity"
@@ -74,7 +75,10 @@ func dbMigrateHandler(cmd *cobra.Command, args []string) {
 
 // initDB - データベース接続を初期化
 func initDB(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	    db, err := gorm.Open(sqlite.Dialector{
+        DriverName: "sqlite", // CGOを使用しないSQLiteドライバーを指定
+        DSN:        dsn,
+    }, &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
