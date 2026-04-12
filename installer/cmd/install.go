@@ -200,8 +200,7 @@ func runInstall(cmd *cobra.Command) error {
 			"キャプチャ保存先: %s\n\n"+
 			"次のステップ:\n"+
 			"1. インストール先フォルダに移動\n"+
-			"2. 'make setup-dev' コマンドを実行\n"+
-			"3. 'make server-dev' でサーバーを起動\n",
+			"2. 'make server-dev' でサーバーを起動\n",
 			installPath, serverPort, capturesDir)))
 
 	return nil

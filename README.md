@@ -82,9 +82,9 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 
 ## 事前準備
 
-### ステップ1: Winget で基本ツールをインストール
+### ステップ1: Winget で基本ツールをインストール(必須)
 
-以下のツールを Winget でインストールしてください：
+以下のツールがローカルに存在しない場合、Winget でインストールしてください：
 
 <!--
 opensslはパスが自動で追加されない
@@ -93,13 +93,21 @@ wingetのmakeは古いけど仕方がない
 ```powershell
 winget install FFmpeg
 winget install ffprobe
+winget install GnuWin32.Make
 winget install OpenJS.NodeJS.LTS
 winget install GoLang.Go
-winget install openssl 
-winget install GnuWin32.Make
-winget install Docker.DockerDesktop
-winget install Caddy
+winget install -e --id Yarn.Yarn
 ```
+
+### ステップ2: Winget で基本ツールをインストール(任意)
+以下のツールがローカルに存在しない場合、Winget で必要に応じてインストールしてください：
+```powershell
+winget install Caddy
+winget install openssl 
+winget install Docker.DockerDesktop
+```
+
+
 <!--
 ### ステップ2: MSYS2 をダウンロード・インストール
 
@@ -145,8 +153,8 @@ npm --version
 すべてのコマンドがバージョン情報を表示すれば、セットアップは成功です。
 -->
 
+<!--
 ## インストール・セットアップ
-
 ### 1. リポジトリをクローン
 
 ```bash
@@ -205,6 +213,8 @@ openssl rand -base64 32
 make setup-dev # 依存関係をインストール
 make web-build
 ```
+-->
+
 
 ## 使用手順
 
@@ -221,7 +231,7 @@ make server-dev # サーバーを起動
 デフォルトでは以下のURLでアクセスできます：
 
 ```
-http://localhost:8000
+http://localhost:{port}
 ```
 
 #### 3. フォルダ監視の設定
@@ -311,6 +321,29 @@ VITE_API_BASE_URL=http://app.local:8000
 8. アクセスURL: `https://app.local`
 
 詳細は [DNS_SETUP.md](dns/DNS_SETUP.md) を参照してください。
+
+
+### サーバーの設定ファイル
+
+```yaml
+# サーバー設定
+server:
+  host: "0.0.0.0"                # Tailscale 使用時はそのIP を指定
+  port: 8000　　　　　　　　　　　 # ポート番号を変更したい場合は変更
+  jwt_secret: "jwt_secret_key"
+  schemes: "http"                # Caddy 使用時は "https"
+
+# スクリーンショット保存先
+storage:
+  captures_dir: "C:\\Users\\user\\Pictures\\Screenshots" # 環境に合わせて変更
+
+# 動画ファイル名パターン
+series:
+  patterns:
+    - "{title}{episode}"      # 例: frielen01.mp4
+    - "{title}-{episode}"     # 例: frielen2-01.mp4
+    # パターンは必要に応じて追加してください
+```
 
 
 ## 技術スタック
