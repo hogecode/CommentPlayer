@@ -1,0 +1,143 @@
+name: Build Winget Tools
+
+# タグ push 時（リリース時）と手動実行
+on:
+  push:
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/build_thirdparty.yaml'
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build-winget-tools:
+    name: Build and Package Winget Tools
+    runs-on: windows-latest
+    steps:
+
+      # Winget がインストールされていることを確認
+      - name: Verify Winget is Available
+        run: |
+          winget --version
+
+      # ダウンロード用の作業フォルダを作成
+      - name: Create Winget Tools Directory
+        run: |
+          mkdir winget-tools
+          cd winget-tools
+          mkdir bin
+
+      # FFmpeg をダウンロード
+      - name: Download FFmpeg
+        run: |
+          # FFmpeg パッケージ ID: Gyan.FFmpeg
+          # winget install を使う代わりに、直接ダウンロードリンクから取得
+          # FFmpeg 公式リリースから最新版をダウンロード
+          $ProgressPreference = 'SilentlyContinue'
+          $url = "https://github.com/GyanD/codexffmpeg/releases/download/6.1.1/ffmpeg-6.1.1-full_build.7z"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/ffmpeg.7z
+          # 7z がインストールされていると仮定して解凍
+          7z x -o"winget-tools/bin" winget-tools/ffmpeg.7z
+
+      # Go をダウンロード
+      - name: Download Go
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          # Go の最新版をダウンロード
+          $goVersion = "1.23.8"
+          $url = "https://go.dev/dl/go$($goVersion).windows-amd64.zip"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/go.zip
+          Expand-Archive -Path winget-tools/go.zip -DestinationPath winget-tools/bin
+
+      # OpenSSL をダウンロード
+      - name: Download OpenSSL
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          # OpenSSL の公式バイナリをダウンロード
+          $url = "https://github.com/openssl/openssl/releases/download/openssl-3.3.1/openssl-3.3.1-win64.zip"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/openssl.zip
+          Expand-Archive -Path winget-tools/openssl.zip -DestinationPath winget-tools/bin
+
+      # Make (GnuWin32) をダウンロード
+      - name: Download Make
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          # GnuWin32 Make をダウンロード
+          $url = "https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/bin/make.exe
+
+      # Docker Desktop をダウンロード
+      - name: Download Docker Desktop
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          # Docker Desktop 最新版をダウンロード
+          $url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/DockerDesktop.exe
+
+      # Caddy をダウンロード
+      - name: Download Caddy
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          # Caddy の最新版をダウンロード
+          $url = "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_windows_amd64.zip"
+          Invoke-WebRequest -Uri $url -OutFile winget-tools/caddy.zip
+          Expand-Archive -Path winget-tools/caddy.zip -DestinationPath winget-tools/bin
+
+      # 使用したハッシュファイルを作成
+      - name: Create Checksums
+        run: |
+          cd winget-tools
+          Get-ChildItem -Recurse -File | % { 
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+            "$hash  $($_.Name)" | Out-File -FilePath SHA256SUMS -Append -Encoding ASCII
+          }
+
+      # tar.gz に圧縮
+      - name: Compress Tools to tar.gz
+        run: |
+          $progressPreference = 'SilentlyContinue'
+          # Windows PowerShell で tar.gz を作成
+          # tar コマンドが利用可能（Windows 10 以降）
+          tar -czf winget-tools.tar.gz winget-tools
+
+      # ファイルサイズを確認
+      - name: Check Archive Size
+        run: |
+          $file = Get-Item winget-tools.tar.gz
+          Write-Host "Archive size: $([Math]::Round($file.Length / 1GB, 2)) GB"
+
+      # アーティファクトとしてアップロード
+      - name: Upload Winget Tools as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winget-tools
+          path: winget-tools.tar.gz
+          retention-days: 7
+
+  # リリース作成とファイルアップロード（タグ push 時のみ）
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-winget-tools
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+
+      # アーティファクトをダウンロード
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: winget-tools
+          path: .
+
+      # Winget Tools を GitHub Release にアップロード
+      - name: Upload Winget Tools to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: winget-tools.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Release Created
+        run: |
+          echo "::notice title=Release Created::Winget tools have been uploaded to GitHub Release"
