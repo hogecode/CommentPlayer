@@ -39,10 +39,15 @@ func DownloadFile(url string, filePath string) (int64, error) {
 		return 0, fmt.Errorf("ダウンロードに失敗しました: %w", err)
 	}
 	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
 
 	// Check response status
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return 0, fmt.Errorf("ダウンロードに失敗しました (ステータスコード: %d)", resp.StatusCode)
+		return 0, fmt.Errorf(
+			"ダウンロードに失敗しました (ステータスコード: %d, body: %s)",
+			resp.StatusCode,
+			string(body),
+		)
 	}
 
 	// Create output file

@@ -1,4 +1,4 @@
-name: Build Winget Tools
+name: Build Thirdparty Tools
 
 # タグ push 時（リリース時）と手動実行
 on:
@@ -10,9 +10,12 @@ on:
   workflow_dispatch:
   workflow_call:
 
+permissions:
+  contents: write # リリース作成のために必要
+
 jobs:
-  build-winget-tools:
-    name: Build and Package Winget Tools
+  build-thirdparty-tools:
+    name: Build and Package Thirdparty Tools
     runs-on: windows-latest
     steps:
 
@@ -22,10 +25,10 @@ jobs:
           winget --version
 
       # ダウンロード用の作業フォルダを作成
-      - name: Create Winget Tools Directory
+      - name: Create Thirdparty Tools Directory
         run: |
-          mkdir winget-tools
-          cd winget-tools
+          mkdir thirdparty-tools
+          cd thirdparty-tools
           mkdir bin
 
       # FFmpeg をダウンロード
@@ -36,9 +39,9 @@ jobs:
           # FFmpeg 公式リリースから最新版をダウンロード
           $ProgressPreference = 'SilentlyContinue'
           $url = "https://github.com/GyanD/codexffmpeg/releases/download/6.1.1/ffmpeg-6.1.1-full_build.7z"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/ffmpeg.7z
+          Invoke-WebRequest -Uri $url -OutFile thirdparty-tools/ffmpeg.7z
           # 7z がインストールされていると仮定して解凍
-          7z x -o"winget-tools/bin" winget-tools/ffmpeg.7z
+          7z x -o"thirdparty-tools/bin" thirdparty-tools/ffmpeg.7z
 
       # Go をダウンロード
       - name: Download Go
@@ -47,8 +50,8 @@ jobs:
           # Go の最新版をダウンロード
           $goVersion = "1.23.8"
           $url = "https://go.dev/dl/go$($goVersion).windows-amd64.zip"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/go.zip
-          Expand-Archive -Path winget-tools/go.zip -DestinationPath winget-tools/bin
+          Invoke-WebRequest -Uri $url -OutFile thirdparty-tools/go.zip
+          Expand-Archive -Path thirdparty-tools/go.zip -DestinationPath thirdparty-tools/bin
 
       # OpenSSL をダウンロード
       - name: Download OpenSSL
@@ -59,7 +62,7 @@ jobs:
          $url = "https://www.openssl.org/source/openssl-3.3.1.tar.gz"
          $out = "openssl.tar.gz"
 
-         New-Item -ItemType Directory -Force -Path "winget-tools"
+         New-Item -ItemType Directory -Force -Path "thirdparty-tools"
 
          Invoke-WebRequest -Uri $url -OutFile $out
     
@@ -69,16 +72,16 @@ jobs:
           $ProgressPreference = 'SilentlyContinue'
           # GnuWin32 Make をダウンロード
           $url = "https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/bin/make.exe
+          Invoke-WebRequest -Uri $url -OutFile thirdparty-tools/bin/make.exe
 
       # Node.js をダウンロード
       - name: Download Node.js
         shell: pwsh
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          New-Item -ItemType Directory -Force -Path "winget-tools"
+          New-Item -ItemType Directory -Force -Path "thirdparty-tools"
           $url = "https://nodejs.org/dist/v20.11.1/node-v20.11.1-x64.msi"
-          Invoke-WebRequest -Uri $url -OutFile "winget-tools/node.msi"
+          Invoke-WebRequest -Uri $url -OutFile "thirdparty-tools/node.msi"
 
       # Caddy をダウンロード
       - name: Download Caddy
@@ -86,13 +89,13 @@ jobs:
           $ProgressPreference = 'SilentlyContinue'
           # Caddy の最新版をダウンロード
           $url = "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_windows_amd64.zip"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/caddy.zip
-          Expand-Archive -Path winget-tools/caddy.zip -DestinationPath winget-tools/bin
+          Invoke-WebRequest -Uri $url -OutFile thirdparty-tools/caddy.zip
+          Expand-Archive -Path thirdparty-tools/caddy.zip -DestinationPath thirdparty-tools/bin
 
       # 使用したハッシュファイルを作成
       - name: Create Checksums
         run: |
-          cd winget-tools
+          cd thirdparty-tools
           Get-ChildItem -Recurse -File | % { 
             $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash
             "$hash  $($_.Name)" | Out-File -FilePath SHA256SUMS -Append -Encoding ASCII
@@ -104,27 +107,27 @@ jobs:
           $progressPreference = 'SilentlyContinue'
           # Windows PowerShell で tar.gz を作成
           # tar コマンドが利用可能（Windows 10 以降）
-          tar -czf winget-tools.tar.gz winget-tools
+          tar -czf thirdparty-tools.tar.gz thirdparty-tools
 
       # ファイルサイズを確認
       - name: Check Archive Size
         run: |
-          $file = Get-Item winget-tools.tar.gz
+          $file = Get-Item thirdparty-tools.tar.gz
           Write-Host "Archive size: $([Math]::Round($file.Length / 1GB, 2)) GB"
 
       # アーティファクトとしてアップロード
-      - name: Upload Winget Tools as Artifact
+      - name: Upload Thirdparty Tools as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: winget-tools
-          path: winget-tools.tar.gz
+          name: thirdparty-tools
+          path: thirdparty-tools.tar.gz
           retention-days: 7
 
   # リリース作成とファイルアップロード（タグ push 時のみ）
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: build-winget-tools
+    needs: build-thirdparty-tools
     if: startsWith(github.ref, 'refs/tags/')
     steps:
 
@@ -132,17 +135,17 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: winget-tools
+          name: thirdparty-tools
           path: .
 
-      # Winget Tools を GitHub Release にアップロード
-      - name: Upload Winget Tools to Release
+      # Thirdparty Tools を GitHub Release にアップロード
+      - name: Upload Thirdparty Tools to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: winget-tools.tar.gz
+          files: thirdparty-tools.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify Release Created
         run: |
-          echo "::notice title=Release Created::Winget tools have been uploaded to GitHub Release"
+          echo "::notice title=Release Created::Thirdparty tools have been uploaded to GitHub Release"

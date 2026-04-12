@@ -35,11 +35,14 @@ func runInstall(cmd *cobra.Command) error {
 	fmt.Println("このツールは CommentPlayer をお使いのシステムにインストールします。")
 	fmt.Println()
 
-	// Step 1: Show system information
+	// Step 1: OS check and system information display
 	if err := showSystemInfo(); err != nil {
 		return fmt.Errorf("システム情報の表示に失敗しました: %w", err)
 	}
 
+	// ------------------------------------------
+	// インストールフォーム
+	// ------------------------------------------
 	// Step 2: Display installation form
 	form := ui.NewInstallForm()
 	p := tea.NewProgram(form)
@@ -77,17 +80,34 @@ func runInstall(cmd *cobra.Command) error {
 		return err
 	}
 
-	// TODO: git clone を実行してリポジトリをインストール先にクローンする処理を追加
-	
-	// Step 6: Download and extract winget tools
+
+	// ------------------------------------------
+	// GitHubからダウンロード
+	// ------------------------------------------
+	// Step 6: Clone repository from GitHub
+	fmt.Println()
+	fmt.Println(ui.StyleSubtitle.Render("📥 ソースコードをダウンロードしています..."))
+
+	// Check if git is installed
+	if !utils.CommandExists("git") {
+		return fmt.Errorf("Git がインストールされていません。CommentPlayer をインストールするには Git が必要です")
+	}
+
+	// Clone repository with version (using 'latest' as default)
+	version := "latest"  // TODO: Version detection from config or environment
+	if err := installer.CloneRepositoryWithVersion(installPath, version); err != nil {
+		return err
+	}
+
+	fmt.Println(ui.StyleSuccess.Render(fmt.Sprintf("✓ ソースコードをダウンロードしました: %s", installPath)))
+
+	// Step 7: Download and extract thirdparty tools
 	fmt.Println()
 	fmt.Println(ui.StyleSubtitle.Render("📦 サードパーティーライブラリをダウンロードしています..."))
 	
-	// Get the latest release version (or use a specific version)
-	version := "latest"  // TODO: Version detection from git tag or config
-	toolsDownloadURL := utils.GetGitHubReleaseDownloadURL("hogecode", "CommentPlayer", version, "winget-tools.tar.gz")
-	
-	toolsTempPath := filepath.Join(os.TempDir(), "winget-tools.tar.gz")
+	// TODO: リリースからダウンロードURLを取得する関数を実装して、最新のリリースからダウンロードするようにする
+	toolsTempPath := filepath.Join(os.TempDir(), "thirdparty-tools.tar.gz")
+	toolsDownloadURL := utils.GetGitHubReleaseDownloadURL("hogecode", "CommentPlayer", version, "thirdparty-tools.tar.gz")
 	if _, err := utils.DownloadFile(toolsDownloadURL, toolsTempPath); err != nil {
 		// Continue without tools if download fails (tools are optional)
 		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ サードパーティーライブラリのダウンロードに失敗しました: %v", err)))
@@ -103,23 +123,27 @@ func runInstall(cmd *cobra.Command) error {
 		// Clean up temporary file
 		_ = os.Remove(toolsTempPath)
 	}
-	
-	// Step 7: Create configuration
+
+
+	// ------------------------------------------
+	// 設定ファイルの生成
+	// ------------------------------------------
+	// Step 8: Create configuration
 	fmt.Println()
 	fmt.Println(ui.StyleSubtitle.Render("📝 設定ファイルを生成しています..."))
 
 	configPath := filepath.Join(installPath, "server", "config.yaml")
 	if err := generateConfigFile(configPath, installData); err != nil {
-		return fmt.Errorf("設定ファイルの生成に失敗しました: %w", err)
+		return fmt.Errorf("サーバーの設定ファイルの生成に失敗しました: %w", err)
 	}
 
-	// Step 7: Create .env.local file for frontend
+	// Step 9: Create .env.local file for frontend
 	envLocalPath := filepath.Join(installPath, "apps", "web", ".env.local")
 	if err := generateEnvLocal(envLocalPath, serverPortStr); err != nil {
 		return fmt.Errorf(".env.local ファイルの生成に失敗しました: %w", err)
 	}
 
-	// Step 8: Display completion message
+	// Step 10: Display completion message
 	fmt.Println()
 	fmt.Println(ui.StyleSuccess.Render("✅ CommentPlayer のインストールが完了しました！"))
 	fmt.Println()
@@ -209,7 +233,7 @@ func validateDirectory(dirPath, name string) error {
 	return nil
 }
 
-// generateConfigFile generates the config.yaml file
+// generateConfigFile generates the config.yaml file by using the template
 func generateConfigFile(configPath string, installData map[string]string) error {
 	// Ensure directory exists
 	configDir := filepath.Dir(configPath)
@@ -220,8 +244,29 @@ func generateConfigFile(configPath string, installData map[string]string) error 
 	serverPort := installData["serverPort"]
 	capturesDir := installData["capturesDir"]
 
-	// Generate config content
-	content := installer.GenerateConfigYAML(serverPort, capturesDir)
+	// Template file path - config.yaml.example should be in the server directory
+	// After cloning, the path will be installPath/server/config.yaml.example
+	installPath := filepath.Dir(filepath.Dir(configPath)) // Go up two levels from server/config.yaml to installPath
+	templatePath := filepath.Join(installPath, "server", "config.yaml.example")
+	
+	// Read the template file
+	data, err := os.ReadFile(templatePath)
+	if err != nil {
+		return fmt.Errorf("テンプレートファイルの読み込みに失敗しました (%s): %w", templatePath, err)
+	}
+
+	content := string(data)
+
+	// Replace placeholders with actual values
+	// Replace port
+	content = strings.ReplaceAll(content, "port: 8000", fmt.Sprintf("port: %s", serverPort))
+	
+	// Replace JWT secret with a generated one
+	jwtSecret := installer.GenerateJWTSecret()
+	content = strings.ReplaceAll(content, "your_jwt_secret_key_here", jwtSecret)
+	
+	// Replace captures directory
+	content = strings.ReplaceAll(content, "C:\\\\Users\\\\user\\\\Pictures\\\\Screenshots", capturesDir)
 
 	if err := os.WriteFile(configPath, []byte(content), 0644); err != nil {
 		return fmt.Errorf("ファイルの書き込みに失敗しました: %w", err)
@@ -240,8 +285,7 @@ func generateEnvLocal(envPath string, serverPort string) error {
 	}
 
 	// Template file path (relative to the cloned repository)
-	templatePath := filepath.Join(filepath.Dir(envDir), ".env.local.example")
-	
+	templatePath := filepath.Join(envDir, ".env.local.example")
 	// Read the template file
 	data, err := os.ReadFile(templatePath)
 	if err != nil {

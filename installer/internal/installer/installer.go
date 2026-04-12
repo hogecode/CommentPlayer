@@ -190,8 +190,17 @@ func Uninstall(installPath string) error {
 
 // CloneRepository clones the CommentPlayer repository from GitHub
 func CloneRepository(installPath string) error {
+	return CloneRepositoryWithVersion(installPath, "latest")
+}
+
+// CloneRepositoryWithVersion clones the CommentPlayer repository with a specific version
+func CloneRepositoryWithVersion(installPath, version string) error {
 	// GitHub repository URL
 	repoURL := "https://github.com/hogecode/CommentPlayer.git"
+	
+	// Determine revision (branch or tag)
+	// For 'latest', use custom-features branch; otherwise use version tag (e.g., v1.0.0)
+	// revision = "v" + version
 	
 	// Create a temporary directory for cloning
 	tempDir := filepath.Join(installPath, ".temp-clone")
@@ -200,10 +209,10 @@ func CloneRepository(installPath string) error {
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Clone repository
-	cmd := exec.Command("git", "clone", repoURL, tempDir)
+	// Clone repository with specific branch/tag
+	cmd := exec.Command("git", "clone", /*"-b", revision,*/ repoURL, tempDir)
 	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("リポジトリのクローンに失敗しました: %w\n出力: %s", err, string(output))
+		return fmt.Errorf("CommentPlayer のソースコードのクローン中に予期しないエラーが発生しました: %w\nGit のエラーログ: %s", err, string(output))
 	}
 
 	// Copy cloned content to install path
@@ -254,8 +263,8 @@ func copyDirectory(src, dst string) error {
 	return nil
 }
 
-// generateJWTSecret generates a random JWT secret key
-func generateJWTSecret() string {
+// GenerateJWTSecret generates a random JWT secret key
+func GenerateJWTSecret() string {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -267,7 +276,7 @@ func generateJWTSecret() string {
 
 // GenerateConfigYAML generates config.yaml content by modifying the template file
 func GenerateConfigYAML(serverPort, capturesDir string) string {
-	jwtSecret := generateJWTSecret()
+	jwtSecret := GenerateJWTSecret()
 	
 	// This function is maintained for backward compatibility
 	// The actual config file creation uses CreateConfigFile which reads config.yaml.example
