@@ -52,13 +52,17 @@ jobs:
 
       # OpenSSL をダウンロード
       - name: Download OpenSSL
+        shell: pwsh
         run: |
-          $ProgressPreference = 'SilentlyContinue'
-          # OpenSSL の公式バイナリをダウンロード
-          $url = "https://github.com/openssl/openssl/releases/download/openssl-3.3.1/openssl-3.3.1-win64.zip"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/openssl.zip
-          Expand-Archive -Path winget-tools/openssl.zip -DestinationPath winget-tools/bin
+         $ProgressPreference = 'SilentlyContinue'
 
+         $url = "https://www.openssl.org/source/openssl-3.3.1.tar.gz"
+         $out = "openssl.tar.gz"
+
+         New-Item -ItemType Directory -Force -Path "winget-tools"
+
+         Invoke-WebRequest -Uri $url -OutFile $out
+    
       # Make (GnuWin32) をダウンロード
       - name: Download Make
         run: |
@@ -67,13 +71,14 @@ jobs:
           $url = "https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download"
           Invoke-WebRequest -Uri $url -OutFile winget-tools/bin/make.exe
 
-      # Docker Desktop をダウンロード
-      - name: Download Docker Desktop
+      # Node.js をダウンロード
+      - name: Download Node.js
+        shell: pwsh
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          # Docker Desktop 最新版をダウンロード
-          $url = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
-          Invoke-WebRequest -Uri $url -OutFile winget-tools/DockerDesktop.exe
+          New-Item -ItemType Directory -Force -Path "winget-tools"
+          $url = "https://nodejs.org/dist/v20.11.1/node-v20.11.1-x64.msi"
+          Invoke-WebRequest -Uri $url -OutFile "winget-tools/node.msi"
 
       # Caddy をダウンロード
       - name: Download Caddy
