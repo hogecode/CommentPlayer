@@ -52,8 +52,9 @@ func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit 
 	}
 
 	// Year でフィルター（年が指定されている場合）
+	// GetVideoYearsと同様にjikkyo_date IS NOT NULLでフィルタしてからキャスト
 	if year > 0 {
-		query = query.Where("CAST(STRFTIME('%Y', jikkyo_date) AS INTEGER) = ?", year)
+		query = query.Where("jikkyo_date IS NOT NULL AND CAST(SUBSTR(jikkyo_date, 1, 4) AS INTEGER) = ?", year)
 	}
 
 	// 合計数を取得
@@ -111,17 +112,28 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 
 // GetVideoYears - ビデオの年一覧を取得（jikkyo_dateから年を抽出してソート）
 func (q *VideoQuery) GetVideoYears() ([]int, error) {
-	var years []int
-	err := q.db.
-		Model(&entity.Video{}).
-		Where("is_deleted = 0 AND jikkyo_date IS NOT NULL").
-		Select("DISTINCT CAST(STRFTIME('%Y', jikkyo_date) AS INTEGER) as year").
-		Order("year DESC").
-		Scan(&years).Error
+	var years []*int
+	// 生のSQLで実行：NULLになる可能性があるので *int で受け取る
+err := q.db.Raw(
+	"SELECT DISTINCT CAST(SUBSTR(jikkyo_date, 1, 4) AS INTEGER) as year " +
+		"FROM video " +
+		"WHERE is_deleted = 0 " +
+		"AND jikkyo_date IS NOT NULL " +
+		"ORDER BY year DESC",
+).Scan(&years).Error
+
 	if err != nil {
 		return nil, err
 	}
-	return years, nil
+
+	// ポインタをint値に変換（nullチェック込み）
+	result := make([]int, 0, len(years))
+	for _, year := range years {
+		if year != nil {
+			result = append(result, *year)
+		}
+	}
+	return result, nil
 }
 
 // GetVideoByID - IDでビデオを取得
