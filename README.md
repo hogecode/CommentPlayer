@@ -97,16 +97,15 @@ winget install GnuWin32.Make
 winget install OpenJS.NodeJS.LTS
 winget install GoLang.Go
 winget install -e --id Yarn.Yarn
-```
-
-### ステップ2: Winget で基本ツールをインストール(任意)
-以下のツールがローカルに存在しない場合、Winget で必要に応じてインストールしてください：
-```powershell
 winget install Caddy
-winget install openssl 
-winget install Docker.DockerDesktop
 ```
 
+<!--
+### ステップ2: Winget で基本ツールをインストール(任意)
+以下のツールがローカルに存在しない場合、Winget でインストールしてください(必須ではありません)：
+```powershell
+```
+-->
 
 <!--
 ### ステップ2: MSYS2 をダウンロード・インストール
@@ -220,13 +219,20 @@ make web-build
 
 ### 基本的な使い方
 
-#### 1. 開発サーバーの起動
+#### 1. 最新リリースからインストーラをダウンロードして設定
+
+CommentPlayer-Installer-vx.x.x.exeをダウンロードし、対話型に値を設定します。
+
+
+#### 2. 開発サーバーの起動
+
+初回はインストーラーで自動的にサーバーが起動します。次回以降は以下コマンドで起動してください。
 
 ```bash
 make server-dev # サーバーを起動
 ```
 
-#### 2. ブラウザでアクセス
+#### 3. ブラウザでアクセス
 
 デフォルトでは以下のURLでアクセスできます：
 
@@ -234,7 +240,7 @@ make server-dev # サーバーを起動
 http://localhost:{port}
 ```
 
-#### 3. フォルダ監視の設定
+#### 4. フォルダ監視の設定
 
 設定画面（⚙️）から以下の操作を行います：
 
@@ -250,7 +256,7 @@ http://localhost:{port}
 
 <img src="docs/photos/series.jpeg" alt="シリーズ管理" style="max-width: 75%; height: auto;" />
 
-#### 4. 動画の再生
+#### 5. 動画の再生
 
 一覧画面で目的の動画を選択して再生します。
 
@@ -371,7 +377,7 @@ series:
 | **GORM** | ORM |
 | **SQLite** | データベース |
 | **Fsnotify** | ファイルシステム監視 |
-| **その他** | Validator, Resty, Cobra, Viper |
+| **その他** | Validator, Resty, Cobra, Viper, Bubbletea, LipGloss |
 
 ### インフラ・開発環境
 

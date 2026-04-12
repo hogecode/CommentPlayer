@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -44,6 +45,9 @@ func runInstall(cmd *cobra.Command) error {
 	// インストールフォーム
 	// ------------------------------------------
 	// Step 2: Display installation form
+	fmt.Println("次のフォームに必要な情報を入力してください。")
+	fmt.Println("これらの情報は後で`server.config.yaml`で変更可能です。")
+	fmt.Println(ui.StyleWarning.Render("インストール先のパス区切り文字は '\\\\' です。"))
 	form := ui.NewInstallForm()
 	p := tea.NewProgram(form)
 
@@ -196,12 +200,25 @@ func runInstall(cmd *cobra.Command) error {
 	fmt.Println(ui.StyleSuccess.Render("✅ CommentPlayer のインストールが完了しました！"))
 	fmt.Println()
 	fmt.Println(ui.StyleBox.Render(
-		fmt.Sprintf("インストール先: %s\nサーバーポート: %s\n"+
+		fmt.Sprintf("インストール先: %s\nサーバーポート: %d\n"+
 			"キャプチャ保存先: %s\n\n"+
-			"次のステップ:\n"+
-			"1. インストール先フォルダに移動\n"+
-			"2. 'make server-dev' でサーバーを起動\n",
-			installPath, serverPort, capturesDir)))
+			"アクセスURL: http://localhost:%d\n\n"+
+			"ブラウザで http://localhost:%d にアクセスしてください\n",
+			installPath, serverPort, capturesDir, serverPort, serverPort)))
+
+	// 20秒待機した後に、make start-dev を実行してサーバーを起動
+	fmt.Println()
+	fmt.Println(ui.StyleBox.Render("⏳ 20秒後にサーバーを起動します..."))
+	time.Sleep(20 * time.Second)
+
+	fmt.Println()
+	fmt.Println(ui.StyleBox.Render("🚀 サーバーを起動中..."))
+	if err := utils.RunCommandWithCwd(projectRoot, "make", "start-dev"); err != nil {
+		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make start-dev の実行に失敗しました: %v", err)))
+		fmt.Println(ui.StyleBox.Render("手動でサーバーを起動するには、インストール先で以下を実行してください:\n  make start-dev"))
+	} else {
+		fmt.Println(ui.StyleSuccess.Render("✓ サーバーを起動しました"))
+	}
 
 	return nil
 }
