@@ -94,8 +94,8 @@ func runInstall(cmd *cobra.Command) error {
 	}
 
 	// Clone repository with version (using 'latest' as default)
-	version := "v0.1.1"  // TODO: Version detection from config or environment
-	if err := installer.CloneRepositoryWithVersion(installPath, version); err != nil {
+	cloneVersion := "latest"  // TODO: Version detection from config or environment
+	if err := installer.CloneRepositoryWithVersion(installPath, cloneVersion); err != nil {
 		return err
 	}
 
@@ -108,6 +108,7 @@ func runInstall(cmd *cobra.Command) error {
 	/*
 	// TODO: リリースからダウンロードURLを取得する関数を実装して、最新のリリースからダウンロードするようにする
 	toolsTempPath := filepath.Join(os.TempDir(), "thirdparty-tools.tar.gz")
+	version := "v0.1.1" // TODO: Version detection from config or environment
 	toolsDownloadURL := utils.GetGitHubReleaseDownloadURL("hogecode", "CommentPlayer", version, "thirdparty-tools.tar.gz")
 	if _, err := utils.DownloadFile(toolsDownloadURL, toolsTempPath); err != nil {
 		// Continue without tools if download fails (tools are optional)
