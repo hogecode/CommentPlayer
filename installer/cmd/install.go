@@ -94,7 +94,7 @@ func runInstall(cmd *cobra.Command) error {
 	}
 
 	// Clone repository with version (using 'latest' as default)
-	version := "latest"  // TODO: Version detection from config or environment
+	version := "v0.1.1"  // TODO: Version detection from config or environment
 	if err := installer.CloneRepositoryWithVersion(installPath, version); err != nil {
 		return err
 	}
@@ -104,7 +104,8 @@ func runInstall(cmd *cobra.Command) error {
 	// Step 7: Download and extract thirdparty tools
 	fmt.Println()
 	fmt.Println(ui.StyleSubtitle.Render("📦 サードパーティーライブラリをダウンロードしています..."))
-	
+
+	/*
 	// TODO: リリースからダウンロードURLを取得する関数を実装して、最新のリリースからダウンロードするようにする
 	toolsTempPath := filepath.Join(os.TempDir(), "thirdparty-tools.tar.gz")
 	toolsDownloadURL := utils.GetGitHubReleaseDownloadURL("hogecode", "CommentPlayer", version, "thirdparty-tools.tar.gz")
@@ -123,6 +124,7 @@ func runInstall(cmd *cobra.Command) error {
 		// Clean up temporary file
 		_ = os.Remove(toolsTempPath)
 	}
+	*/
 
 
 	// ------------------------------------------
@@ -143,7 +145,52 @@ func runInstall(cmd *cobra.Command) error {
 		return fmt.Errorf(".env.local ファイルの生成に失敗しました: %w", err)
 	}
 
-	// Step 10: Display completion message
+
+	// ------------------------------------------
+	// ビルドの実行
+	// ------------------------------------------
+	// Step 10: Build Web and Server
+	fmt.Println()
+	fmt.Println(ui.StyleSubtitle.Render("🔨 ビルドを実行しています..."))
+
+	// Get the installation path (should be installPath)
+	projectRoot := installPath
+
+	// Run make setup-dev
+	fmt.Println()
+	fmt.Println(ui.StyleBox.Render("📦 開発環境をセットアップ中..."))
+	if err := utils.RunCommandWithCwd(projectRoot, "make", "setup-dev"); err != nil {
+		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make setup-dev の実行に失敗しました: %v", err)))
+		fmt.Println(ui.StyleBox.Render("手動でセットアップするには、インストール先で以下を実行してください:\n  make setup-dev"))
+	} else {
+		fmt.Println(ui.StyleSuccess.Render("✓ 開発環境をセットアップしました"))
+	}
+
+	// Run make web-build
+	fmt.Println()
+	fmt.Println(ui.StyleBox.Render("🌐 Webをビルド中..."))
+	if err := utils.RunCommandWithCwd(projectRoot, "make", "web-build"); err != nil {
+		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make web-build の実行に失敗しました: %v", err)))
+		fmt.Println(ui.StyleBox.Render("手動でビルドするには、インストール先で以下を実行してください:\n  make web-build"))
+	} else {
+		fmt.Println(ui.StyleSuccess.Render("✓ Webをビルドしました"))
+	}
+
+	// Run make server-build
+	fmt.Println()
+	fmt.Println(ui.StyleBox.Render("🖥️ サーバーをビルド中..."))
+	if err := utils.RunCommandWithCwd(projectRoot, "make", "server-build"); err != nil {
+		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make server-build の実行に失敗しました: %v", err)))
+		fmt.Println(ui.StyleBox.Render("手動でビルドするには、インストール先で以下を実行してください:\n  make server-build"))
+	} else {
+		fmt.Println(ui.StyleSuccess.Render("✓ サーバーをビルドしました"))
+	}
+
+
+	// ------------------------------------------
+	// インストール完了
+	// ------------------------------------------
+	// Step 11: Display completion message
 	fmt.Println()
 	fmt.Println(ui.StyleSuccess.Render("✅ CommentPlayer のインストールが完了しました！"))
 	fmt.Println()

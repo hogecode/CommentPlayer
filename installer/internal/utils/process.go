@@ -17,6 +17,32 @@ func RunCommand(name string, args ...string) (string, error) {
 	return string(output), nil
 }
 
+// RunCommandWithCwd executes a shell command in a specific working directory
+func RunCommandWithCwd(cwd string, name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = cwd
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("コマンド実行に失敗しました (%s %v): %w", name, args, err)
+	}
+	return nil
+}
+
+// RunCommandWithCwdAndOutput executes a shell command in a specific working directory and returns output
+func RunCommandWithCwdAndOutput(cwd string, name string, args ...string) (string, error) {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = cwd
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(output), fmt.Errorf("コマンド実行に失敗しました (%s): %w\n出力: %s", name, err, string(output))
+	}
+	return string(output), nil
+}
+
+
 // RunCommandWithOutput executes a command and returns output
 func RunCommandWithOutput(name string, args ...string) (string, error) {
 	cmd := exec.Command(name, args...)

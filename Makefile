@@ -74,7 +74,7 @@ server-run-hot: ## サーバーをホットリロードで起動
 	cd server && air -c .air.toml
 
 server-build: ## バイナリをビルド
-	cd server && go build -o bin/server cmd/main.go
+	cd server && go build -o bin/ cmd/main.go
 
 server-test: db-setup-test ## テストを実行
 	cd server && @which tparse > /dev/null || (echo "Installing tparse from go.mod..." && go install github.com/mfridman/tparse@latest)
@@ -88,7 +88,7 @@ server-lint: ## golangci-lintを実行
 	cd server && @echo "🔍 golangci-lintを実行中..." && golangci-lint run --config=.golangci.yml ./...
 
 server-clean: ## ビルド成果物をクリーン
-	cd server && rm -rf bin/
+	cd server && rm -rf exe
 	cd server && find . -name "*_templ.go" -type f -delete
 
 

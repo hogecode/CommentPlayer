@@ -67,3 +67,4 @@ Accept-Language: ja
 ###
 ## /series/{id}
 GET {{baseUrl}}/series/12
+

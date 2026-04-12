@@ -1,6 +1,0 @@
-
-bin
-app.db
-*.db
-*.db-journal
-.env.caddy

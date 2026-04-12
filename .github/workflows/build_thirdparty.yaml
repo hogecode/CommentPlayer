@@ -145,7 +145,6 @@ jobs:
           files: thirdparty-tools.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Notify Release Created
         run: |
           echo "::notice title=Release Created::Thirdparty tools have been uploaded to GitHub Release"

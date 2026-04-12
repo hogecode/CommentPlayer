@@ -21,7 +21,7 @@ func DownloadFile(url string, filePath string) (int64, error) {
 
 	// Create HTTP client with timeout
 	client := &http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: 300 * time.Second, // バイナリファイルのダウンロードには時間がかかる可能性があるため、タイムアウトを長めに設定
 	}
 
 	// Create request

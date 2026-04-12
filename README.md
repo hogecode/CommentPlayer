@@ -82,8 +82,6 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 
 ## 事前準備
 
-GormのSQLite接続機能にCGOが必要なせいで、事前準備が結構面倒です。。。
-
 ### ステップ1: Winget で基本ツールをインストール
 
 以下のツールを Winget でインストールしてください：
@@ -102,7 +100,7 @@ winget install GnuWin32.Make
 winget install Docker.DockerDesktop
 winget install Caddy
 ```
-
+<!--
 ### ステップ2: MSYS2 をダウンロード・インストール
 
 1. [MSYS2 公式サイト](https://www.msys2.org/)から `msys2-x86_64-xxxxxxx.exe` をダウンロード
@@ -128,7 +126,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 ```
 
 > スクリプト実行後、**必ず PowerShell を閉じて再起動してください**。新しい PATH 設定が有効になるには PowerShell の再起動が必須です。
-
+-->
 <!--
 ### ステップ5: インストール確認
 
