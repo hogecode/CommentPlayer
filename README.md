@@ -266,6 +266,7 @@ http://localhost:{port}
 
 ### 他のアクセス方法
 
+<!--
 #### Tailscale を使用する場合
 
 1. `config.yaml` を編集：
@@ -285,9 +286,11 @@ VITE_API_BASE_URL=http://{tailscale-ip}:8000
 5. `make web-build`でフロントを再ビルド
 6. `make server-dev`コマンドで起動
 7. アクセスURL: `http://{tailscale-ip}:8000`
+-->
 
 #### Caddy でHTTPS を使用する場合
 
+<!--
 1. `config.yaml` を編集：
 
 ```yaml
@@ -304,27 +307,31 @@ VITE_API_BASE_URL=https://localhost:8000
 4. `make generate-all-win`でAPI設定を更新
 5. `make web-build`でフロントを再ビルド
 6. `make server-dev`コマンドで起動
-7. アクセスURL: `https://localhost`
 
+-->
+1. アクセスURL: `https://localhost`
+   
 #### DNS masq でローカルドメインを使用する場合
 
 1. DNS masq を設定
+<!--
 2. `config.yaml` を編集：
 ```yaml
 server:
   schemes: "https"
 ```
 
-3. フロントエンド設定を編集
+1. フロントエンド設定を編集
 ```txt
 VITE_API_BASE_URL=http://app.local:8000
 ```
 
-4. `make setup-dev`で依存関係をインストール
-5. `make generate-all-win`でAPI設定を更新
-6. `make web-build`でフロントを再ビルド
-7. `make server-dev`コマンドで起動
-8. アクセスURL: `https://app.local`
+1. `make setup-dev`で依存関係をインストール
+2. `make generate-all-win`でAPI設定を更新
+3. `make web-build`でフロントを再ビルド
+4. `make server-dev`コマンドで起動
+-->
+2. アクセスURL: `https://app.local`
 
 詳細は [DNS_SETUP.md](dns/DNS_SETUP.md) を参照してください。
 
