@@ -9,11 +9,12 @@
 import type { Configuration } from '@/generated/configuration'
 import { BaseAPI } from '@/generated/base'
 import type { AxiosInstance } from 'axios'
-import { setupAuthInterceptor, setupErrorInterceptor } from '@/lib/api/api-interceptor'
+import { setupAuthInterceptor, setupErrorInterceptor, setupDynamicBaseURLInterceptor } from '@/lib/api/api-interceptor'
 
 /**
  * エラーインターセプターが自動的に設定されたBaseAPI
  * OpenAPI生成のBaseAPIを拡張して、エラーハンドリングを自動化
+ * 動的ベースURL設定も自動適用
  */
 export class WrappedBaseAPI extends BaseAPI {
   constructor(
@@ -23,10 +24,16 @@ export class WrappedBaseAPI extends BaseAPI {
   ) {
     super(configuration, basePath, axiosInstance)
 
-    // Axiosインスタンスにエラーインターセプターを設定
+    // Axiosインスタンスにインターセプターを設定
     if (axiosInstance) {
-      setupErrorInterceptor(axiosInstance)
+      // 動的ベースURLインターセプターを最初に設定
+      setupDynamicBaseURLInterceptor(axiosInstance)
+      
+      // 認証インターセプターを設定
       setupAuthInterceptor(axiosInstance)
+      
+      // エラーインターセプターを設定
+      setupErrorInterceptor(axiosInstance)
     }
   }
 }

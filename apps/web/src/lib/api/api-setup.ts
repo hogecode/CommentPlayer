@@ -5,7 +5,7 @@
  */
 
 import globalAxios from 'axios'
-import { setupErrorInterceptor, setupAuthInterceptor } from '@/lib/api/api-interceptor'
+import { setupErrorInterceptor, setupAuthInterceptor, setupDynamicBaseURLInterceptor } from '@/lib/api/api-interceptor'
 
 /**
  * APIクライアントの初期化
@@ -20,6 +20,10 @@ import { setupErrorInterceptor, setupAuthInterceptor } from '@/lib/api/api-inter
  * ```
  */
 export function initializeApiClient(): void {
+  // 動的ベースURLインターセプターを最初に設定
+  // （相対URLを絶対URLに変換する必要があるため、最初に実行）
+  setupDynamicBaseURLInterceptor(globalAxios)
+  
   // グローバルなAxiosインスタンスに認証インターセプターを設定
   // （リクエストインターセプターはレスポンスインターセプターより先に実行される）
   setupAuthInterceptor(globalAxios)

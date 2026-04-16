@@ -2,6 +2,7 @@
  * Axiosインターセプター設定
  * - リクエストインターセプター: JWT認証トークンを自動追加
  * - レスポンスインターセプター: エラーレスポンスを処理してユーザーにメッセージ表示
+ * - 動的ベースURL設定: ブラウザのURLからAPIリクエストのベースURLを自動決定
  */
 
 import type { AxiosInstance, AxiosError } from 'axios'
@@ -133,6 +134,29 @@ function extractErrorMessage(data: ApiErrorResponse | undefined, status: number)
 }
 
 /**
+ * 動的ベースURLインターセプターを設定
+ * ブラウザのURLからAPIリクエストの送信先URLを自動決定
+ * 例: ブラウザURL http://localhost:3000 → API http://localhost:3000/api/...
+ * @param axiosInstance - インターセプターを適用するAxiosインスタンス
+ */
+export function setupDynamicBaseURLInterceptor(axiosInstance: AxiosInstance): void {
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      // ブラウザのプロトコル＋ホスト＋ポートを取得
+      const origin = window.location.origin
+      
+      // URLが相対パスの場合、originを付与して絶対URLに変換
+      if (config.url && !config.url.startsWith('http')) {
+        config.url = origin + config.url
+      }
+      
+      return config
+    },
+    (error) => Promise.reject(error)
+  )
+}
+
+/**
  * 認証インターセプターを設定
  * リクエストヘッダーに自動的にJWT認証トークンを含める
  * @param axiosInstance - インターセプターを適用するAxiosインスタンス
@@ -174,6 +198,7 @@ export function handleCustomApiError(
 export default {
   setupErrorInterceptor,
   setupAuthInterceptor,
+  setupDynamicBaseURLInterceptor,
   handleApiError,
   handleCustomApiError,
 }
