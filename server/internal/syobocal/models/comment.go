@@ -24,6 +24,27 @@ type JikkyoChat struct {
 	Content   string      `json:"content"`
 }
 
+// Jikkyo XML Types
+
+// JikkyoPacketXML is the XML packet response from Jikkyo API
+type JikkyoPacketXML struct {
+	Chats []JikkiyoChatXML `xml:"chat"`
+}
+
+// JikkiyoChatXML represents a comment/chat from the broadcast in XML format
+type JikkiyoChatXML struct {
+	Thread    string `xml:"thread,attr"`
+	No        string `xml:"no,attr"`
+	Vpos      string `xml:"vpos,attr"`
+	Date      string `xml:"date,attr"` // Unix timestamp
+	DateUsec  string `xml:"date_usec,attr"`
+	Mail      string `xml:"mail,attr"`
+	UserID    string `xml:"user_id,attr"`
+	Premium   string `xml:"premium,attr"`
+	Anonymity string `xml:"anonymity,attr"`
+	Content   string `xml:",chardata"`
+}
+
 // CommentAnalysis contains the analysis of broadcast marker comments (ｷﾀ, A, B, C)
 type CommentAnalysis struct {
 	KitaTime int64 // Unix timestamp of ｷﾀ comment

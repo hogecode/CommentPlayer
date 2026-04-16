@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,6 +18,8 @@ import (
 	"github.com/hogecode/commentPlayer/internal/entity"
 	"github.com/hogecode/commentPlayer/internal/i18n"
 	"github.com/hogecode/commentPlayer/internal/service"
+	"github.com/hogecode/commentPlayer/internal/syobocal/config"
+	"github.com/hogecode/commentPlayer/internal/syobocal/models"
 )
 
 // RegisterVideoRoutes - ビデオ関連ルートを登録
@@ -247,7 +251,7 @@ func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 		}
 
 		// コメントファイルを取得してApiComment[]に変換
-		comments := a.getCommentsFromFile(video.FilePath)
+		comments := a.getCommentsFromFile(video.FilePath, video)
 
 		// FilePath を URL に変換
 		// http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式
@@ -417,7 +421,10 @@ func (a *App) RegenerateThumbnail(videosGroup *gin.RouterGroup) {
 }
 
 // getCommentsFromFile - ビデオファイルに対応するコメントファイルを取得してApiCommentに変換
-func (a *App) getCommentsFromFile(videoFilePath string) []dto.ApiComment {
+// コメントファイルがなく、videoテーブルの該当レコードの
+// channel_id、prog_start_time、prog_end_timeが存在する場合は、
+// ニコニコ実況からコメントを取得して返す
+func (a *App) getCommentsFromFile(videoFilePath string, video *entity.Video) []dto.ApiComment {
 	baseFileName := service.GetBaseFileName(filepath.Base(videoFilePath))
 	folderPath := filepath.Dir(videoFilePath)
 
@@ -430,6 +437,14 @@ func (a *App) getCommentsFromFile(videoFilePath string) []dto.ApiComment {
 			if err == nil && comments != nil {
 				return comments
 			}
+		}
+	}
+
+	// ローカルファイルがない場合、ニコニコ実況からコメント取得を試みる
+	if video != nil && video.ChannelID != nil && video.ProgStartTime != nil && video.ProgEndTime != nil {
+		comments := a.getCommentsFromJikkyo(video, baseFileName, folderPath)
+		if comments != nil {
+			return comments
 		}
 	}
 
@@ -597,6 +612,120 @@ func (a *App) parseMailAttribute(mail string) (commentType, commentSize, comment
 	}
 
 	return
+}
+
+// getCommentsFromJikkyo - ニコニコ実況からコメントを取得して変換
+func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, folderPath string) []dto.ApiComment {
+	if a.JikkyoClient == nil {
+		return nil
+	}
+
+	// ChannelIDからJikkyoIDへマッピング
+	channelMapping := config.NewChannelMapping()
+	jikkyoID := ""
+	for _, ch := range channelMapping {
+		if ch.ChID == *video.ChannelID {
+			jikkyoID = ch.JikkyoID
+			break
+		}
+	}
+
+	if jikkyoID == "" {
+		// マッピングが見つからない場合は処理を中止
+		return nil
+	}
+
+	// UNIXタイムスタンプに変換
+	// video.ProgStartTimeとvideo.ProgEndTimeをUTCに変換
+	// +0900 JST を UTC に変換する例:
+	startTime := video.ProgStartTime.Add(-9 * time.Hour).Unix()
+	endTime := video.ProgEndTime.Add(-9 * time.Hour).Unix()
+
+	// XML形式でコメント取得
+	slog.Info("Fetching comments from Jikkyo API",
+		slog.String("jikkyo_id", jikkyoID),
+		slog.Int64("start_time", startTime),
+		slog.Int64("end_time", endTime),
+	)
+	packet, xmlBytes, err := a.JikkyoClient.GetJikkyoCommentsXML(jikkyoID, startTime, endTime)
+	if err != nil || packet == nil {
+		// API呼び出し失敗時は空配列を返す
+		slog.Error("Failed to fetch comments from Jikkyo API",
+			slog.String("jikkyo_id", jikkyoID),
+			slog.Any("error", err),
+		)
+		return []dto.ApiComment{}
+	}
+
+	// Normalize vpos values: set the first comment's vpos to 0 and adjust all others accordingly
+	if len(packet.Chats) > 0 {
+		firstVpos, err := strconv.ParseInt(packet.Chats[0].Vpos, 10, 64)
+		if err == nil && firstVpos > 0 {
+			for i := range packet.Chats {
+				currentVpos, err := strconv.ParseInt(packet.Chats[i].Vpos, 10, 64)
+				if err == nil {
+					normalizedVpos := currentVpos - firstVpos
+					packet.Chats[i].Vpos = fmt.Sprintf("%d", normalizedVpos)
+				}
+			}
+		}
+	}
+
+	// XMLファイルを保存（エラー時はスキップ）
+	// 正規化されたデータを反映させるため、packetを再度XMLにマーシャル
+	normalizedXmlBytes, marshalErr := xml.MarshalIndent(packet, "", "  ")
+	if marshalErr == nil {
+		xmlBytes = normalizedXmlBytes
+	}
+	
+	commentPath := filepath.Join(folderPath, baseFileName+".xml")
+	if err := os.WriteFile(commentPath, xmlBytes, 0644); err != nil {
+		slog.Warn("Failed to save comment XML file",
+			slog.String("path", commentPath),
+			slog.Any("error", err),
+		)
+	} else {
+		slog.Info("Comment XML file saved successfully",
+			slog.String("path", commentPath),
+		)
+	}
+
+	// コメントを変換
+	comments := make([]dto.ApiComment, 0, len(packet.Chats))
+	for _, chat := range packet.Chats {
+		comment := a.chatJikkyoXMLToApiComment(chat)
+		comments = append(comments, comment)
+	}
+	return comments
+}
+
+// chatJikkyoXMLToApiComment - JikkiyoChatXMLをApiCommentに変換
+func (a *App) chatJikkyoXMLToApiComment(chat models.JikkiyoChatXML) dto.ApiComment {
+	// vpos（ビデオ位置）を秒単位の浮動小数点数に変換
+	time := float64(0)
+	if chat.Vpos != "" {
+		if vpos, err := strconv.ParseInt(chat.Vpos, 10, 64); err == nil {
+			time = float64(vpos) / 100.0 // vposは10ミリ秒単位
+		}
+	}
+
+	// mailフィールドからコメント表示スタイルを解析
+	commentType, commentSize, commentColor := a.parseMailAttribute(chat.Mail)
+
+	// UserIDがある場合は表示、ない場合はnil
+	var author *string
+	if chat.UserID != "" && chat.Anonymity != "1" {
+		author = &chat.UserID
+	}
+
+	return dto.ApiComment{
+		Time:   time,
+		Type:   commentType,
+		Size:   commentSize,
+		Color:  commentColor,
+		Author: author,
+		Text:   chat.Content,
+	}
 }
 
 // buildVideoURL - ファイルパスをURL に変換

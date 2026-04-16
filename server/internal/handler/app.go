@@ -5,6 +5,7 @@ import (
 	"github.com/hogecode/commentPlayer/internal/config"
 	"github.com/hogecode/commentPlayer/internal/query"
 	"github.com/hogecode/commentPlayer/internal/service"
+	"github.com/hogecode/commentPlayer/internal/syobocal/api"
 	"gorm.io/gorm"
 
 	_ "github.com/gin-gonic/gin" 
@@ -21,12 +22,13 @@ import (
 // @host 100.72.160.115:8000
 // @schemes http
 type App struct {
-	DB           *gorm.DB
-	VideoQuery   *query.VideoQuery
-	CaptureQuery *query.CaptureQuery
-	Validator    *validator.Validate
-	FileWatcher  *service.FileWatcher
-	Config       *config.Config
+	DB            *gorm.DB
+	VideoQuery    *query.VideoQuery
+	CaptureQuery  *query.CaptureQuery
+	Validator     *validator.Validate
+	FileWatcher   *service.FileWatcher
+	Config        *config.Config
+	JikkyoClient  *api.Client
 }
 
 // NewApp - Initialize a new App
@@ -38,5 +40,6 @@ func NewApp(db *gorm.DB, cfg *config.Config) *App {
 		Validator:    validator.New(),
 		FileWatcher:  nil,
 		Config:       cfg,
+		JikkyoClient: api.NewClient(),
 	}
 }
