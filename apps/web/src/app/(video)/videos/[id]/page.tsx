@@ -15,6 +15,7 @@ import { CommentUtils } from "@/lib/comment-utils";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useMemo, useState } from "react";
 import { ChevronLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * ビデオページコンポーネント
@@ -112,8 +113,40 @@ export default function VideoPage() {
   if (isLoading) {
     return (
       <RootLayout>
-        <div className="page-center-container">
-          <div className="text-white text-xl">読み込み中...</div>
+        <div className="page-container">
+          <div className="px-8 flex gap-3 pt-3">
+            {/* バック矢印ボタンのスケルトン */}
+            <Skeleton className="w-6 h-6 rounded-md" />
+            {/* ブレッドクラムのスケルトン */}
+            <div className="flex gap-2">
+              <Skeleton className="w-16 h-6" />
+              <Skeleton className="w-16 h-6" />
+              <Skeleton className="w-20 h-6" />
+            </div>
+          </div>
+
+          {/* ビデオプレイヤーエリアのスケルトン */}
+          <div className="overflow-hidden px-8 pb-4">
+            <Skeleton className="w-full aspect-video rounded-lg" />
+          </div>
+
+          {/* パネルエリアのスケルトン */}
+          <div className="flex-1 border-t border-gray-700 bg-[#0D0807] overflow-hidden">
+            <div className="p-4 space-y-4">
+              {/* タブのスケルトン */}
+              <div className="flex gap-2">
+                <Skeleton className="w-20 h-8" />
+                <Skeleton className="w-20 h-8" />
+                <Skeleton className="w-20 h-8" />
+              </div>
+              {/* コンテンツのスケルトン */}
+              <div className="space-y-3">
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-3/4 h-6" />
+              </div>
+            </div>
+          </div>
         </div>
       </RootLayout>
     );
