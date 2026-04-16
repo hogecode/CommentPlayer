@@ -80,6 +80,7 @@ export default function HomePage() {
           {mylistVideos.length > 0 && (
             <section>
               <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">マイリスト</h2>
                 <div className="flex items-center gap-2">
                   <Link
                     to="/mylist"
