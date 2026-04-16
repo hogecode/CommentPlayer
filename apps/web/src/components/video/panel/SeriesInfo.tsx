@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { ChevronRight, Play } from "lucide-react";
 import { formatVideoDateTimeWithDuration, formatDateTimeJP } from "@/lib/format";
+import { config } from "@/lib/config";
 
 interface SeriesInfoProps {
   /**ビデオデータ */
@@ -101,7 +102,7 @@ const SeriesInfo: React.FC<SeriesInfoProps> = ({ video }) => {
                 {v.screenshot_file_path && (
                   <div className="shrink-0 w-16 h-12 relative">
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}/screenshots/${v.screenshot_file_path}`}
+                      src={`${config.apiBaseUrl}/screenshots/${v.screenshot_file_path}`}
                       alt={v.file_name}
                       className="w-full h-full object-cover rounded"
                       loading="lazy"

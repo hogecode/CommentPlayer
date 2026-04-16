@@ -18,6 +18,7 @@ import { useVideoDownloadMutation } from '@/services/useVideoDownload'
 import { useRegenerateThumbnailMutation } from '@/services/useVideos'
 import Message from '@/message'
 import { CHANNEL_ID_TO_NAME } from '@/constant'
+import { config } from '@/lib/config'
 
 interface VideoCardProps {
   video: EntityVideo
@@ -29,7 +30,7 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
-  const thumbnailUrl = `${import.meta.env.VITE_API_BASE_URL}/screenshots/${video.screenshot_file_path}`
+  const thumbnailUrl = `${config.apiBaseUrl}/screenshots/${video.screenshot_file_path}`
   const channelLogoUrl = video.channel_id ? `/assets/images/logos/ch${video.channel_id}.png` : null
   const downloadMutation = useVideoDownloadMutation()
   const regenerateThumbnailMutation = useRegenerateThumbnailMutation()
