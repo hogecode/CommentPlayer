@@ -161,19 +161,6 @@ export default function CommentList({
     }
   }, [currentPlaybackPosition, commentDelay, displayedComments, virtualizer]);
 
-  // 自動スクロール
-  useEffect(() => {
-    if (isManualScroll || !parentRef.current) return;
-
-    // 最新のコメントまでスクロール
-    if (displayedComments.length > 0) {
-      virtualizer.scrollToIndex(displayedComments.length - 1, {
-        align: "end",
-        behavior: "auto",
-      });
-    }
-  }, [displayedComments.length, isManualScroll, virtualizer]);
-
   // ビデオ再生時のコメントクリック処理
   const handleCommentClick = useCallback(
     (comment: Comment) => {
