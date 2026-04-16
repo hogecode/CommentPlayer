@@ -74,14 +74,14 @@ func initFFmpegPaths() {
 		// LookPath で探す
 		if path, err := exec.LookPath(candidate); err == nil {
 			ffprobePath = path
-			slog.Info("initFFmpegPaths: ffprobe found",
+			slog.Debug("initFFmpegPaths: ffprobe found",
 				"path", ffprobePath)
 			break
 		}
 		// 絶対パスの場合、ファイルが存在するか確認
 		if _, err := os.Stat(candidate); err == nil {
 			ffprobePath = candidate
-			slog.Info("initFFmpegPaths: ffprobe found",
+			slog.Debug("initFFmpegPaths: ffprobe found",
 				"path", ffprobePath)
 			break
 		}
@@ -96,14 +96,14 @@ func initFFmpegPaths() {
 		// LookPath で探す
 		if path, err := exec.LookPath(candidate); err == nil {
 			ffmpegPath = path
-			slog.Info("initFFmpegPaths: ffmpeg found",
+			slog.Debug("initFFmpegPaths: ffmpeg found",
 				"path", ffmpegPath)
 			break
 		}
 		// 絶対パスの場合、ファイルが存在するか確認
 		if _, err := os.Stat(candidate); err == nil {
 			ffmpegPath = candidate
-			slog.Info("initFFmpegPaths: ffmpeg found",
+			slog.Debug("initFFmpegPaths: ffmpeg found",
 				"path", ffmpegPath)
 			break
 		}

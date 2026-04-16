@@ -1,5 +1,8 @@
 # CommentPlayer サーバー設定
 
+# 環境設定 (development, staging, production, testing)
+environment: "production"
+
 # データベース設定
 db:
   dsn: "app.db"

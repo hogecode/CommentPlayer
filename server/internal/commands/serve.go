@@ -75,6 +75,13 @@ func serveCommandHandler(cmd *cobra.Command, args []string) {
 		log.Fatalf("Failed to migrate database: %v\n", err)
 	}
 
+	// Gin モードを環境に応じて設定
+	if cfg.Environment == config.Development {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Gin エンジンを初期化
 	engine := gin.Default()
 
