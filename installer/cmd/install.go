@@ -213,9 +213,9 @@ func runInstall(cmd *cobra.Command) error {
 
 	fmt.Println()
 	fmt.Println(ui.StyleBox.Render("🚀 サーバーを起動中..."))
-	if err := utils.RunCommandWithCwd(projectRoot, "make", "start-dev"); err != nil {
-		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make start-dev の実行に失敗しました: %v", err)))
-		fmt.Println(ui.StyleBox.Render("手動でサーバーを起動するには、インストール先で以下を実行してください:\n  make start-dev"))
+	if err := utils.RunCommandWithCwd(projectRoot, "make", "server-dev"); err != nil {
+		fmt.Println(ui.StyleWarning.Render(fmt.Sprintf("⚠ make server-dev の実行に失敗しました: %v", err)))
+		fmt.Println(ui.StyleBox.Render("手動でサーバーを起動するには、インストール先で以下を実行してください:\n  make server-dev"))
 	} else {
 		fmt.Println(ui.StyleSuccess.Render("✓ サーバーを起動しました"))
 	}
