@@ -6,6 +6,7 @@ import { config } from '@/lib/config'
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { useGetCaptureByIdQuery, useGetAdjacentCapture } from '@/services/useCaptures'
+import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
@@ -20,6 +21,7 @@ export default function CapturePage() {
   const { id: captureIdParam } = useParams({ from: '/captures/$id' })
   const navigate = useNavigate({ from: '/captures/$id' })
   const [loadingNext, setLoadingNext] = useState(false)
+  const { settings } = useSettingsStore()
 
   // IDが有効な数値かチェック
   const captureId = captureIdParam ? parseInt(captureIdParam as string, 10) : null
@@ -127,7 +129,7 @@ export default function CapturePage() {
             </div>
 
             {/* 再生ボタン */}
-            {captureData.video_id && (
+            {captureData.video_id && settings.enable_playback_button && (
               <Button
                 variant="default"
                 size="lg"

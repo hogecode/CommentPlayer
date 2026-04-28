@@ -20,6 +20,7 @@ export function createDefaultSettings(): Required<DtoClientSettingsDTO> {
     video_watched_history_max_count: 100,
     sync_settings: true,
     last_synced_at: 0,
+    enable_playback_button: true,
     comment_speed_rate: 1,
     comment_font_size: 25,
     close_comment_form_after_sending: true,

@@ -1115,6 +1115,10 @@ const docTemplate = `{
                 "default_comment_color": {
                     "type": "string"
                 },
+                "enable_playback_button": {
+                    "description": "ビデオ再生設定",
+                    "type": "boolean"
+                },
                 "last_synced_at": {
                     "description": "Unix timestamp (ms)",
                     "type": "integer"

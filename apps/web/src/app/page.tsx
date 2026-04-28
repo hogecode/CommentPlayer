@@ -7,7 +7,6 @@ import { useVideosQuery } from "@/services/useVideos";
 import { useSettingsStore } from "@/stores/settings-store";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-
 export default function HomePage() {
   const settings = useSettingsStore((state) => state.settings);
 
@@ -47,7 +46,6 @@ export default function HomePage() {
     <RootLayout>
       <div className="container mx-auto pt-24 px-4 pb-16">
         <PageBreadcrumb items={[{ label: "ホーム", href: "/" }]} />
-
         <div className="space-y-12">
           {/* 最新の動画セクション */}
           <section>

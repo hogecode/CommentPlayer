@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **comment_font_size** | **number** |  | [optional] [default to undefined]
 **comment_speed_rate** | **number** | コメント設定 | [optional] [default to undefined]
 **default_comment_color** | **string** |  | [optional] [default to undefined]
+**enable_playback_button** | **boolean** | ビデオ再生設定 | [optional] [default to undefined]
 **last_synced_at** | **number** | Unix timestamp (ms) | [optional] [default to undefined]
 **max_comments_display_count** | **number** |  | [optional] [default to undefined]
 **mute_abusive_discriminatory_prejudiced_comments** | **boolean** |  | [optional] [default to undefined]
@@ -35,6 +36,7 @@ const instance: DtoClientSettingsDTO = {
     comment_font_size,
     comment_speed_rate,
     default_comment_color,
+    enable_playback_button,
     last_synced_at,
     max_comments_display_count,
     mute_abusive_discriminatory_prejudiced_comments,

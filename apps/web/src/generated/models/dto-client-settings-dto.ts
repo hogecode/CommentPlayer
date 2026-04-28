@@ -32,6 +32,10 @@ export interface DtoClientSettingsDTO {
     'comment_speed_rate'?: number;
     'default_comment_color'?: string;
     /**
+     * ビデオ再生設定
+     */
+    'enable_playback_button'?: boolean;
+    /**
      * Unix timestamp (ms)
      */
     'last_synced_at'?: number;

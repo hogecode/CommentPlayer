@@ -34,6 +34,9 @@ type ClientSettingsDTO struct {
 	SyncSettings bool  `json:"sync_settings"`
 	LastSyncedAt int64 `json:"last_synced_at"` // Unix timestamp (ms)
 
+	// ビデオ再生設定
+	EnablePlaybackButton bool `json:"enable_playback_button"`
+
 	// コメント設定
 	CommentSpeedRate             float64 `json:"comment_speed_rate"`
 	CommentFontSize              int     `json:"comment_font_size"`
