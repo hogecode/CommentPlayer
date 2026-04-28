@@ -1,2 +1,4 @@
 {
+    "editor.semanticHighlighting.enabled": "configuredByTheme",
+    "workbench.colorTheme": "Quiet Light"
 }

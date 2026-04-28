@@ -85,6 +85,18 @@ const docTemplate = `{
                         "name": "video_id",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "ビデオの再生位置（秒）",
+                        "name": "playback_position",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "コメント遅延秒数",
+                        "name": "comment_delay",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1681,6 +1693,9 @@ const docTemplate = `{
                 "_": {
                     "type": "string"
                 },
+                "comment_delay": {
+                    "type": "number"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1689,6 +1704,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "playback_position": {
+                    "type": "number"
                 },
                 "video_id": {
                     "type": "integer"

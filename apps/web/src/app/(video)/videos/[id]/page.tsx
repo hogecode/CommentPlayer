@@ -13,7 +13,7 @@ import { EntityVideo } from "@/generated";
 import Message from "@/message";
 import { CommentUtils } from "@/lib/comment-utils";
 import { useSettingsStore } from "@/stores/settings-store";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,6 +31,33 @@ export default function VideoPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [commentDelay, setCommentDelay] = useState(0);
   const navigate = useNavigate();
+  const [initialPlaybackPosition, setInitialPlaybackPosition] = useState<number | null>(null);
+  const [initialCommentDelay, setInitialCommentDelay] = useState<number | null>(null);
+
+  // URLのクエリパラメータから再生位置とコメント遅延を読み込む
+  useEffect(() => {
+    // URLのクエリパラメータを取得
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const playbackPositionStr = searchParams.get('playback_position');
+      const commentDelayStr = searchParams.get('comment_delay');
+
+      if (playbackPositionStr) {
+        const pos = parseFloat(playbackPositionStr);
+        if (!isNaN(pos)) {
+          setInitialPlaybackPosition(pos);
+        }
+      }
+
+      if (commentDelayStr) {
+        const delay = parseFloat(commentDelayStr);
+        if (!isNaN(delay)) {
+          setInitialCommentDelay(delay);
+          setCommentDelay(delay);
+        }
+      }
+    }
+  }, []);
 
   // IDが有効な数値かチェック
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;
@@ -193,6 +220,7 @@ export default function VideoPage() {
             delayOffset={commentDelay}
             onCurrentTimeChange={setCurrentTime}
             videoTitle={videoTitle}
+            initialPlaybackPosition={initialPlaybackPosition ?? undefined}
           />
         </div>
 

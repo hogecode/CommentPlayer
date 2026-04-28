@@ -152,10 +152,12 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
+         * @param {number} [playbackPosition] ビデオの再生位置（秒）
+         * @param {number} [commentDelay] コメント遅延秒数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesPost: async (file: File, videoId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1CapturesPost: async (file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'file' is not null or undefined
             assertParamExists('apiV1CapturesPost', 'file', file)
             // verify required parameter 'videoId' is not null or undefined
@@ -180,6 +182,14 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
 
             if (videoId !== undefined) { 
                 localVarFormParams.append('video_id', videoId as any);
+            }
+
+            if (playbackPosition !== undefined) { 
+                localVarFormParams.append('playback_position', playbackPosition as any);
+            }
+
+            if (commentDelay !== undefined) { 
+                localVarFormParams.append('comment_delay', commentDelay as any);
             }
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -249,11 +259,13 @@ export const CapturesApiFp = function(configuration?: Configuration) {
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
+         * @param {number} [playbackPosition] ビデオの再生位置（秒）
+         * @param {number} [commentDelay] コメント遅延秒数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesPost(file, videoId, options);
+        async apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -304,11 +316,13 @@ export const CapturesApiFactory = function (configuration?: Configuration, baseP
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
+         * @param {number} [playbackPosition] ビデオの再生位置（秒）
+         * @param {number} [commentDelay] コメント遅延秒数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
-            return localVarFp.apiV1CapturesPost(file, videoId, options).then((request) => request(axios, basePath));
+        apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
+            return localVarFp.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -357,11 +371,13 @@ export class CapturesApi extends BaseAPI {
      * @summary キャプチャを作成
      * @param {File} file キャプチャファイル
      * @param {number} videoId ビデオID
+     * @param {number} [playbackPosition] ビデオの再生位置（秒）
+     * @param {number} [commentDelay] コメント遅延秒数
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1CapturesPost(file: File, videoId: number, options?: RawAxiosRequestConfig) {
-        return CapturesApiFp(this.configuration).apiV1CapturesPost(file, videoId, options).then((request) => request(this.axios, this.basePath));
+    public apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -89,13 +89,28 @@ export function useCreateCaptureMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { file: File; video_id: number }) => {
-      const response = await capturesApi.apiV1CapturesPost(data.file, data.video_id);
+    mutationFn: async (data: { 
+      file: File; 
+      video_id: number;
+      playback_position?: number;
+      comment_delay?: number;
+    }) => {
+      // OpenAPI生成の apiV1CapturesPost メソッドを使用
+      const response = await capturesApi.apiV1CapturesPost(
+        data.file,
+        data.video_id,
+        data.playback_position,
+        data.comment_delay,
+      );
       return response.data;
     },
     onSuccess: () => {
       // キャプチャリスト情報を無効化して再フェッチ
       queryClient.invalidateQueries({ queryKey: ["captures"] });
+    },
+    onError: (error) => {
+      // エラーログ出力
+      console.error('Failed to create capture:', error);
     },
   });
 }

@@ -18,11 +18,6 @@ CommePlayer/
 
 ## 開発環境のセットアップ
 
-### 推奨: Docker Compose ホットリロード開発
-
-```bash
-make up      # Vite（フロント） + air（バック） + Caddy でホットリロード起動
-make down    # 停止
 ```
 
 ## 技術スタック
@@ -76,15 +71,3 @@ make down    # 停止
 - Tailwind CSS ユーティリティクラスを活用
 - ダークモード対応（CSS 変数で実装）
 
-## Claude AI 統合
-
-DevContainer で Claude API を使用可能：
-
-```bash
-# API キー設定（.env.local）
-CLAUDE_API_KEY=sk-ant-xxxxxxxxxxxxx
-
-# Claude CLI での質問
-claude "このコードの問題点は？"
-claude --file ./src/main.tsx
-```

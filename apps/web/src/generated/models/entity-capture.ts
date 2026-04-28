@@ -16,9 +16,11 @@
 
 export interface EntityCapture {
     '_'?: string;
+    'comment_delay'?: number;
     'created_at'?: string;
     'filename'?: string;
     'id'?: number;
+    'playback_position'?: number;
     'video_id'?: number;
 }
 

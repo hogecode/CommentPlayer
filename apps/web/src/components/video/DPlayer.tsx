@@ -37,6 +37,8 @@ interface Props {
   programTime?: string;
   /** タイムシフト表示フラグ（VideoHeader表示用） */
   isShowingOriginalBroadcastTime?: boolean;
+  /** 初期再生位置（秒） */
+  initialPlaybackPosition?: number;
 }
 
 /**
@@ -61,21 +63,17 @@ export default function DPlayer({
   onCurrentTimeChange,
   videoTitle,
   programTime,
+  initialPlaybackPosition,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const DPlayerRef = useRef<any>(null);
   const commentListRef = useRef<Comment[]>(danList);
   const videoIdRef = useRef<number | undefined>(videoId);
-  const mutateRef = useRef<any>(null);
+  const delayOffsetRef = useRef<number>(delayOffset);
 
   const { settings } = useSettingsStore();
   const { showHeader: toggleHeaderVisibility, hideHeader } = usePlayerHeaderStore();
   const createCaptureMutation = useCreateCaptureMutation();
-  
-  // mutateを参照に保存
-  useEffect(() => {
-    mutateRef.current = createCaptureMutation.mutate;
-  }, [createCaptureMutation.mutate]);
 
   // danList が変わったら ref を同期
   useEffect(() => {
@@ -86,6 +84,11 @@ export default function DPlayer({
   useEffect(() => {
     videoIdRef.current = videoId;
   }, [videoId]);
+
+  // delayOffset が変わったら ref を同期
+  useEffect(() => {
+    delayOffsetRef.current = delayOffset;
+  }, [delayOffset]);
 
   // DPlayer 初期化（src が変わったら再初期化）
   useEffect(() => {
@@ -171,8 +174,6 @@ export default function DPlayer({
                   // OffscreenCanvas を Blob に変換
                   const blob = await offscreenCanvas.convertToBlob({ type: 'image/png' });
                   
-                  console.log('Screenshot data:', { blob, videoId: videoIdRef.current, mutate: mutateRef.current });
-                  
                   if (!blob) {
                     Message.error('スクリーンショットのBlob生成に失敗しました');
                     return;
@@ -182,21 +183,17 @@ export default function DPlayer({
                     Message.error('ビデオIDが設定されていません');
                     return;
                   }
-                  
-                  if (!mutateRef.current) {
-                    Message.error('アップロード機能が初期化されていません');
-                    return;
-                  }
 
                   const timestamp = new Date().getTime();
                   const file = new File([blob], `screenshot_${timestamp}.png`, { type: 'image/png' });
 
-                  mutateRef.current({
+                  // createCaptureMutation.mutate を直接呼び出す
+                  createCaptureMutation.mutate({
                     file,
                     video_id: videoIdRef.current,
+                    playback_position: dp.video.currentTime,
+                    comment_delay: delayOffsetRef.current,
                   });
-                  
-                  Message.success('スクリーンショットをアップロードしました');
                 } else {
                   Message.error('キャンバスのコンテキストを取得できません');
                 }
@@ -216,6 +213,14 @@ export default function DPlayer({
       }, 100);
 
       DPlayerRef.current = dp;
+
+      // 初期再生位置へシーク
+      if (initialPlaybackPosition !== undefined && initialPlaybackPosition > 0) {
+        dp.video.currentTime = initialPlaybackPosition;
+        if (dp.danmaku) {
+          dp.danmaku.seek();
+        }
+      }
 
       // dplayer-containerのクリック/タップイベント：ヘッダーをトグル
       const handlePlayerTap = () => {
@@ -336,7 +341,7 @@ export default function DPlayer({
       DPlayerRef.current?.destroy();
       DPlayerRef.current = null;
     };
-  }, [src, videoId, onCurrentTimeChange, toggleHeaderVisibility, hideHeader]);
+  }, [src, videoId, onCurrentTimeChange, toggleHeaderVisibility, hideHeader, initialPlaybackPosition]);
 
   // delayOffset が変わったらコメント位置を再同期
   useEffect(() => {
@@ -345,6 +350,17 @@ export default function DPlayer({
       DPlayerRef.current.danmaku.seek();
     }
   }, [delayOffset]);
+
+  // 初期再生位置へシーク
+  useEffect(() => {
+    if (DPlayerRef.current?.video && initialPlaybackPosition !== undefined && initialPlaybackPosition > 0) {
+      DPlayerRef.current.video.currentTime = initialPlaybackPosition;
+      // コメント表示位置を同期
+      if (DPlayerRef.current?.danmaku) {
+        DPlayerRef.current.danmaku.seek();
+      }
+    }
+  }, [initialPlaybackPosition]);
 
   return (
     <div className="dplayer-container-wrapper group relative w-full h-full">

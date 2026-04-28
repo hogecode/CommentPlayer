@@ -8,7 +8,7 @@ import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
 import { useGetCaptureByIdQuery, useGetAdjacentCapture } from '@/services/useCaptures'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
 
 /**
  * キャプチャ詳細ページ
@@ -125,6 +125,30 @@ export default function CapturePage() {
               </p>
               <p className="text-sm text-muted-foreground">作成日時: {createdDate}</p>
             </div>
+
+            {/* 再生ボタン */}
+            {captureData.video_id && (
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  const captureAny = captureData as any;
+                  if (captureAny.playback_position) {
+                    params.append('playback_position', captureAny.playback_position.toString());
+                  }
+                  if (captureAny.comment_delay) {
+                    params.append('comment_delay', captureAny.comment_delay.toString());
+                  }
+                  const query = params.toString() ? `?${params.toString()}` : '';
+                  navigate({ to: `/videos/${captureData.video_id}${query}` });
+                }}
+                className="gap-2 mt-4"
+              >
+                <Play className="w-5 h-5" />
+                ビデオを再生
+              </Button>
+            )}
           </div>
 
           {/* ナビゲーションボタン */}

@@ -130,6 +130,8 @@ func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
 // @Tags Captures
 // @Param file formData file true "キャプチャファイル"
 // @Param video_id formData int true "ビデオID"
+// @Param playback_position formData number false "ビデオの再生位置（秒）"
+// @Param comment_delay formData number false "コメント遅延秒数"
 // @Consume multipart/form-data
 // @Produce json
 // @Success 201 {object} entity.Capture
@@ -141,24 +143,43 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 	capturesGroup.POST("", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
-		// MultipartForm から video_id を取得
-		videoIDStr := ctx.PostForm("video_id")
-		if videoIDStr == "" {
-			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "video_id_required"),
-				Code:  "VALIDATION_ERROR",
-			})
-			return
-		}
+	// MultipartForm から video_id を取得
+	videoIDStr := ctx.PostForm("video_id")
+	if videoIDStr == "" {
+		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: i18n.GetErrorMessage(locale, "video_id_required"),
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
 
-		videoID, err := strconv.Atoi(videoIDStr)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
-				Code:  "VALIDATION_ERROR",
-			})
-			return
+	videoID, err := strconv.Atoi(videoIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// playback_position と comment_delay を取得（オプション）
+	playbackPositionStr := ctx.PostForm("playback_position")
+	var playbackPosition float64
+	if playbackPositionStr != "" {
+		pos, err := strconv.ParseFloat(playbackPositionStr, 64)
+		if err == nil {
+			playbackPosition = pos
 		}
+	}
+
+	commentDelayStr := ctx.PostForm("comment_delay")
+	var commentDelay float64
+	if commentDelayStr != "" {
+		delay, err := strconv.ParseFloat(commentDelayStr, 64)
+		if err == nil {
+			commentDelay = delay
+		}
+	}
 
 		// ビデオの存在確認
 		video, err := a.VideoQuery.GetVideoByID(videoID)
@@ -203,9 +224,11 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 
 		// Capture エンティティを作成（まずIDを取得するために先にDBに保存）
 		capture := entity.Capture{
-			Filename:  file.Filename,
-			VideoID:   videoID,
-			CreatedAt: time.Now(),
+			Filename:         file.Filename,
+			VideoID:          videoID,
+			PlaybackPosition: playbackPosition,
+			CommentDelay:     commentDelay,
+			CreatedAt:        time.Now(),
 		}
 
 		// DB処理をqueryパッケージに委譲（IDを自動生成させる）

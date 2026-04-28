@@ -444,12 +444,16 @@ definitions:
     properties:
       _:
         type: string
+      comment_delay:
+        type: number
       created_at:
         type: string
       filename:
         type: string
       id:
         type: integer
+      playback_position:
+        type: number
       video_id:
         type: integer
     type: object
@@ -634,6 +638,14 @@ paths:
         name: video_id
         required: true
         type: integer
+      - description: ビデオの再生位置（秒）
+        in: formData
+        name: playback_position
+        type: number
+      - description: コメント遅延秒数
+        in: formData
+        name: comment_delay
+        type: number
       produces:
       - application/json
       responses:

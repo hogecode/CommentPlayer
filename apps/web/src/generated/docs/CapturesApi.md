@@ -191,10 +191,14 @@ const apiInstance = new CapturesApi(configuration);
 
 let file: File; //キャプチャファイル (default to undefined)
 let videoId: number; //ビデオID (default to undefined)
+let playbackPosition: number; //ビデオの再生位置（秒） (optional) (default to undefined)
+let commentDelay: number; //コメント遅延秒数 (optional) (default to undefined)
 
 const { status, data } = await apiInstance.apiV1CapturesPost(
     file,
-    videoId
+    videoId,
+    playbackPosition,
+    commentDelay
 );
 ```
 
@@ -204,6 +208,8 @@ const { status, data } = await apiInstance.apiV1CapturesPost(
 |------------- | ------------- | ------------- | -------------|
 | **file** | [**File**] | キャプチャファイル | defaults to undefined|
 | **videoId** | [**number**] | ビデオID | defaults to undefined|
+| **playbackPosition** | [**number**] | ビデオの再生位置（秒） | (optional) defaults to undefined|
+| **commentDelay** | [**number**] | コメント遅延秒数 | (optional) defaults to undefined|
 
 
 ### Return type
