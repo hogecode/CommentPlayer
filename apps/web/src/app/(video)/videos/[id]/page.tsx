@@ -57,7 +57,26 @@ export default function VideoPage() {
         }
       }
     }
-  }, []);
+  }, [videoIdParam]);
+
+  // URLが変わったときにコメント遅延を初期化（クエリパラメータがあればそれを使用）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const commentDelayStr = searchParams.get('comment_delay');
+
+      if (commentDelayStr) {
+        const delay = parseFloat(commentDelayStr);
+        if (!isNaN(delay)) {
+          setCommentDelay(delay);
+          return;
+        }
+      }
+    }
+
+    // クエリパラメータがなければ0に初期化
+    setCommentDelay(0);
+  }, [videoIdParam]);
 
   // IDが有効な数値かチェック
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;

@@ -61,7 +61,7 @@ function Switch({
           position: relative;
           display: inline-flex;
           align-items: center;
-          background-color: hsl(var(--color-secondary));
+          background-color: hsl(var(--color-primary));
           border-radius: 9999px;
           border: 1px solid white;
           transition: all 200ms;
@@ -74,7 +74,7 @@ function Switch({
         }
 
         .rc-switch.rc-switch-checked {
-          background-color: hsl(var(--color-secondary));
+          background-color: hsl(var(--color-primary));
         }
 
         .rc-switch-disabled {
