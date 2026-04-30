@@ -30,8 +30,8 @@ const pages: { path: string; component: any }[] = [
   { path: '/videos', component: HomePage },
   { path: '/videos/search', component: SearchPage },
   { path: '/videos/$id', component: VideoPage },
+  { path: '/captures', component: CapturesPage },　//先に/capturesを定義
   { path: '/captures/$id', component: CapturePage },
-  { path: '/captures', component: CapturesPage },
   { path: '/mylist', component: MyListPage },
   { path: '/watched-history', component: WatchedHistoryPage },
   { path: '/settings', component: SettingsPage },
