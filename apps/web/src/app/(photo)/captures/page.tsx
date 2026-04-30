@@ -161,7 +161,7 @@ export default function CapturesPage() {
                       }}
                     >
                       <img
-                        src={`${config.apiBaseUrl}/captures/${capture.filename}`}
+                        src={`${config.apiBaseUrl}/photos/${capture.filename}`}
                         alt={capture.filename || `Capture ${capture.id}`}
                         loading='lazy'
                         className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-200"
