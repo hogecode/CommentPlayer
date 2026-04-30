@@ -1,32 +1,108 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Switch as SwitchPrimitive } from "radix-ui"
+import React from 'react'
+import RcSwitch from 'rc-switch'
+import { cn } from '@/lib/utils'
+import 'rc-switch/assets/index.css'
 
-import { cn } from "@/lib/utils"
+interface SwitchProps {
+  // コンポーネント固有のプロパティ
+  checked?: boolean
+  onChange?: (checked: boolean) => void
+  onCheckedChange?: (checked: boolean) => void
+  disabled?: boolean
+  id?: string
+  className?: string
+  size?: 'sm' | 'default'
+  // その他の HTML 属性
+  'aria-label'?: string
+  [key: string]: any
+}
 
 function Switch({
   className,
-  size = "default",
+  size = 'default',
+  disabled = false,
+  checked = false,
+  onChange,
+  onCheckedChange,
+  id,
   ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
-  size?: "sm" | "default"
-}) {
+}: SwitchProps) {
+  // onCheckedChange が渡された場合は、onChange にマッピング
+  const handleChange = (newChecked: boolean) => {
+    if (onCheckedChange) {
+      onCheckedChange(newChecked)
+    } else if (onChange) {
+      onChange(newChecked)
+    }
+  }
+
+  const sizeClasses = {
+    default: 'rc-switch-default',
+    sm: 'rc-switch-sm',
+  }
+
   return (
-    <SwitchPrimitive.Root
-      data-slot="switch"
-      data-size={size}
-      className={cn(
-        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80 data-disabled:cursor-not-allowed data-disabled:opacity-50",
-        className
-      )}
-      {...props}
-    >
-      <SwitchPrimitive.Thumb
-        data-slot="switch-thumb"
-        className="pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] dark:data-checked:bg-primary-foreground group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 dark:data-unchecked:bg-foreground"
+    <>
+      <style>{`
+        /* rc-switchのスタイルをカスタマイズ */
+        .rc-switch-default {
+          min-width: 32px !important;
+          height: 18.4px !important;
+        }
+
+        .rc-switch-sm {
+          min-width: 24px !important;
+          height: 14px !important;
+        }
+
+        .rc-switch {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          background-color: hsl(var(--color-secondary));
+          border-radius: 9999px;
+          border: 1px solid white;
+          transition: all 200ms;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .rc-switch:not(.rc-switch-disabled):hover {
+          box-shadow: 0 0 0 2px hsl(var(--color-ring) / 0.1);
+        }
+
+        .rc-switch.rc-switch-checked {
+          background-color: hsl(var(--color-secondary));
+        }
+
+        .rc-switch-disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+
+        .rc-switch-inner {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 9999px;
+          transition: all 200ms;
+        }
+      `}</style>
+      <RcSwitch
+        id={id}
+        checked={checked}
+        disabled={disabled}
+        onChange={handleChange}
+        className={cn(
+          sizeClasses[size],
+          disabled && 'opacity-50 cursor-not-allowed',
+          className
+        )}
+        {...props}
       />
-    </SwitchPrimitive.Root>
+    </>
   )
 }
 

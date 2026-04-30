@@ -4,7 +4,7 @@ import { useSettingsStore } from '@/stores/settings-store'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 
-export function VideoPlaybackSettings() {
+export function GeneralSettings() {
   const { settings, updateSettings } = useSettingsStore()
 
   const handleEnablePlaybackButtonChange = (checked: boolean) => {
@@ -13,7 +13,7 @@ export function VideoPlaybackSettings() {
 
   return (
     <div className="space-y-6">
-      {/* ビデオ再生ボタン有効化設定 */}
+      {/* 一般設定 */}
       <div className="flex items-center justify-between">
         <div>
           <Label htmlFor="enable-playback-button" className="text-base font-semibold">

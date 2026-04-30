@@ -8,7 +8,7 @@ import { FolderManagement } from '@/components/settings/FolderManagement'
 import { MutedKeywordsSettings } from '@/components/settings/MutedKeywordsSettings'
 import { CommentDisplaySettings } from '@/components/settings/CommentDisplaySettings'
 import { SeriesManagement } from '@/components/settings/SeriesManagement'
-import { VideoPlaybackSettings } from '@/components/settings/VideoPlaybackSettings'
+import { GeneralSettings } from '@/components/settings/GeneralSettings'
 
 export default function SettingsPage() {
 
@@ -30,8 +30,8 @@ export default function SettingsPage() {
 
            {/* ビデオ再生設定セクション */}
            <section className="border rounded-lg p-6">
-             <h3 className="text-2xl font-bold mb-4">ビデオ再生設定</h3>
-             <VideoPlaybackSettings />
+             <h3 className="text-2xl font-bold mb-4">一般設定</h3>
+             <GeneralSettings />
            </section>
 
            {/* コメント表示設定セクション */}
