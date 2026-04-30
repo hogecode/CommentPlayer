@@ -66,7 +66,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 			"error", err.Error())
 	} else {
 		// CORSヘッダーを設定してから静的ファイルを配信
-		engine.GET("/captures/*filepath", func(c *gin.Context) {
+		engine.GET("/photos/*filepath", func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
 			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
 			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
@@ -75,7 +75,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 		})
 
 		// OPTIONSリクエストにも対応
-		engine.OPTIONS("/captures/*filepath", func(c *gin.Context) {
+		engine.OPTIONS("/photos/*filepath", func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Origin", "*")
 			c.Header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
 			c.Header("Access-Control-Allow-Headers", "Range, Content-Type")
@@ -86,7 +86,7 @@ func (a *App) RegisterStaticRoutes(engine *gin.Engine) {
 
 		slog.Info("RegisterStaticRoutes: Captures directory route registered with CORS support",
 			"captures_dir", capturesDir,
-			"route", "/captures")
+			"route", "/photos")
 	}
 
 	// スクリーンショットの配信（CORS対応）

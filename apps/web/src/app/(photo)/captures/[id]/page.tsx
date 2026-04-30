@@ -88,7 +88,7 @@ export default function CapturePage() {
     )
   }
 
-  const imageSrc = `${config.apiBaseUrl}/captures/${captureData.filename}`
+  const imageSrc = `${config.apiBaseUrl}/photos/${captureData.filename}`
   const createdDate = captureData.created_at
     ? new Date(captureData.created_at).toLocaleDateString('ja-JP')
     : 'Unknown'
