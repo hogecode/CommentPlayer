@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { useCapturesStore } from '@/stores/captures-store'
 
 export default function CapturesPage() {
-  const limit = 12
+  const limit = 20
   const navigate = useNavigate({ from: '/captures' })
 
   // ストア

@@ -38,11 +38,10 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
   commentDelay,
   handleCommentDelay,
 }) => {
-  const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
 
   // 時間を分:秒形式で表示する関数
   const formatTime = (seconds: number): string => {
-    const isPositive = seconds < 0;
+    const isPositive = seconds <= 0;
     const absSeconds = Math.abs(seconds);
 
     const minutes = Math.floor(absSeconds / 60);
@@ -63,7 +62,6 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
     if (commentAfterCurrentTime) {
       const delayInSeconds = commentAfterCurrentTime.time - currentTime;
       handleCommentDelay(- delayInSeconds);
-      setSelectedMarker(text);
     }
   };
 
@@ -78,14 +76,12 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
     if (commentAfterCurrentTime) {
       const delayInSeconds = commentAfterCurrentTime.time - currentTime;
       handleCommentDelay(- delayInSeconds);
-      setSelectedMarker(commentAfterCurrentTime.text);
     }
   };
 
   // リセットボタン
   const handleReset = () => {
     handleCommentDelay(0);
-    setSelectedMarker(null);
   };
 
   return (
@@ -145,13 +141,8 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
         <Button
           variant="default"
           size="lg"
-          onClick={() => handleSetDelayFromPatternComment(/^キタ/)}
+          onClick={() => handleSetDelayFromPatternComment(/^ｷﾀ/)}
           title="キタコメントへ遷移"
-          className={
-            selectedMarker && /^キタ/.test(selectedMarker)
-              ? "bg-primary text-primary-foreground"
-              : ""
-          }
         >
           K
         </Button>
@@ -160,9 +151,6 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           size="lg"
           onClick={() => handleSetDelayFromComment("A")}
           title="Aコメントへ遷移"
-          className={
-            selectedMarker === "A" ? "bg-primary text-primary-foreground" : ""
-          }
         >
           A
         </Button>
@@ -172,9 +160,6 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
           size="lg"
           onClick={() => handleSetDelayFromComment("B")}
           title="Bコメントへ遷移"
-          className={
-            selectedMarker === "B" ? "bg-primary text-primary-foreground" : ""
-          }
         >
           B
         </Button>
