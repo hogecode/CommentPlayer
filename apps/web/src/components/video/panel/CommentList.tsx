@@ -275,6 +275,8 @@ export default function CommentList({
                     setContextMenuOpen(true);
                   }}
                   video={video}
+                  onMuteKeyword={handleMuteKeyword}
+                  onMuteUser={handleMuteUser}
                 />
               </div>
             ))}
@@ -319,6 +321,8 @@ interface CommentItemProps {
   onCommentClick: (comment: Comment) => void;
   onContextMenu: (e: React.MouseEvent) => void;
   video?: EntityVideo;
+  onMuteKeyword: (comment: CommentItemWithId) => void;
+  onMuteUser: (comment: CommentItemWithId) => void;
 }
 
 /**
@@ -349,9 +353,15 @@ function formatCommentTime(
 function CommentItem({
   comment,
   onCommentClick,
-  onContextMenu,
   video,
-}: CommentItemProps) {
+  onMuteKeyword,
+  onMuteUser,
+}: CommentItemProps & {
+  onMuteKeyword: (comment: CommentItemWithId) => void;
+  onMuteUser: (comment: CommentItemWithId) => void;
+}) {
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+
   return (
     <div
       className={`px-4 py-2 text-sm  flex items-center justify-between group transition-colors  `}
@@ -368,15 +378,39 @@ function CommentItem({
         <span className="text-xs text-muted-foreground opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap">
           {video ? formatCommentTime(comment, video) : `${comment.time?.toFixed(0)}s`}
         </span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onContextMenu(e);
-          }}
-          className="transition-opacity p-1 hover:bg-muted rounded"
-        >
-          <MoreVertical className="w-4 h-4" />
-        </button>
+        <DropdownMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="transition-opacity p-1 hover:bg-muted rounded"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {comment.author && (
+              <>
+                <DropdownMenuItem
+                  onClick={() => onMuteUser(comment)}
+                  className="gap-2"
+                >
+                  <Ban className="w-4 h-4" />
+                  <span>このコメントの投稿者をミュート</span>
+                </DropdownMenuItem>
+              </>
+            )}
+
+            <DropdownMenuItem
+              onClick={() => onMuteKeyword(comment)}
+              className="gap-2"
+            >
+              <Ban className="w-4 h-4" />
+              <span>このコメントをミュート</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

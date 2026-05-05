@@ -129,7 +129,7 @@ export default function CapturePage() {
             </div>
 
             {/* 再生ボタン */}
-            {captureData.video_id && settings.enable_playback_button && (
+            {captureData.video_id && /*settings.enable_playback_button &&*/ (
               <Button
                 variant="default"
                 size="lg"
