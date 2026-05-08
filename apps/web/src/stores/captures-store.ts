@@ -26,7 +26,7 @@ export const useCapturesStore = create<CapturesState>((set) => ({
   sortKey: 'id',
   sortOrder: 'asc',
   currentPage: 1,
-  limit: 12,
+  limit: 24,
 
   setCaptureList: (captures) =>
     set({

@@ -1,5 +1,4 @@
-# CommentPlayer REST API 仕様書
-
+# CommentPlayer REST API 仕様
 **バージョン**: 1.0  
 **作成日**: 2026年4月9日
 

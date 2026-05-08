@@ -40,5 +40,5 @@ func IsPopularChannel(jikkyoID string) bool {
 	// jk1 to jk9 are the main terrestrial/ground wave channels
 	return jikkyoID == "jk1" || jikkyoID == "jk2" || jikkyoID == "jk4" ||
 		jikkyoID == "jk5" || jikkyoID == "jk6" || jikkyoID == "jk7" ||
-		jikkyoID == "jk8" || jikkyoID == "jk9"
+		/*jikkyoID == "jk8"*/ || jikkyoID == "jk9"
 }
