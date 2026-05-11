@@ -209,6 +209,145 @@ export default function DPlayer({
           }
         };
 
+        // Document PIP を設定
+        // DocumentPiPManager.ts のパターンに従った実装
+        // video.requestPictureInPicture() をオーバーライドして Document Picture-in-Picture API を使用
+        if (DPlayerRef.current?.video && containerRef.current) {
+          const videoElement = DPlayerRef.current.video as HTMLVideoElement;
+          
+          // Document Picture-in-Picture API がサポートされているかチェック
+          if (('documentPictureInPicture' in window) === false) {
+            console.log('[DPlayer] Document Picture-in-Picture API is not supported.');
+          } else {
+            // オリジナルメソッドを退避
+            const originalRequestPIP = videoElement.requestPictureInPicture;
+
+            // DocumentPiPManager.ts のパターン: 非同期関数として定義
+            // .bind() を使わず、直接代入することでユーザーアクティベーションを保持
+            const newRequestPictureInPicture = async function() {
+              const dpp = (window as any).documentPictureInPicture;
+              
+              // すでに Document Picture-in-Picture が開始されている場合は終了
+              if (dpp.window) {
+                console.log('[DPlayer] Closing existing Document PIP window...');
+                dpp.window.close();
+                return {} as PictureInPictureWindow;
+              }
+
+              try {
+                console.log('[DPlayer] Requesting Document Picture-in-Picture window...');
+                
+                // Document Picture-in-Picture ウインドウをリクエスト
+                const pipWindow = await dpp.requestWindow({
+                width: 540,
+                height: 304,
+                });
+
+                console.log('[DPlayer] Document PIP window created successfully.');
+
+                // すべてのスタイルシートをコピー
+                [...document.styleSheets].forEach((styleSheet) => {
+                  try {
+                    const cssRules = [...(styleSheet.cssRules as any)]
+                      .map((rule) => rule.cssText)
+                      .join('');
+                    const style = document.createElement('style');
+                    style.textContent = cssRules;
+                    pipWindow.document.head.appendChild(style);
+                  } catch (e) {
+                    // CORS エラーの場合は link 要素でインポート
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.type = styleSheet.type;
+                    link.media = (styleSheet.media as any).mediaText || '';
+                    link.href = styleSheet.href || '';
+                    pipWindow.document.head.appendChild(link);
+                  }
+                });
+
+                console.log('[DPlayer] Stylesheets copied to PIP window.');
+
+                // PIP ウインドウの背景色を設定
+                pipWindow.document.body.style.backgroundColor = '#1e1310';
+
+                // DocumentPiPManager.ts のパターンに従い、要素そのものを PIP ウインドウに移動
+                // クローンではなく実際の要素を移動することで、DPlayer の完全な状態を保持
+                if (containerRef.current && containerRef.current.parentElement) {
+                  // 元の親要素を記録しておく
+                  const originalParent = containerRef.current.parentElement;
+                  
+                  // PIP ウインドウ用のコンテナを作成
+                  const pipContainer = pipWindow.document.createElement('div');
+                  pipContainer.classList.add('dplayer-container-wrapper');
+                  pipContainer.style.height = '100vh';
+                  pipContainer.style.width = '100vw';
+                  
+                  // .dplayer-container をPIP ウインドウに移動（クローンではなく実際の要素）
+                  pipContainer.appendChild(containerRef.current);
+                  pipWindow.document.body.appendChild(pipContainer);
+                  
+                  console.log('[DPlayer] .dplayer-container moved to PIP window.');
+
+                  // メインウインドウに「Picture-in-Picture で再生しています」というメッセージを表示
+                  const pipMessage = document.createElement('div');
+                  pipMessage.classList.add('dplayer-pip-message');
+                  pipMessage.textContent = 'Picture-in-Picture で再生しています';
+                  pipMessage.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    margin: 30px auto;
+                    padding: 10px 20px;
+                    font-size: 18px;
+                    color: #999;
+                    text-align: center;
+                    width: 80%;
+                  `;
+                  originalParent.appendChild(pipMessage);
+
+                  // pagehide イベント: ウインドウが閉じられた際
+                  pipWindow.addEventListener('pagehide', () => {
+                    console.log('[DPlayer] Document Picture-in-Picture window closed.');
+                    // メインウインドウの「Picture-in-Picture で再生しています」メッセージを削除
+                    const msg = document.querySelector('.dplayer-pip-message');
+                    if (msg) {
+                      msg.remove();
+                    }
+                    // .dplayer-container を元の位置に戻す
+                    if (containerRef.current) {
+                      originalParent.appendChild(containerRef.current);
+                    }
+                  });
+                }
+
+                // onenter イベント: ウインドウが表示された際
+                dpp.onenter = () => {
+                  console.log('[DPlayer] Document Picture-in-Picture window entered.');
+                };
+
+                console.log('[DPlayer] Document Picture-in-Picture initialized.');
+                return {} as PictureInPictureWindow;
+              } catch (error: any) {
+                console.error('[DPlayer] Document PIP error:', error);
+                // フォールバック: 標準的なvideo PIP
+                console.log('[DPlayer] Falling back to standard video PIP.');
+                try {
+                  return await originalRequestPIP.call(videoElement);
+                } catch (fallbackError) {
+                  console.error('[DPlayer] Standard PIP also failed:', fallbackError);
+                  throw fallbackError;
+                }
+              }
+            };
+
+            // 直接代入（.bind() は使わない）
+            videoElement.requestPictureInPicture = newRequestPictureInPicture;
+
+            console.log('[DPlayer] Document Picture-in-Picture hook completed.');
+          }
+        }
+
         // .dplayer-comment-icon の左側にカスタムカメラアイコンを挿入
         const commentIcon = containerRef.current?.querySelector('.dplayer-comment-icon');
         if (commentIcon) {
