@@ -50,8 +50,8 @@ CommePlayer/
 ### TypeScript / React コード
 
 - 文字列はシングルクォート使用
-- 型安全性を確保（`any` は避ける）
 - **`new Date()` は絶対に使わない → `date-fns` を使用**
+- `make web-build`でviteのビルドを実行できる 
 
 ### Go コード
 

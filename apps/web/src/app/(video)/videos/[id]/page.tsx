@@ -33,7 +33,6 @@ export default function VideoPage() {
   const navigate = useNavigate();
   const [initialPlaybackPosition, setInitialPlaybackPosition] = useState<number | null>(null);
   const [initialCommentDelay, setInitialCommentDelay] = useState<number | null>(null);
-
   // URLのクエリパラメータから再生位置とコメント遅延を読み込む
   useEffect(() => {
     // URLのクエリパラメータを取得
@@ -240,6 +239,7 @@ export default function VideoPage() {
             onCurrentTimeChange={setCurrentTime}
             videoTitle={videoTitle}
             initialPlaybackPosition={initialPlaybackPosition ?? undefined}
+            currentVideo={videoData}
           />
         </div>
 

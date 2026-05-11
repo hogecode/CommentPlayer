@@ -3,9 +3,10 @@
 import { Comment } from '@/types/danmaku';
 import { useSettingsStore } from '@/stores/settings-store';
 import { usePlayerHeaderStore } from '@/stores/player-header-store';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import Message from '@/message';
 import { useCreateCaptureMutation } from '@/services/useCaptures';
+import { SeriesApi } from '@/generated';
 import VideoHeader from '@/components/video/VideoHeader';
 
 /**
@@ -39,6 +40,8 @@ interface Props {
   isShowingOriginalBroadcastTime?: boolean;
   /** 初期再生位置（秒） */
   initialPlaybackPosition?: number;
+  /** 現在の動画の詳細情報（次動画計算用） */
+  currentVideo?: any;
 }
 
 /**
@@ -64,6 +67,7 @@ export default function DPlayer({
   videoTitle,
   programTime,
   initialPlaybackPosition,
+  currentVideo,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const DPlayerRef = useRef<any>(null);
@@ -104,7 +108,7 @@ export default function DPlayer({
         container: containerRef.current,
         theme: '#E64F97',
         lang: 'ja-jp',
-        loop: true,
+        loop: false,
         autoplay: true,
         hotkey: true,
         screenshot: false,
@@ -478,14 +482,61 @@ export default function DPlayer({
         }
       };
 
+      // 動画終了時のイベントリスナー
+      const handleVideoEnded = async () => {
+        console.log('[DPlayer] Video ended');
+        // 次の動画への遷移ロジック（currentVideoがセットされている場合）
+        if (currentVideo?.series_id && currentVideo?.episode) {
+          try {
+            // シリーズデータを取得して次の動画IDを計算
+            const seriesId = currentVideo.series_id;
+            const currentEpisode = currentVideo.episode;
+            
+            // OpenAPI生成コードを使用してシリーズデータを取得
+            const seriesApi = new SeriesApi();
+            const response = await seriesApi.apiV1SeriesIdGet(seriesId);
+            
+            const seriesData = response.data;
+            const videos = seriesData?.videos ?? [];
+            
+            if (videos.length > 0) {
+              // エピソード番号でソート（昇順）
+              const sortedVideos = [...videos].sort((a: any, b: any) => {
+                const episodeA = a.episode ?? Number.MAX_VALUE;
+                const episodeB = b.episode ?? Number.MAX_VALUE;
+                return episodeA - episodeB;
+              });
+
+              // 現在のエピソードのインデックスを検索
+              const currentIndex = sortedVideos.findIndex((v: any) => v.episode === currentEpisode);
+
+              if (currentIndex !== -1) {
+                // 次の動画を取得（最後の場合は最初に戻す）
+                const nextIndex = (currentIndex + 1) % sortedVideos.length;
+                const nextVideo = sortedVideos[nextIndex];
+
+                if (nextVideo?.id) {
+                  console.log('[DPlayer] Navigating to next video:', nextVideo.id);
+                  window.location.href = `/videos/${nextVideo.id}`;
+                }
+              }
+            }
+          } catch (error) {
+            console.error('[DPlayer] Error handling video end:', error);
+          }
+        }
+      };
+
       if (dp.video) {
         dp.video.addEventListener('timeupdate', handleTimeUpdate);
+        dp.video.addEventListener('ended', handleVideoEnded);
       }
 
       // クリーンアップ関数を保存
       DPlayerRef.current._cleanup = () => {
         if (dp.video) {
           dp.video.removeEventListener('timeupdate', handleTimeUpdate);
+          dp.video.removeEventListener('ended', handleVideoEnded);
         }
 
         // リスナーをクリーンアップ
