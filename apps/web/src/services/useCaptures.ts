@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { CapturesApi, type DtoCaptureListResponse, type EntityCapture } from "@/generated";
 import { useCapturesStore } from "@/stores/captures-store";
+import Message from "@/message";
 
 // APIクライアントのセットアップ
 const capturesApi = new CapturesApi();
@@ -107,6 +108,7 @@ export function useCreateCaptureMutation() {
     onSuccess: () => {
       // キャプチャリスト情報を無効化して再フェッチ
       queryClient.invalidateQueries({ queryKey: ["captures"] });
+      Message.success("キャプチャが作成されました");
     },
     onError: (error) => {
       // エラーログ出力

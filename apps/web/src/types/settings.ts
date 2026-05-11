@@ -17,7 +17,7 @@ import type { DtoClientSettingsDTO } from '@/generated/models'
  */
 export function createDefaultSettings(): Required<DtoClientSettingsDTO> {
   return {
-    video_watched_history_max_count: 100,
+    video_watched_history_max_count: 300,
     sync_settings: true,
     last_synced_at: 0,
     enable_playback_button: true,

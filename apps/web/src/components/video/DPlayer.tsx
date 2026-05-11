@@ -107,7 +107,7 @@ export default function DPlayer({
         loop: true,
         autoplay: true,
         hotkey: true,
-        screenshot: true,
+        screenshot: false,
         crossOrigin: 'anonymous',
         volume: 1.0,
         playbackSpeed: [0.25, 0.5, 0.75, 1, 1.1, 1.25, 1.5, 1.75, 2],
@@ -145,70 +145,93 @@ export default function DPlayer({
 
       // スクリーンショットボタンのクリックイベントをカスタマイズ
       setTimeout(() => {
+        // スクリーンショット処理の共通ロジック
+        const handleCaptureClick = async (e: Event) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          try {
+            // ビデオ要素を直接キャプチャ
+            const videoWrapper = containerRef.current?.querySelector('.dplayer-video-wrap') as HTMLElement | null;
+            const videoElement = videoWrapper?.querySelector('video') as HTMLVideoElement | null;
+            
+            if (!videoElement) {
+              Message.error('ビデオ要素が見つかりません');
+              return;
+            }
+
+            // 現在再生中の動画のキャプチャを ImageBitmap として取得
+            const imageBitmap = await createImageBitmap(videoElement);
+            
+            try {
+              // OffscreenCanvas を使用して ImageBitmap から直接 Blob に変換
+              const offscreenCanvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+              const ctx = offscreenCanvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(imageBitmap, 0, 0);
+                
+                // OffscreenCanvas を Blob に変換
+                const blob = await offscreenCanvas.convertToBlob({ type: 'image/png' });
+                
+                if (!blob) {
+                  Message.error('スクリーンショットのBlob生成に失敗しました');
+                  return;
+                }
+                
+                if (!videoIdRef.current) {
+                  Message.error('ビデオIDが設定されていません');
+                  return;
+                }
+
+                const timestamp = new Date().getTime();
+                const file = new File([blob], `screenshot_${timestamp}.png`, { type: 'image/png' });
+
+                // createCaptureMutation.mutate を直接呼び出す
+                createCaptureMutation.mutate({
+                  file,
+                  video_id: videoIdRef.current,
+                  playback_position: dp.video.currentTime,
+                  comment_delay: delayOffsetRef.current,
+                });
+              } else {
+                Message.error('キャンバスのコンテキストを取得できません');
+              }
+            } catch (canvasError) {
+              console.error('Canvas error:', canvasError);
+              Message.error('スクリーンショット変換中にエラーが発生しました');
+            } finally {
+              // ImageBitmap のクリーンアップ
+              imageBitmap.close();
+            }
+          } catch (error) {
+            console.error('Screenshot error:', error);
+            Message.error('スクリーンショット処理中にエラーが発生しました');
+          }
+        };
+
+        // .dplayer-comment-icon の左側にカスタムカメラアイコンを挿入
+        const commentIcon = containerRef.current?.querySelector('.dplayer-comment-icon');
+        if (commentIcon) {
+          commentIcon.insertAdjacentHTML('beforebegin', `
+            <div class="dplayer-icon dplayer-capture-icon" aria-label="キャプチャ"
+                data-balloon-nofocus="" data-balloon-pos="up">
+                <span class="dplayer-icon-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 23c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6zM16 13c-2.206 0-4 1.794-4 4s1.794 4 4 4c2.206 0 4-1.794 4-4s-1.794-4-4-4zM27 28h-22c-1.654 0-3-1.346-3-3v-16c0-1.654 1.346-3 3-3h3c0.552 0 1 0.448 1 1s-0.448 1-1 1h-3c-0.551 0-1 0.449-1 1v16c0 0.552 0.449 1 1 1h22c0.552 0 1-0.448 1-1v-16c0-0.551-0.448-1-1-1h-11c-0.552 0-1-0.448-1-1s0.448-1 1-1h11c1.654 0 3 1.346 3 3v16c0 1.654-1.346 3-3 3zM24 10.5c0 0.828 0.672 1.5 1.5 1.5s1.5-0.672 1.5-1.5c0-0.828-0.672-1.5-1.5-1.5s-1.5 0.672-1.5 1.5zM15 4c0 0.552-0.448 1-1 1h-4c-0.552 0-1-0.448-1-1v0c0-0.552 0.448-1 1-1h4c0.552 0 1 0.448 1 1v0z"></path></svg>
+                </span>
+            </div>
+          `);
+        }
+
+        // 新しく挿入したカスタムアイコンにクリックイベントを付与
+        const newCaptureButton = containerRef.current?.querySelector('.dplayer-capture-icon');
+        if (newCaptureButton) {
+          newCaptureButton.addEventListener('click', handleCaptureClick);
+        }
+
+        // 念のため既存の .dplayer-camera-icon にも付与（存在する場合）
         const captureButton = containerRef.current?.querySelector('.dplayer-camera-icon');
         if (captureButton) {
-          captureButton.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            try {
-              // ビデオ要素を直接キャプチャ
-              const videoWrapper = containerRef.current?.querySelector('.dplayer-video-wrap') as HTMLElement | null;
-              const videoElement = videoWrapper?.querySelector('video') as HTMLVideoElement | null;
-              
-              if (!videoElement) {
-                Message.error('ビデオ要素が見つかりません');
-                return;
-              }
-
-              // 現在再生中の動画のキャプチャを ImageBitmap として取得
-              const imageBitmap = await createImageBitmap(videoElement);
-              
-              try {
-                // OffscreenCanvas を使用して ImageBitmap から直接 Blob に変換
-                const offscreenCanvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
-                const ctx = offscreenCanvas.getContext('2d');
-                if (ctx) {
-                  ctx.drawImage(imageBitmap, 0, 0);
-                  
-                  // OffscreenCanvas を Blob に変換
-                  const blob = await offscreenCanvas.convertToBlob({ type: 'image/png' });
-                  
-                  if (!blob) {
-                    Message.error('スクリーンショットのBlob生成に失敗しました');
-                    return;
-                  }
-                  
-                  if (!videoIdRef.current) {
-                    Message.error('ビデオIDが設定されていません');
-                    return;
-                  }
-
-                  const timestamp = new Date().getTime();
-                  const file = new File([blob], `screenshot_${timestamp}.png`, { type: 'image/png' });
-
-                  // createCaptureMutation.mutate を直接呼び出す
-                  createCaptureMutation.mutate({
-                    file,
-                    video_id: videoIdRef.current,
-                    playback_position: dp.video.currentTime,
-                    comment_delay: delayOffsetRef.current,
-                  });
-                } else {
-                  Message.error('キャンバスのコンテキストを取得できません');
-                }
-              } catch (canvasError) {
-                console.error('Canvas error:', canvasError);
-                Message.error('スクリーンショット変換中にエラーが発生しました');
-              } finally {
-                // ImageBitmap のクリーンアップ
-                imageBitmap.close();
-              }
-            } catch (error) {
-              console.error('Screenshot error:', error);
-              Message.error('スクリーンショット処理中にエラーが発生しました');
-            }
-          });
+          captureButton.addEventListener('click', handleCaptureClick);
         }
       }, 100);
 

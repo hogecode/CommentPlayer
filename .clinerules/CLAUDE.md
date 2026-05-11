@@ -49,16 +49,12 @@ CommePlayer/
 
 ### TypeScript / React コード
 
-- **コード編集後は必ず `make web-lint; make web-typecheck` を実行**
 - 文字列はシングルクォート使用
 - 型安全性を確保（`any` は避ける）
 - **`new Date()` は絶対に使わない → `date-fns` を使用**
 
 ### Go コード
 
-- **コード編集後は必ず `make server-fmt` を実行**
-  - goimports による import 整理
-  - golangci-lint によるリント
 - 変数・メソッド名は camelCase
 - 複数行処理にはコメント記載（「なぜ」を説明）
 - エラーハンドリングは明示的に実装
