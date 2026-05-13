@@ -276,9 +276,10 @@ export default function DPlayer({
 
                 // DocumentPiPManager.ts のパターンに従い、要素そのものを PIP ウインドウに移動
                 // クローンではなく実際の要素を移動することで、DPlayer の完全な状態を保持
+                let originalParent: HTMLElement | null = null;
                 if (containerRef.current && containerRef.current.parentElement) {
                   // 元の親要素を記録しておく
-                  const originalParent = containerRef.current.parentElement;
+                  originalParent = containerRef.current.parentElement;
                   
                   // PIP ウインドウ用のコンテナを作成
                   const pipContainer = pipWindow.document.createElement('div');
@@ -319,19 +320,89 @@ export default function DPlayer({
                       msg.remove();
                     }
                     // .dplayer-container を元の位置に戻す
-                    if (containerRef.current) {
+                    if (containerRef.current && originalParent) {
                       originalParent.appendChild(containerRef.current);
                     }
                   });
                 }
 
-                // onenter イベント: ウインドウが表示された際
-                dpp.onenter = () => {
-                  console.log('[DPlayer] Document Picture-in-Picture window entered.');
-                };
+                   // onenter イベント: ウインドウが表示された際
+                 dpp.onenter = () => {
+                   console.log('[DPlayer] Document Picture-in-Picture window entered.');
+                 };
 
-                console.log('[DPlayer] Document Picture-in-Picture initialized.');
-                return {} as PictureInPictureWindow;
+                 // ── キーボードイベント転送：PIP ウインドウでのキー入力をメインウインドウに転送 ──
+                 // PIP ウインドウは独立したウインドウなため、キーボードイベントがメインウインドウに到達しない
+                 // そのため、PIP ウインドウで発生したキー入力をメインウインドウに転送する
+                 const handlePIPKeyDown = (e: KeyboardEvent) => {
+                   console.log('[DPlayer] PIP keydown event:', e.key, e.code);
+                   
+                   // PIP ウインドウで発生したキーボードイベントをメインウインドウに転送
+                   // DPlayer の hotkey 機能が応答するよう、メインウインドウの video 要素にフォーカスを与える
+                   const mainVideoElement = DPlayerRef.current?.video;
+                   if (mainVideoElement && !mainVideoElement.contains(document.activeElement)) {
+                     // キーボードイベントをメインウインドウに転送
+                     const transferredEvent = new KeyboardEvent(e.type, {
+                       bubbles: true,
+                       cancelable: true,
+                       key: e.key,
+                       code: e.code,
+                       keyCode: (e as any).keyCode,
+                       charCode: (e as any).charCode,
+                       ctrlKey: e.ctrlKey,
+                       altKey: e.altKey,
+                       shiftKey: e.shiftKey,
+                       metaKey: e.metaKey,
+                     });
+                     
+                     // メインウインドウの document に転送イベントをディスパッチ
+                     window.document.dispatchEvent(transferredEvent);
+                     console.log('[DPlayer] Transferred keydown event to main window:', e.key);
+                   }
+                 };
+
+                 const handlePIPKeyUp = (e: KeyboardEvent) => {
+                   const transferredEvent = new KeyboardEvent(e.type, {
+                     bubbles: true,
+                     cancelable: true,
+                     key: e.key,
+                     code: e.code,
+                     keyCode: (e as any).keyCode,
+                     charCode: (e as any).charCode,
+                     ctrlKey: e.ctrlKey,
+                     altKey: e.altKey,
+                     shiftKey: e.shiftKey,
+                     metaKey: e.metaKey,
+                   });
+                   window.document.dispatchEvent(transferredEvent);
+                 };
+
+                 // PIP ウインドウにキーボードリスナーを登録
+                 pipWindow.addEventListener('keydown', handlePIPKeyDown);
+                 pipWindow.addEventListener('keyup', handlePIPKeyUp);
+                 console.log('[DPlayer] Keyboard event listeners attached to PIP window.');
+
+                 // pagehide イベント時にリスナーをクリーンアップ（既存の pagehide リスナーを更新）
+                 const originalPagehideListener = pipWindow.onpagehide;
+                 pipWindow.addEventListener('pagehide', () => {
+                   console.log('[DPlayer] Document Picture-in-Picture window closed.');
+                   // キーボードリスナーを削除
+                   pipWindow.removeEventListener('keydown', handlePIPKeyDown);
+                   pipWindow.removeEventListener('keyup', handlePIPKeyUp);
+                   
+                   // メインウインドウの「Picture-in-Picture で再生しています」メッセージを削除
+                   const msg = document.querySelector('.dplayer-pip-message');
+                   if (msg) {
+                     msg.remove();
+                   }
+                   // .dplayer-container を元の位置に戻す
+                   if (containerRef.current && originalParent) {
+                     originalParent.appendChild(containerRef.current);
+                   }
+                 });
+
+                 console.log('[DPlayer] Document Picture-in-Picture initialized.');
+                 return {} as PictureInPictureWindow;
               } catch (error: any) {
                 console.error('[DPlayer] Document PIP error:', error);
                 // フォールバック: 標準的なvideo PIP
