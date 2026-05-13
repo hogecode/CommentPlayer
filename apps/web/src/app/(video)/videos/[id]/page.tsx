@@ -211,7 +211,7 @@ export default function VideoPage() {
 
   return (
     <RootLayout>
-      <div className="page-container ">
+      <div className="page-container overflow-y-auto">
         <div className="px-8 flex gap-3 pt-3">
           {/* バック矢印ボタン */}
           <button
@@ -230,7 +230,7 @@ export default function VideoPage() {
           />
         </div>
         {/* ビデオプレイヤーとタイトル */}
-        <div className="overflow-hidden px-8 pb-4">
+        <div className="overflow-auto shrink-0 min-h-1/2 px-8 pb-4">
           <DPlayer
             src={videoSrc}
             commentList={commentList}
@@ -244,7 +244,7 @@ export default function VideoPage() {
         </div>
 
         {/* コメントパネル（固定高さ） */}
-        <div className="flex-1 border-t border-gray-700 bg-[#0D0807] overflow-hidden">
+        <div className="flex-1 border-t min-h-1/2 border-gray-700 bg-[#0D0807] overflow-hidden">
           <VideoPanel
             comments={commentList}
             playbackMode="Video"
