@@ -244,7 +244,7 @@ export default function VideoPage() {
         </div>
 
         {/* コメントパネル（固定高さ） */}
-        <div className="flex-1 border-t min-h-1/2 border-gray-700 bg-[#0D0807] overflow-hidden">
+        <div className="flex-1 border-t min-h-2/3 border-gray-700 bg-[#0D0807] overflow-hidden">
           <VideoPanel
             comments={commentList}
             playbackMode="Video"
