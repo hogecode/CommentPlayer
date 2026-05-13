@@ -38,7 +38,6 @@ const CommentDelay: React.FC<CommentDelayProps> = ({
   commentDelay,
   handleCommentDelay,
 }) => {
-
   // 時間を分:秒形式で表示する関数
   const formatTime = (seconds: number): string => {
     const isPositive = seconds <= 0;

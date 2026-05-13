@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Comment } from "@/types/danmaku";
 import { EntityVideo } from "@/generated";
 import CommentList from "./CommentList";
