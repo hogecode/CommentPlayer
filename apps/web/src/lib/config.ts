@@ -5,8 +5,7 @@
 
 
 export const config = {
-  // APIのベースURL - ブラウザのURLから動的に取得
-  apiBaseUrl: window.location.origin,
+  apiBaseUrl: `http://${window.location.hostname}:8000`,
 } as const
 
 /*  

@@ -33,7 +33,7 @@ async function updateClientSettings(settings: DtoClientSettingsDTO) {
  * 成功時にZustandストアに設定を保存
  */
 export function useSettingsQuery(options?: any) {
-  const { updateSettings } = useSettingsStore();
+  const { updateSettings, settings } = useSettingsStore();
 
   const query = useQuery<DtoClientSettingsDTO>({
     queryKey: ["settings"],
@@ -45,11 +45,22 @@ export function useSettingsQuery(options?: any) {
 
   // enabledで制御しているためonSuceessが動作しないので、useEffectで代替
   // onSuccess を useEffect 外で実行するための処理
+  // サーバーから取得したデータをローカル設定とマージ
+  // ローカルで同期待機中の値（特に mylist や watched_history など）を優先保持する
   React.useEffect(() => {
     if (query.status === "success" && query.data) {
-      updateSettings(query.data);
+      // サーバーのデータとローカルの現在値をマージ
+      // ローカルの値が存在する場合はそちらを優先
+      const mergedSettings = {
+        ...query.data,
+        // ローカルのマイリストが存在し、かつ配列なら優先
+        mylist: Array.isArray(settings.mylist) && settings.mylist.length > 0 
+          ? settings.mylist 
+          : query.data.mylist,
+      };
+      updateSettings(mergedSettings);
     }
-  }, [query.status, query.data, updateSettings]);
+  }, [query.status, query.data, updateSettings, settings.mylist]);
 
   // onError を useEffect 外で実行するための処理
   React.useEffect(() => {

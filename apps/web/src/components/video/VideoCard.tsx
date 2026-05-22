@@ -150,7 +150,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
                 // 追加する場合
                 const newMylist = [
                   ...settingsStore.settings.mylist,
-                  { id: video.id, created_at: Date.now() },
+                  { id: video.id, created_at: Math.floor(Date.now() / 1000) },
                 ];
                 settingsStore.updateSettings({ mylist: newMylist });
                 Message.success("マイリストに追加しました");
