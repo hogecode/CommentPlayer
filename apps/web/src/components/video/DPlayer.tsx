@@ -459,6 +459,29 @@ export default function DPlayer({
         }
       }
 
+      // ビデオが変わったときに確実に自動再生させる
+      // loadedmetadata イベント: ビデオのメタデータが読み込まれたとき
+      const handleLoadedMetadata = () => {
+        if (dp.video) {
+          // メタデータ読み込み後に再生を開始
+          const playPromise = dp.video.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log('[DPlayer] Auto-play started successfully');
+              })
+              .catch((error) => {
+                console.warn('[DPlayer] Auto-play failed:', error);
+                // 自動再生が失敗した場合はユーザーインタラクションを待つ
+              });
+          }
+        }
+      };
+
+      if (dp.video) {
+        dp.video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      }
+
       // dplayer-containerのクリック/タップイベント：ヘッダーをトグル
       const handlePlayerTap = () => {
         toggleHeaderVisibility();
