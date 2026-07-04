@@ -13,7 +13,9 @@ export function MutedKeywordsSettings() {
   const [newKeyword, setNewKeyword] = useState('')
   const [matchType, setMatchType] = useState<'partial' | 'forward' | 'backward' | 'exact' | 'regex'>('partial')
   const [isAdding, setIsAdding] = useState(false)
-
+  // NGワードの表示/非表示を管理（基本は***表示）
+  const [showPatterns, setShowPatterns] = useState(false)
+  
   const handleAddKeyword = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newKeyword.trim()) {
@@ -117,9 +119,19 @@ export function MutedKeywordsSettings() {
 
       {/* NGワード一覧 */}
       <div className="space-y-3">
-        <Label className="text-base font-semibold">
-          登録済みNGワード ({settings.muted_comment_keywords.length})
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">
+            登録済みNGワード ({settings.muted_comment_keywords.length})
+          </Label>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPatterns(!showPatterns)}
+            className="whitespace-nowrap text-xs"
+          >
+            {showPatterns ? '非表示' : '表示'}
+          </Button>
+        </div>
         {settings.muted_comment_keywords.length === 0 ? (
           <div className="border rounded-lg p-6 text-center bg-muted/30">
             <p className="text-sm text-muted-foreground">NGワードが登録されていません</p>
@@ -133,9 +145,17 @@ export function MutedKeywordsSettings() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <code className="text-xs px-2 py-1 rounded bg-background border border-border truncate">
-                      {keyword.pattern}
-                    </code>
+                    <input
+                      type={showPatterns ? 'text' : 'password'}
+                      value={keyword.pattern}
+                      onChange={(e) => {
+                        const newKeywords = settings.muted_comment_keywords.map((kw, i) =>
+                          i === index ? { ...kw, pattern: e.target.value } : kw
+                        )
+                        updateSettings({ muted_comment_keywords: newKeywords })
+                      }}
+                      className="text-xs px-2 py-1 rounded border border-border bg-background text-foreground placeholder-muted-foreground flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
                     <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary font-medium whitespace-nowrap">
                       {getMatchTypeLabel(keyword.match)}
                     </span>

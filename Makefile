@@ -70,7 +70,7 @@ server-dev-legacy: ## サーバーを起動(非推奨)
 	powershell -Command "$$env:PATH=$$env:PATH + ';C:\Program Files (x86)\GnuWin32\bin;C:\msys64\mingw64\bin;C:\Program Files\OpenSSL\bin'; $$env:CC='C:\msys64\mingw64\bin\gcc.exe'; $$env:CXX='C:\msys64\mingw64\bin\g++.exe'; cd server; go run cmd/main.go serve"
 
 server-dev: ## サーバーを起動
-	powershell -Command "cd server; go run cmd/main.go serve"
+	cd server && go run cmd/main.go serve
 
 server-run-hot: ## サーバーをホットリロードで起動
 # 動作しない
