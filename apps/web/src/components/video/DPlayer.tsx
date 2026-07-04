@@ -612,6 +612,7 @@ export default function DPlayer({
                 if (nextVideo?.id) {
                   console.log('[DPlayer] Navigating to next video:', nextVideo.id);
                   window.location.href = `/videos/${nextVideo.id}`;
+                  dp.video.play();
                 }
               }
             }
@@ -668,6 +669,23 @@ export default function DPlayer({
       }
     }
   }, [initialPlaybackPosition]);
+
+  // URLが変わったときにdplayerを再生
+  useEffect(() => {
+    if (src && DPlayerRef.current?.video) {
+      const playPromise = DPlayerRef.current.video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('[DPlayer] Auto-play started after src change');
+          })
+          .catch((error: any) => {
+            console.warn('[DPlayer] Auto-play failed after src change:', error);
+            // 自動再生が失敗した場合はユーザーインタラクションを待つ
+          });
+      }
+    }
+  }, [src]);
 
   return (
     <div className="dplayer-container-wrapper group relative w-full h-full">

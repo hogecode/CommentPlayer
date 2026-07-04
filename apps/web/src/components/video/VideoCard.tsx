@@ -127,10 +127,11 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
                 )}
               </div>
               <div className="line-clamp-2">
-                {formatVideoDateTimeWithDuration(
-                  video.jikkyo_date as string,
+                {/* jikkyo_dateがnullの場合は空文字列が表示されます */}
+                {video.jikkyo_date ? formatVideoDateTimeWithDuration(
+                  video.jikkyo_date,
                   video.duration ?? 0,
-                )}
+                ) : '放映情報なし'}
               </div>
             </div>
           </ItemDescription>

@@ -27,12 +27,24 @@ export function formatDateTime(dateStr: string): string {
  * Format a date to Japanese date and time format.
  * e.g., "2026/03/24 09:47"
  */
-export function formatDateTimeJP(date: Date | string): string {
+export function formatDateTimeJP(date: Date | string | null | undefined): string {
     try {
+        // nullまたはundefinedの場合は空文字列を返す
+        if (!date) {
+            return "";
+        }
+        
         const dateObj = typeof date === "string" ? new Date(date) : date;
+        
+        // 無効な日付の場合は空文字列を返す
+        if (isNaN(dateObj.getTime())) {
+            return "";
+        }
+        
         return format(dateObj, "yyyy/MM/dd HH:mm", { locale: ja });
-    } catch {
-        return typeof date === "string" ? date : date.toString();
+    } catch (error) {
+        console.error("Error formatting date time:", error);
+        return "";
     }
 }
 
@@ -67,9 +79,19 @@ export function formatDuration(seconds: number): string {
  * Format video date with start time, end time and duration.
  * e.g., "2026/03/26 (木) 23:56 ～ 00:26 (30分)"
  */
-export function formatVideoDateTimeWithDuration(date: Date | string, durationSeconds: number): string {
+export function formatVideoDateTimeWithDuration(date: Date | string | null | undefined, durationSeconds: number): string {
     try {
+        // nullまたはundefinedの場合は空文字列を返す
+        if (!date) {
+            return "";
+        }
+        
         const dateObj = typeof date === "string" ? new Date(date) : date;
+        
+        // 無効な日付の場合は空文字列を返す
+        if (isNaN(dateObj.getTime())) {
+            return "";
+        }
         
         // Start date and time
         const startFormatted = format(dateObj, "yyyy/MM/dd (E) HH:mm", { locale: ja });
@@ -82,7 +104,9 @@ export function formatVideoDateTimeWithDuration(date: Date | string, durationSec
         const minutes = Math.round(durationSeconds / 60);
         
         return `${startFormatted} ～ ${endFormatted} (${minutes}分)`;
-    } catch {
-        return typeof date === "string" ? date : date.toString();
+    } catch (error) {
+        // エラーが発生した場合は空文字列を返す
+        console.error("Error formatting video date time:", error);
+        return "";
     }
 }
