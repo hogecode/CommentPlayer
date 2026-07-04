@@ -29,10 +29,12 @@ export default function SettingsPage() {
           </section>
 
            {/* ビデオ再生設定セクション */}
+           {/*
            <section className="border rounded-lg p-6">
              <h3 className="text-2xl font-bold mb-4">一般設定</h3>
              <GeneralSettings />
            </section>
+           */}
 
            {/* コメント表示設定セクション */}
            <section className="border rounded-lg p-6">
