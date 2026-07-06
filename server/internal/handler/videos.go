@@ -251,6 +251,7 @@ func (a *App) GetVideoByID(videosGroup *gin.RouterGroup) {
 		}
 
 		// コメントファイルを取得してApiComment[]に変換
+		// XMLファイル→ニコ実の順で取得を試みている
 		comments := a.getCommentsFromFile(video.FilePath, video)
 
 		// FilePath を URL に変換
@@ -615,6 +616,7 @@ func (a *App) parseMailAttribute(mail string) (commentType, commentSize, comment
 }
 
 // getCommentsFromJikkyo - ニコニコ実況からコメントを取得して変換
+// TODO: XMLファイルを保存する処理は書いたが、DBに保存する処理はまだ書いていない
 func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, folderPath string) []dto.ApiComment {
 	if a.JikkyoClient == nil {
 		return nil

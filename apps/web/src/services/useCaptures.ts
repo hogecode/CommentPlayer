@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { CapturesApi, type DtoCaptureListResponse, type EntityCapture } from "@/generated";
 import { useCapturesStore } from "@/stores/captures-store";
+import { apiConfiguration } from "@/lib/api/api-config";
 import Message from "@/message";
 
-// APIクライアントのセットアップ
-const capturesApi = new CapturesApi();
+// APIクライアントのセットアップ（共通設定を使用）
+const capturesApi = new CapturesApi(apiConfiguration);
 /**
  * キャプチャ一覧を取得
  */

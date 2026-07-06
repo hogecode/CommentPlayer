@@ -1,9 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SyobocalApi, type DtoSyobocalTitleSearchResponse, type DtoSyobocalSaveTitleRequest, type DtoSyobocalSaveTitleResponse } from "@/generated";
 import Message from "@/message";
+import { apiConfiguration } from "@/lib/api/api-config";
 
 // APIクライアントのセットアップ
-const syobocalApi = new SyobocalApi();
+const syobocalApi = new SyobocalApi(apiConfiguration);
 
 /**
  * Syobocal タイトル検索クエリ

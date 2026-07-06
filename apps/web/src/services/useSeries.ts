@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DtoSeriesListResponse, DtoSeriesWithVideosResponse } from "@/generated";
 import { SeriesApi } from "@/generated";
+import { apiConfiguration } from "@/lib/api/api-config";
 import Message from "@/message";
 
-// APIクライアントのセットアップ
-const seriesApi = new SeriesApi();
+// APIクライアントのセットアップ（共通設定を使用）
+const seriesApi = new SeriesApi(apiConfiguration);
 
 /**
  * シリーズ一覧を取得

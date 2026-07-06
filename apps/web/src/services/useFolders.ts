@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DtoFolderListResponse } from "@/generated";
 import { FoldersApi } from "@/generated";
+import { apiConfiguration } from "@/lib/api/api-config";
 import Message from "@/message";
 
-// APIクライアントのセットアップ
-const foldersApi = new FoldersApi();
+// APIクライアントのセットアップ（共通設定を使用）
+const foldersApi = new FoldersApi(apiConfiguration);
 
 /**
  * 監視対象フォルダ一覧を取得

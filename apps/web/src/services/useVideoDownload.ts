@@ -1,8 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { VideosApi } from '@/generated'
+import { apiConfiguration } from '@/lib/api/api-config'
 
-// APIクライアントのセットアップ
-const videosApi = new VideosApi()
+// APIクライアントのセットアップ（共通設定を使用）
+const videosApi = new VideosApi(apiConfiguration)
 
 /**
  * ビデオダウンロード用のカスタムフック

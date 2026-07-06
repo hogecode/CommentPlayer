@@ -6,6 +6,7 @@ import { UsersApi, type DtoUserAccessTokenRequest } from '@/generated'
 import { useNavigate } from '@tanstack/react-router'
 import { useSnackbarStore } from '@/stores/snackbar-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { apiConfiguration } from '@/lib/api/api-config'
 
 /**
  * ユーザーログイン用の Zod スキーマ
@@ -23,8 +24,8 @@ export const loginUserSchema = z.object({
 
 export type LoginUserInput = z.infer<typeof loginUserSchema>
 
-// APIクライアントのセットアップ
-const usersApi = new UsersApi()
+// APIクライアントのセットアップ（共通設定を使用）
+const usersApi = new UsersApi(apiConfiguration)
 
 /**
  * ユーザーログイン用のカスタムフック

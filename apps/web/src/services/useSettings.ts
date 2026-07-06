@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SettingsApi, type DtoClientSettingsDTO } from "@/generated";
 import { useSettingsStore } from "@/stores/settings-store";
+import { apiConfiguration } from "@/lib/api/api-config";
 
-// APIクライアントのセットアップ
-const settingsApi = new SettingsApi();
+// APIクライアントのセットアップ（共通設定を使用）
+const settingsApi = new SettingsApi(apiConfiguration);
 
 /**
  * サーバーからクライアント設定を取得する（非-Hook）

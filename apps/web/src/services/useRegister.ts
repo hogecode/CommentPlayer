@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { UsersApi, type DtoUserCreateRequest } from '@/generated'
 import { useNavigate } from '@tanstack/react-router'
 import { useSnackbarStore } from '@/stores/snackbar-store'
+import { apiConfiguration } from '@/lib/api/api-config'
 
 /**
  * ユーザー登録用の Zod スキーマ
@@ -30,8 +31,8 @@ export const registerUserSchema = z
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>
 
-// APIクライアントのセットアップ
-const usersApi = new UsersApi()
+// APIクライアントのセットアップ（共通設定を使用）
+const usersApi = new UsersApi(apiConfiguration)
 
 /**
  * ユーザー登録用のカスタムフック

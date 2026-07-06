@@ -19,7 +19,6 @@ import (
 // @title commentPlayer API
 // @version 1.0.0
 // @description Watch commentPlayer API documentation
-// @host 100.72.160.115:8000
 // @schemes http
 type App struct {
 	DB            *gorm.DB
