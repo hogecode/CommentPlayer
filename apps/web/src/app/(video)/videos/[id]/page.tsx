@@ -29,12 +29,15 @@ import { useCommentDelayShortcuts } from "@/hooks/useCommentDelayShortcuts";
 export default function VideoPage() {
   const { id: videoIdParam } = useParams({ from: "/videos/$id" });
   const { settings } = useSettingsStore();
+  const navigate = useNavigate(); 
+
   const [currentTime, setCurrentTime] = useState(0);
   const [commentDelay, setCommentDelay] = useState(0);
-  const navigate = useNavigate();
   const [initialPlaybackPosition, setInitialPlaybackPosition] = useState<number | null>(null);
   const [initialCommentDelay, setInitialCommentDelay] = useState<number | null>(null);
+
   // URLのクエリパラメータから再生位置とコメント遅延を読み込む
+  // キャプチャ画像からの遷移時に、URLにクエリパラメータが付与される想定
   useEffect(() => {
     // URLのクエリパラメータを取得
     if (typeof window !== 'undefined') {
@@ -82,18 +85,12 @@ export default function VideoPage() {
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;
   const isValidId = videoId !== null && !isNaN(videoId) && videoId > 0;
 
-  // 無効なIDの場合はエラー表示
-  if (!isValidId) {
-    return (
-      <RootLayout>
-        <div className="page-center-container">
-          <div className="text-red-500 text-xl">ビデオIDが無効です</div>
-        </div>
-      </RootLayout>
-    );
-  }
-
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);
+
+  const videoTitle =
+    (videoData as any)?.file_name || `弾幕プレイヤー - ${videoId}`;
+  const videoSrc =
+    `${config.apiBaseUrl}${(videoData as any)?.src}` || "/blank30.mp4";
 
   // コメントを変換・フィルタリング（useMemoで最適化）
   const commentList: Comment[] = useMemo(() => {
@@ -146,11 +143,6 @@ export default function VideoPage() {
     );
   }, [videoData, settings]);
 
-  const videoTitle =
-    (videoData as any)?.file_name || `弾幕プレイヤー - ${videoId}`;
-  const videoSrc =
-    `${config.apiBaseUrl}${(videoData as any)?.src}` || "/blank30.mp4";
-  
   // カスタムフック：コメント遅延のキーボードショートカット
   useCommentDelayShortcuts({
     commentDelay,
@@ -160,9 +152,21 @@ export default function VideoPage() {
   });
 
   const router = useRouter();
+  
   const handleBackClick = () => {
     router.history.back();
   };
+
+  // 無効なIDの場合はエラー表示
+  if (!isValidId) {
+    return (
+      <RootLayout>
+        <div className="page-center-container">
+          <div className="text-red-500 text-xl">ビデオIDが無効です</div>
+        </div>
+      </RootLayout>
+    );
+  }
 
   if (isLoading) {
     return (
