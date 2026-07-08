@@ -80,12 +80,19 @@ func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit 
 }
 
 // SearchVideos - ビデオを検索
+// 検索対象: file_name, description, Series.SyobocalTitleName, subtitle
 func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy string) ([]entity.Video, int64, error) {
-	query := q.db.Preload("Series").Where("file_name LIKE ? OR description LIKE ?", "%"+q_str+"%", "%"+q_str+"%")
+	searchParam := "%" + q_str + "%"
+	
+	// LEFT JOINでSeriesを結合し、複数カラムで検索
+	query := q.db.Preload("Series").
+		Joins("LEFT JOIN series ON video.series_id = series.id").
+		Where("video.file_name LIKE ? OR video.description LIKE ? OR series.syobocal_title_name LIKE ? OR video.subtitle LIKE ?",
+			searchParam, searchParam, searchParam, searchParam)
 
 	// FilterBy でフィルター
 	if filterBy != "" {
-		query = query.Where("status = ?", filterBy)
+		query = query.Where("video.status = ?", filterBy)
 	}
 
 	// 合計数を取得
@@ -95,7 +102,7 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 	}
 
 	// ソート
-	query = query.Order("jikkyo_date " + order)
+	query = query.Order("video.jikkyo_date " + order)
 
 	// ページネーション
 	offset := (page - 1) * limit
