@@ -52,14 +52,8 @@ web-dev: ## Vite React開発サーバーを起動
 web-build: ## Vite React をビルド
 	cd apps/web && yarn build
 
-web-typecheck: ## TypeScriptをチェック（ビルドなし）
-	cd apps/web && yarn typecheck
-
 web-lint: ## ESLintでリント
 	cd apps/web && yarn lint
-
-web-preview: ## ビルド後のプレビュー
-	cd apps/web && yarn preview
 
 
 ## ========================
@@ -70,11 +64,7 @@ server-dev: ## サーバーを起動
 	cd server && go run cmd/main.go serve
 
 server-run-hot: ## サーバーをホットリロードで起動
-# TODO: 動作しない
 	cd server && air -c .air.toml
-
-server-build: ## バイナリをビルド
-	cd server && go build -o bin/ cmd/main.go
 
 server-test: db-setup-test ## テストを実行
 	cd server && @which tparse > /dev/null || (echo "Installing tparse from go.mod..." && go install github.com/mfridman/tparse@latest)
@@ -87,10 +77,6 @@ server-fmt: ## コードをフォーマット
 server-lint: ## golangci-lintを実行
 	cd server && @echo "🔍 golangci-lintを実行中..." && golangci-lint run --config=.golangci.yml ./...
 
-server-clean: ## ビルド成果物をクリーン
-	cd server && rm -rf exe
-	cd server && find . -name "*_templ.go" -type f -delete
-
 
 ## ========================
 ## インストーラコマンド
@@ -98,13 +84,14 @@ server-clean: ## ビルド成果物をクリーン
 installer-build: ## バイナリをビルド
 	cd installer && go build -o bin/ main.go
 
+
 ## ========================
 ## コード生成・ツール
 ## ========================
 
 seed: ## 開発環境用のシードデータを生成
 	@echo "Generating seed data..."
-	cd server && APP_ENV=dev op run --env-file=".env" -- go run cmd/seed/main.go
+	cd server && op run --env-file=".env" -- go run cmd/seed/main.go
 
 goimports: ## goimportsでimport文を整理
 	cd server && @which goimports > /dev/null || (echo "Installing goimports from go.mod..." && go install golang.org/x/tools/cmd/goimports)

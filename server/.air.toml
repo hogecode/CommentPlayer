@@ -3,16 +3,16 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = []
-  bin = "./tmp/main"
-  cmd = " go build -o ./tmp/main ./cmd"
+  args_bin = ["serve"]
+  bin = "./tmp/main.exe"
+  cmd = "go build -o ./tmp/main.exe ./cmd/main.go"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "web"]
   exclude_file = []
   exclude_regex = ["_test.go", "_templ\\.go$"]
   exclude_unchanged = false
   follow_symlink = false
-  full_bin = "APP_ENV=dev ./tmp/main serve"
+  full_bin = "./tmp/main.exe"
   include_dir = []
   include_ext = ["go", "html", "sql", "templ", "toml"]
   include_file = []
