@@ -689,7 +689,7 @@ export default function DPlayer({
   }, [src]);
 
   return (
-    <div className="dplayer-container-wrapper group relative w-full h-full">
+    <div className="dplayer-container-wrapper group relative max-w-280 flex  mx-auto h-full">
       {/* ビデオヘッダー */}
       {/*<VideoHeader
         title={videoTitle}

@@ -38,7 +38,7 @@ export default function DPlayerVideo({
   programTime,
 }: Props) {
   return (
-    <div className="dplayer-video-wrapper space-y-4">
+    <div className="dplayer-video-wrapper space-y-4 mx-auto">
       <DPlayer
         src={src}
         videoId={videoId}
