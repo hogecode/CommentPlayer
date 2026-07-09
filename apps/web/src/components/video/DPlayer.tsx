@@ -464,6 +464,7 @@ export default function DPlayer({
       const handleLoadedMetadata = () => {
         if (dp.video) {
           // メタデータ読み込み後に再生を開始
+          // スマホのブラウザでは、ユーザー操作なしでの自動再生が制限されてしまう・・・
           const playPromise = dp.video.play();
           if (playPromise !== undefined) {
             playPromise
@@ -472,8 +473,6 @@ export default function DPlayer({
               })
               .catch((error) => {
                 console.warn('[DPlayer] Auto-play failed:', error);
-                // 自動再生が失敗した場合はユーザーインタラクションを待つ
-                Message.info('自動再生がブロックされました。再生ボタンを押してください。');
               });
           }
         }
@@ -559,21 +558,22 @@ export default function DPlayer({
             (history: any) => history.video_id === videoId
           );
 
-          // 視聴履歴が既に登録されている場合のみ、再生位置を更新
-          if (historyIndex !== -1) {
-            const updatedHistory = [...watchedHistory];
-            updatedHistory[historyIndex] = {
-              ...updatedHistory[historyIndex],
-              last_playback_position: currentTime,
-              updated_at: Math.floor(Date.now() / 1000), // 秒単位
-            };
+           // 視聴履歴が既に登録されている場合のみ、再生位置を更新
+           if (historyIndex !== -1) {
+             const updatedHistory = [...watchedHistory];
+             updatedHistory[historyIndex] = {
+               ...updatedHistory[historyIndex],
+               last_playback_position: currentTime,
+               jikkyo_comment_offset: delayOffsetRef.current,
+               updated_at: Math.floor(Date.now() / 1000), // 秒単位
+             };
 
-            updateSettings({ watched_history: updatedHistory });
+             updateSettings({ watched_history: updatedHistory });
 
-            console.log(
-              `[DPlayer] Last playback position updated. (Video ID: ${videoId}, last_playback_position: ${currentTime})`
-            );
-          }
+             console.log(
+               `[DPlayer] Last playback position updated. (Video ID: ${videoId}, last_playback_position: ${currentTime}, jikkyo_comment_offset: ${delayOffsetRef.current})`
+             );
+           }
         }
       };
 

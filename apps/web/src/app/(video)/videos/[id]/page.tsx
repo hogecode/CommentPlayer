@@ -62,27 +62,35 @@ export default function VideoPage() {
     }
   }, [videoIdParam]);
 
-   // URLが変わったときにコメント遅延を初期化（クエリパラメータがあればそれを使用）
-   useEffect(() => {
-     if (typeof window !== 'undefined') {
-       const searchParams = new URLSearchParams(window.location.search);
-       const commentDelayStr = searchParams.get('comment_delay');
-
-       if (commentDelayStr) {
-         const delay = parseFloat(commentDelayStr);
-         if (!isNaN(delay)) {
-           setCommentDelay(delay);
-           return;
-         }
-       }
-     }
-
-     // クエリパラメータがなければ0に初期化
-     setCommentDelay(0);
-   }, [videoIdParam]);
-
   // IDが有効な数値かチェック
   const videoId = videoIdParam ? parseInt(videoIdParam as string, 10) : null;
+
+  // URLが変わったときにコメント遅延を初期化（クエリパラメータ → 視聴履歴から読み込み）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const commentDelayStr = searchParams.get('comment_delay');
+
+      if (commentDelayStr) {
+        const delay = parseFloat(commentDelayStr);
+        if (!isNaN(delay)) {
+          setCommentDelay(delay);
+          return;
+        }
+      }
+    }
+
+    // URLクエリパラメータがなければ、視聴履歴から jikkyo_comment_offset を読み込む
+    if (videoId) {
+      const historyItem = settings.watched_history?.find(
+        (h: any) => h.video_id === videoId
+      );
+      const delayFromHistory = historyItem?.jikkyo_comment_offset ?? 0;
+      setCommentDelay(delayFromHistory);
+    } else {
+      setCommentDelay(0);
+    }
+  }, [videoIdParam, videoId, settings.watched_history]);
   const isValidId = videoId !== null && !isNaN(videoId) && videoId > 0;
 
   const { data: videoData, isLoading, error } = useVideoQuery(videoId);

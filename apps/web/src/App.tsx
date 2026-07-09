@@ -20,7 +20,7 @@ const WATCHED_HISTORY_UPDATE_INTERVAL = 10;
 /**
  * 視聴開始から履歴に追加するまでの時間（秒）
  */
-const WATCHED_HISTORY_THRESHOLD_SECONDS = 5;
+const WATCHED_HISTORY_THRESHOLD_SECONDS = 10;
 
 /**
  * アプリケーション全体の初期化と Service Worker 管理を行うコンポーネント
@@ -31,7 +31,6 @@ export function App() {
   const initializeSettings = useSettingsStore(
     (state) => state.initializeSettings,
   );
-
   const updateSettings = useSettingsStore((state) => state.updateSettings);
 
   // React Query を使用した設定の同期
