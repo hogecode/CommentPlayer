@@ -106,7 +106,8 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
     const params = new URLSearchParams()
     
     // 再生履歴から再生位置を取得
-    if (watchedHistoryItem?.last_playback_position) {
+    // last_playback_positionが22分未満の場合のみクエリパラメータに追加（22分以上は無視）
+    if (watchedHistoryItem?.last_playback_position && watchedHistoryItem.last_playback_position < 1320) {
       params.append('playback_position', Math.round(watchedHistoryItem.last_playback_position).toString())
     }
     

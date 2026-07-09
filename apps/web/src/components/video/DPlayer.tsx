@@ -473,6 +473,7 @@ export default function DPlayer({
               .catch((error) => {
                 console.warn('[DPlayer] Auto-play failed:', error);
                 // 自動再生が失敗した場合はユーザーインタラクションを待つ
+                Message.info('自動再生がブロックされました。再生ボタンを押してください。');
               });
           }
         }
