@@ -70,6 +70,7 @@ CommentPlayer は、ローカルに保存されている動画ファイルをブ
 ### キャプチャ一覧画面
 <video controls src="https://github.com/user-attachments/assets/0d26c241-32a7-4959-a304-50034c8c25a0"></video>
 
+- **シーク機能**: キャプチャした位置に動画をシークして再生する機能 
 
 ## 動作環境
 
@@ -381,7 +382,8 @@ series:
 | **Go** | バックエンド言語 |
 | **Gin** | Web フレームワーク |
 | **OpenAPI** | API 仕様・ドキュメント |
-| **GORM** | ORM |
+| **GORM** | ORM、sqlcにリプレイス中 |
+| **sqlc + dbmate** | SQLとマイグレーション |
 | **SQLite** | データベース |
 | **Fsnotify** | ファイルシステム監視 |
 | **その他** | Validator, Resty, Cobra, Viper, Bubbletea, LipGloss |
