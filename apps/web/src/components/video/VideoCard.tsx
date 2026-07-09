@@ -39,6 +39,20 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
   const settingsStore = useSettingsStore()
   const isInMylist = settingsStore.settings.mylist.some(item => item.id === video.id)
 
+  // 再生履歴から現在のビデオの再生位置を取得
+  const watchedHistoryItem = settingsStore.settings.watched_history?.find(
+    item => item.video_id === video.id
+  )
+  // last_playback_position はミリ秒なので秒単位に変換
+  const lastPlaybackPositionSeconds = watchedHistoryItem?.last_playback_position
+    ? watchedHistoryItem.last_playback_position
+    : null
+  // 動画の進捗率を計算（duration は秒単位）
+  const durationSeconds = video.duration ?? 0
+  const progressPercentage = lastPlaybackPositionSeconds && durationSeconds > 0
+    ? (lastPlaybackPositionSeconds / durationSeconds) * 100
+    : null
+
   const handleDownload = async () => {
     Message.info('ビデオをダウンロードしています。しばらくお待ちください...')
 
@@ -90,14 +104,31 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
         className="transition-colors hover:bg-gray-800 rounded-md"
       >
         {/* サムネイル */}
-        <ItemMedia variant="image" className="h-27 w-48">
+        <ItemMedia variant="image" className="h-27 w-48 relative">
           <img
             src={thumbnailUrl}
             alt={video.file_name}
             loading="lazy"
             className="w-full h-full object-contain hover:opacity-80 transition-opacity"
           />
+          {/* 再生進捗バー */}
+          {progressPercentage !== null && (
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-600 rounded-b">
+              <div
+                className="h-full bg-blue-500 rounded-bl transition-all"
+                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+              />
+            </div>
+          )}
         </ItemMedia>
+
+        {/* 再生時間表示、デバッグ用 */}{/* 
+        {lastPlaybackPositionSeconds !== null && durationSeconds > 0 && (
+          <div className="text-[9px] text-muted-foreground px-2 py-1">
+            {formatDuration(lastPlaybackPositionSeconds)} / {formatDuration(durationSeconds)}
+          </div>
+        )}
+        */}
 
         {/* メインコンテンツ */}
         <ItemContent>
