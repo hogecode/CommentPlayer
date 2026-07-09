@@ -1,7 +1,5 @@
 package dto
 
-import "github.com/hogecode/commentPlayer/internal/entity"
-
 // ---ApiComment---
 // DPlayer形式のコメント（ニコニコ形式をDPlayer形式に変換）
 type ApiComment struct {
@@ -43,8 +41,8 @@ func (v *VideoListRequest) SetDefaults() {
 
 // VideoListResponse - ビデオ一覧取得レスポンス
 type VideoListResponse struct {
-	Data       []entity.Video `json:"data"`
-	Pagination Pagination     `json:"pagination"`
+	Data       []Video    `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }
 
 // VideoSearch
@@ -72,9 +70,9 @@ func (v *VideoSearchRequest) SetDefaults() {
 
 // ---Video---
 // VideoResponse - ビデオ詳細レスポンス
-// entity.Videoを埋め込み、SrcとCommentsを追加
+// Videoを埋め込み、SrcとCommentsを追加
 type VideoResponse struct {
-	*entity.Video
+	*Video
 	Src      string       `json:"src"`
 	Comments []ApiComment `json:"comments"`
 }
@@ -89,9 +87,9 @@ type ThumbnailRegenerateRequest struct {
 
 // ThumbnailRegenerateResponse - サムネイル再生成レスポンス
 type ThumbnailRegenerateResponse struct {
-	ID            int                   `json:"id"`
-	ThumbnailInfo *entity.ThumbnailInfo `json:"thumbnail_info"`
-	Message       string                `json:"message"`
+	ID            int            `json:"id"`
+	ThumbnailInfo *ThumbnailInfo `json:"thumbnail_info"`
+	Message       string         `json:"message"`
 }
 
 // ---VideoYears---

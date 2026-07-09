@@ -243,7 +243,7 @@ export default function VideoPage() {
           />
         </div>
         {/* ビデオプレイヤーとタイトル */}
-        <div className="overflow-auto shrink-0 min-h-1/3 px-8 pb-4">
+        <div className="overflow-auto shrink-0 min-h-1/3 px-4 pb-4">
           <DPlayer
             src={videoSrc}
             commentList={commentList}

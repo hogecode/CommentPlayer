@@ -109,18 +109,30 @@ func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-		// DB処理をqueryパッケージに委譲
-		capture, err := a.CaptureQuery.GetCaptureByID(id)
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
-				Error: i18n.GetErrorMessage(locale, "capture_not_found"),
-				Code:  "NOT_FOUND",
-			})
-			return
-		}
+	// sqlcで生成されたGetCaptureByIDを呼び出す
+	dbCapture, err := a.Queries.GetCaptureByID(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Error: i18n.GetErrorMessage(locale, "capture_not_found"),
+			Code:  "NOT_FOUND",
+		})
+		return
+	}
 
-		// レスポンス
-		ctx.JSON(http.StatusOK, capture)
+	// DB モデル（db.Capture）をエンティティ（entity.Capture）に変換
+	capture := entity.Capture{
+		ID:               int(dbCapture.ID),
+		Filename:         dbCapture.Filename.String,
+		VideoID:          int(dbCapture.VideoID.Int64),
+		SaveDir:          dbCapture.SaveDir.String,
+		SavePath:         dbCapture.SavePath.String,
+		CreatedAt:        dbCapture.CreatedAt.Time,
+		PlaybackPosition: dbCapture.PlaybackPosition.Float64,
+		CommentDelay:     dbCapture.CommentDelay.Float64,
+	}
+
+	// レスポンス
+	ctx.JSON(http.StatusOK, capture)
 	})
 }
 
