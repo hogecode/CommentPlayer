@@ -36,6 +36,7 @@ type Querier interface {
 	SearchVideosNoFilter(ctx context.Context, arg SearchVideosNoFilterParams) ([]Video, error)
 	UpdateCapture(ctx context.Context, arg UpdateCaptureParams) error
 	UpdateSeries(ctx context.Context, arg UpdateSeriesParams) error
+	UpdateVideoJikkyoMetadata(ctx context.Context, arg UpdateVideoJikkyoMetadataParams) error
 }
 
 var _ Querier = (*Queries)(nil)

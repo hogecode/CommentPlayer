@@ -3,6 +3,7 @@
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/hogecode/commentPlayer/internal/config"
+	"github.com/hogecode/commentPlayer/internal/db"
 	"github.com/hogecode/commentPlayer/internal/query"
 	"github.com/hogecode/commentPlayer/internal/service"
 	"github.com/hogecode/commentPlayer/internal/syobocal/api"
@@ -24,6 +25,7 @@ type App struct {
 	DB            *gorm.DB
 	VideoQuery    *query.VideoQuery
 	CaptureQuery  *query.CaptureQuery
+	Queries       *db.Queries
 	Validator     *validator.Validate
 	FileWatcher   *service.FileWatcher
 	Config        *config.Config
@@ -31,11 +33,18 @@ type App struct {
 }
 
 // NewApp - Initialize a new App
-func NewApp(db *gorm.DB, cfg *config.Config) *App {
+func NewApp(dbConn *gorm.DB, cfg *config.Config) *App {
+	// sqlcのQueries初期化（*sql.DBが必要）
+	var sqlDB *db.Queries
+	if sqlDB_obj, err := dbConn.DB(); err == nil {
+		sqlDB = db.New(sqlDB_obj)
+	}
+
 	return &App{
-		DB:           db,
-		VideoQuery:   query.NewVideoQuery(db),
-		CaptureQuery: query.NewCaptureQuery(db),
+		DB:           dbConn,
+		VideoQuery:   query.NewVideoQuery(dbConn),
+		CaptureQuery: query.NewCaptureQuery(dbConn),
+		Queries:      sqlDB,
 		Validator:    validator.New(),
 		FileWatcher:  nil,
 		Config:       cfg,

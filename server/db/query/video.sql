@@ -81,3 +81,10 @@ SELECT *
 FROM video
 WHERE series_id = ? AND is_deleted = 0
 ORDER BY file_name ASC;
+
+-- name: UpdateVideoJikkyoMetadata :exec
+UPDATE video
+SET jikkyo_comment_count = ?,
+    jikkyo_date = ?,
+    updated_at = ?
+WHERE id = ?;

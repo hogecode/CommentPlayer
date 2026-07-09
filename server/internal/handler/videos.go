@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -14,6 +16,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/hogecode/commentPlayer/internal/db"
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/entity"
 	"github.com/hogecode/commentPlayer/internal/i18n"
@@ -616,7 +619,7 @@ func (a *App) parseMailAttribute(mail string) (commentType, commentSize, comment
 }
 
 // getCommentsFromJikkyo - ニコニコ実況からコメントを取得して変換
-// TODO: XMLファイルを保存する処理は書いたが、DBに保存する処理はまだ書いていない
+// XMLファイルと同時に、コメント数と最古日時をDBに保存する
 func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, folderPath string) []dto.ApiComment {
 	if a.JikkyoClient == nil {
 		return nil
@@ -690,6 +693,37 @@ func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, fo
 		slog.Info("Comment XML file saved successfully",
 			slog.String("path", commentPath),
 		)
+	}
+
+	// コメント数と最古日時をDBに保存
+	commentCount := len(packet.Chats)
+	if commentCount > 0 && a.Queries != nil {
+		// 最古日時を取得（最初のチャットの日時）
+		if oldestDateStr, err := strconv.ParseInt(packet.Chats[0].Date, 10, 64); err == nil {
+			oldestDateTime := time.Unix(oldestDateStr, 0)
+
+			// sqlc生成メソッドを使用してVideoテーブルを更新
+			updateErr := a.Queries.UpdateVideoJikkyoMetadata(context.Background(), db.UpdateVideoJikkyoMetadataParams{
+				JikkyoCommentCount: sql.NullInt64{Int64: int64(commentCount), Valid: true},
+				JikkyoDate:         sql.NullTime{Time: oldestDateTime, Valid: true},
+				UpdatedAt:          sql.NullTime{Time: time.Now(), Valid: true},
+				ID:                 int64(video.ID),
+			})
+
+			if updateErr != nil {
+				slog.Warn("Failed to update video Jikkyo metadata",
+					slog.Int("video_id", video.ID),
+					slog.Int("comment_count", commentCount),
+					slog.Any("error", updateErr),
+				)
+			} else {
+				slog.Info("Video Jikkyo metadata updated successfully",
+					slog.Int("video_id", video.ID),
+					slog.Int("comment_count", commentCount),
+					slog.String("jikkyo_date", oldestDateTime.String()),
+				)
+			}
+		}
 	}
 
 	// コメントを変換

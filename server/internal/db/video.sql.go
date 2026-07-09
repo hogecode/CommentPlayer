@@ -499,3 +499,28 @@ func (q *Queries) SearchVideosNoFilter(ctx context.Context, arg SearchVideosNoFi
 	}
 	return items, nil
 }
+
+const updateVideoJikkyoMetadata = `-- name: UpdateVideoJikkyoMetadata :exec
+UPDATE video
+SET jikkyo_comment_count = ?,
+    jikkyo_date = ?,
+    updated_at = ?
+WHERE id = ?
+`
+
+type UpdateVideoJikkyoMetadataParams struct {
+	JikkyoCommentCount sql.NullInt64
+	JikkyoDate         sql.NullTime
+	UpdatedAt          sql.NullTime
+	ID                 int64
+}
+
+func (q *Queries) UpdateVideoJikkyoMetadata(ctx context.Context, arg UpdateVideoJikkyoMetadataParams) error {
+	_, err := q.db.ExecContext(ctx, updateVideoJikkyoMetadata,
+		arg.JikkyoCommentCount,
+		arg.JikkyoDate,
+		arg.UpdatedAt,
+		arg.ID,
+	)
+	return err
+}

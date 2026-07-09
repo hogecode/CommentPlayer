@@ -108,7 +108,22 @@ goimports-check: ## goimportsでimport文をチェック（差分があればエ
 		exit 1; \
 	fi
 
+sqlc-generate: ## sqlcでコード生成
+	cd server && sqlc generate
 
+db-migrate: ## dbmateでマイグレーションを実行
+	cd server && @which dbmate > /dev/null || (echo "Installing dbmate from go.mod..." && go install github.com/amacneil/dbmate@latest)
+	cd server && dbmate -d db/migrations up
+
+.PHONY: db-migrate-down
+db-migrate-down:
+	cd server && dbmate -d db/migrations down
+
+.PHONY: db-migrate-new
+db-migrate-new:
+	cd server && dbmate -d db/migrations new $(NAME)
+
+	
 ## ========================
 ## API コード生成 (Windows用)
 ## ========================
