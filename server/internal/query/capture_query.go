@@ -15,36 +15,6 @@ func NewCaptureQuery(db *gorm.DB) *CaptureQuery {
 	return &CaptureQuery{db: db}
 }
 
-// GetCaptureList - キャプチャ一覧を取得
-func (q *CaptureQuery) GetCaptureList(videoID, page, limit int) ([]entity.Capture, int64, error) {
-	query := q.db
-
-	// VideoID でフィルター
-	if videoID > 0 {
-		query = query.Where("video_id = ?", videoID)
-	}
-
-	// 合計数を取得
-	var total int64
-	if err := query.Model(&entity.Capture{}).Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	// ソート（逆順）
-	query = query.Order("created_at DESC")
-
-	// ページネーション
-	offset := (page - 1) * limit
-	query = query.Offset(offset).Limit(limit)
-
-	// データ取得
-	var captures []entity.Capture
-	if err := query.Find(&captures).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return captures, total, nil
-}
 
 // CreateCapture - キャプチャを作成
 func (q *CaptureQuery) CreateCapture(capture *entity.Capture) error {

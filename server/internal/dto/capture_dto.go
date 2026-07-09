@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/hogecode/commentPlayer/internal/entity"
+// import "github.com/hogecode/commentPlayer/internal/entity"
 
 // CaptureList
 // CaptureListRequest - キャプチャ一覧取得リクエスト
@@ -22,7 +22,7 @@ func (c *CaptureListRequest) SetDefaults() {
 
 // CaptureListResponse - キャプチャ一覧取得レスポンス
 type CaptureListResponse struct {
-	Data       []entity.Capture `json:"data"`
+	Data       []Capture `json:"data"`
 	Pagination Pagination       `json:"pagination"`
 }
 

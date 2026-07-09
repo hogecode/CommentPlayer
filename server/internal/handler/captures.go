@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hogecode/commentPlayer/internal/db"
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/entity"
 	"github.com/hogecode/commentPlayer/internal/i18n"
@@ -60,14 +62,67 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-		// DB処理をqueryパッケージに委譲
-		captures, total, err := a.CaptureQuery.GetCaptureList(req.VideoID, req.Page, req.Limit)
+		// ページネーション計算
+		offset := int64((req.Page - 1) * req.Limit)
+
+		// sqlcで生成されたキャプチャ取得・カウント関数を呼び出す
+		var dbCaptures []db.Capture
+		var total int64
+		var err error
+
+		if req.VideoID > 0 {
+			// VideoIDでフィルター
+			videoIDNull := sql.NullInt64{Int64: int64(req.VideoID), Valid: true}
+			dbCaptures, err = a.Queries.GetCaptureListByVideo(ctx, db.GetCaptureListByVideoParams{
+				VideoID: videoIDNull,
+				Limit:   int64(req.Limit),
+				Offset:  offset,
+			})
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
+					Code:  "INTERNAL_ERROR",
+				})
+				return
+			}
+			total, err = a.Queries.CountCaptureListByVideo(ctx, videoIDNull)
+		} else {
+			// 全件取得
+			dbCaptures, err = a.Queries.GetAllCaptures(ctx, db.GetAllCapturesParams{
+				Limit:  int64(req.Limit),
+				Offset: offset,
+			})
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
+					Code:  "INTERNAL_ERROR",
+				})
+				return
+			}
+			total, err = a.Queries.CountAllCaptures(ctx)
+		}
+
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 				Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
 				Code:  "INTERNAL_ERROR",
 			})
 			return
+		}
+
+		// db.Captureをdto.Captureに変換
+		captures := make([]dto.Capture, len(dbCaptures))
+		for i, dbCapture := range dbCaptures {
+			captures[i] = dto.Capture{
+				ID:               int(dbCapture.ID),
+				Filename:         dbCapture.Filename.String,
+				VideoID:          int(dbCapture.VideoID.Int64),
+				SaveDir:          dbCapture.SaveDir.String,
+				SavePath:         dbCapture.SavePath.String,
+				PlaybackPosition: dbCapture.PlaybackPosition.Float64,
+				CommentDelay:     dbCapture.CommentDelay.Float64,
+				CreatedAt:        dbCapture.CreatedAt.Time,
+			}
 		}
 
 		// レスポンス
