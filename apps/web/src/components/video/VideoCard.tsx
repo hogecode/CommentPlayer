@@ -30,13 +30,16 @@ interface VideoCardProps {
  * ビデオのサムネイル、タイトル、メタデータを表示
  */
 export function VideoCard({ video, onDelete }: VideoCardProps) {
+
   const thumbnailUrl = `${config.apiBaseUrl}/screenshots/${video.screenshot_file_path}`
   const channelLogoUrl = video.channel_id ? `/assets/images/logos/ch${video.channel_id}.png` : null
+
   const downloadMutation = useVideoDownloadMutation()
   const regenerateThumbnailMutation = useRegenerateThumbnailMutation()
   const [isDownloading, setIsDownloading] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
   const settingsStore = useSettingsStore()
+
   const isInMylist = settingsStore.settings.mylist.some(item => item.id === video.id)
 
   // 再生履歴から現在のビデオの再生位置を取得
@@ -47,6 +50,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
   const lastPlaybackPositionSeconds = watchedHistoryItem?.last_playback_position
     ? watchedHistoryItem.last_playback_position
     : null
+    
   // 動画の進捗率を計算（duration は秒単位）
   const durationSeconds = video.duration ?? 0
   const progressPercentage = lastPlaybackPositionSeconds && durationSeconds > 0
@@ -97,8 +101,26 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
     }
   }
 
+  // リンク遷移時のクエリパラメータを構築（再生位置とコメント遅延を含める）
+  const getLinkHref = () => {
+    const params = new URLSearchParams()
+    
+    // 再生履歴から再生位置を取得
+    if (watchedHistoryItem?.last_playback_position) {
+      params.append('playback_position', Math.round(watchedHistoryItem.last_playback_position).toString())
+    }
+    
+    // 再生履歴からコメント遅延を取得
+    if (watchedHistoryItem?.jikkyo_comment_offset) {
+      params.append('comment_delay', watchedHistoryItem.jikkyo_comment_offset.toString())
+    }
+    
+    const query = params.toString() ? `?${params.toString()}` : ''
+    return `/videos/${video.id}${query}`
+  }
+
   return (
-    <a href={`/videos/${video.id}`}>
+    <a href={getLinkHref()}>
       <Item
         variant="default"
         className="transition-colors hover:bg-gray-800 rounded-md"
