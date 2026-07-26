@@ -564,7 +564,7 @@ export default function DPlayer({
              updatedHistory[historyIndex] = {
                ...updatedHistory[historyIndex],
                last_playback_position: currentTime,
-               jikkyo_comment_offset: delayOffsetRef.current,
+               jikkyo_comment_offset: Math.floor(delayOffsetRef.current),
                updated_at: Math.floor(Date.now() / 1000), // 秒単位
              };
 

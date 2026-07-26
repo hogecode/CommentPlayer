@@ -313,6 +313,7 @@ export default function CommentList({
   );
 }
 
+
 /**
  * コメント項目コンポーネント
  */
@@ -349,6 +350,7 @@ function formatCommentTime(
   // jikkyo_date がない場合は秒単位で表示（フォールバック）
   return `${comment.time?.toFixed(0)}s`;
 }
+
 
 function CommentItem({
   comment,
@@ -415,6 +417,7 @@ function CommentItem({
     </div>
   );
 }
+
 
 /**
  * コメントコンテキストメニューコンポーネント

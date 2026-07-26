@@ -57,6 +57,7 @@ export default function VideoPanel({
       >
         <VideoInfo video={video} />
       </TabsContent>
+
       {/* シリーズ情報タブ */}
       <TabsContent
         value="series"
@@ -64,6 +65,7 @@ export default function VideoPanel({
       >
         <SeriesInfo video={video} />
       </TabsContent>
+
       {/* コメント一覧タブ */}
       <TabsContent
         value="comments"
@@ -77,6 +79,7 @@ export default function VideoPanel({
           video={video} 
         />
       </TabsContent>
+
       {/* コメント遅延設定タブ */}
       <TabsContent
         value="delay"
@@ -89,6 +92,7 @@ export default function VideoPanel({
           handleCommentDelay={onCommentDelayChange}
         />
       </TabsContent>
+
       {/* コメント検索タブ */}
       <TabsContent
         value="search"
@@ -96,6 +100,7 @@ export default function VideoPanel({
       >
         <CommentSearch comments={comments} />
       </TabsContent>
+    
       <TabsList
         className="fixed bottom-0 w-[95%] flex align-center justify-center min-h-12 bg-[#2f221f] "
         variant="line"

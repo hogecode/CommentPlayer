@@ -121,7 +121,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
   }
 
   return (
-    <a href={getLinkHref()}>
+    <a href={`/videos/${video.id}`}/*{getLinkHref()}*/>
       <Item
         variant="default"
         className="transition-colors hover:bg-gray-800 rounded-md"
@@ -134,7 +134,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
             loading="lazy"
             className="w-full h-full object-contain hover:opacity-80 transition-opacity"
           />
-          {/* 再生進捗バー */}
+          {/* 再生進捗バー 
           {progressPercentage !== null && (
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-600 rounded-b">
               <div
@@ -143,6 +143,7 @@ export function VideoCard({ video, onDelete }: VideoCardProps) {
               />
             </div>
           )}
+          */}
         </ItemMedia>
 
         {/* 再生時間表示、デバッグ用 */}{/* 

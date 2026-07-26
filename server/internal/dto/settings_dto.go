@@ -14,7 +14,7 @@ type MylistItem struct {
 type WatchedHistoryItem struct {
 	VideoID              int     `json:"video_id"`
 	LastPlaybackPosition float64 `json:"last_playback_position"` // ミリ秒
-	JikkyoCommentOffset  int     `json:"jikkyo_comment_offset"`
+	JikkyoCommentOffset  float64 `json:"jikkyo_comment_offset"`
 	CreatedAt            int64   `json:"created_at"`
 	UpdatedAt            int64   `json:"updated_at"`
 }
