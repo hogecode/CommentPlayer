@@ -438,6 +438,9 @@ func (a *App) getCommentsFromFile(videoFilePath string, video *entity.Video) []d
 		commentPath := filepath.Join(folderPath, baseFileName+ext)
 		if _, err := os.Stat(commentPath); err == nil {
 			comments, err := a.convertCommentsToAPI(commentPath)
+			if err != nil {
+				slog.Error("Failed to convert comments to API format", "error", err, "path", commentPath)
+			}
 			if err == nil && comments != nil {
 				return comments
 			}
@@ -736,7 +739,7 @@ func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, fo
 }
 
 // chatJikkyoXMLToApiComment - JikkiyoChatXMLをApiCommentに変換
-func (a *App) chatJikkyoXMLToApiComment(chat models.JikkiyoChatXML) dto.ApiComment {
+func (a *App) chatJikkyoXMLToApiComment(chat models.JikkyoChatXML) dto.ApiComment {
 	// vpos（ビデオ位置）を秒単位の浮動小数点数に変換
 	time := float64(0)
 	if chat.Vpos != "" {

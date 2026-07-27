@@ -1,5 +1,7 @@
 package models
 
+import "encoding/xml"
+
 // JikkyoResponse is the response from Jikkyo API
 type JikkyoResponse struct {
 	Packets []JikkyoPacket `json:"packet"`
@@ -28,11 +30,12 @@ type JikkyoChat struct {
 
 // JikkyoPacketXML is the XML packet response from Jikkyo API
 type JikkyoPacketXML struct {
-	Chats []JikkiyoChatXML `xml:"chat"`
+	XMLName xml.Name        `xml:"packet"`
+	Chats   []JikkyoChatXML `xml:"chat"`
 }
 
-// JikkiyoChatXML represents a comment/chat from the broadcast in XML format
-type JikkiyoChatXML struct {
+// JikkyoChatXML represents a comment/chat from the broadcast in XML format
+type JikkyoChatXML struct {
 	Thread    string `xml:"thread,attr"`
 	No        string `xml:"no,attr"`
 	Vpos      string `xml:"vpos,attr"`

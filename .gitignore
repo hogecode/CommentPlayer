@@ -42,3 +42,5 @@ tmp
 server/public/screenshots/
 
 .env.caddy
+
+apps/_web/*
