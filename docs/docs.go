@@ -15,6 +15,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/admin/stats/monthly": {
+            "get": {
+                "description": "指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "月別統計を取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "年（デフォルト: 当年）",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "月（デフォルト: 当月, 1-12）",
+                        "name": "month",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdminStatsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/captures": {
             "get": {
                 "description": "キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order でソートをカスタマイズできます",
@@ -1130,6 +1173,44 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AdminStatsResponse": {
+            "type": "object",
+            "properties": {
+                "daily_views": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DailyViewsResponse"
+                    }
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "monthly_summary": {
+                    "$ref": "#/definitions/dto.MonthlyStatsResponse"
+                },
+                "series_views": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SeriesViewsResponse"
+                    }
+                },
+                "video_ranking": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VideoRankingResponse"
+                    }
+                },
+                "watched_history_by_date": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.WatchedHistoryByDateResponse"
+                    }
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ApiComment": {
             "type": "object",
             "required": [
@@ -1339,6 +1420,19 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DailyViewsResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "description": "YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "view_count": {
+                    "description": "その日の再生数",
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -1403,6 +1497,23 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.MonthlyStatsResponse": {
+            "type": "object",
+            "properties": {
+                "days_with_views": {
+                    "description": "再生があった日数",
+                    "type": "integer"
+                },
+                "total_views_month": {
+                    "description": "月間再生数",
+                    "type": "integer"
+                },
+                "unique_videos_watched": {
+                    "description": "ユニーク動画数",
+                    "type": "integer"
                 }
             }
         },
@@ -1498,6 +1609,24 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.SeriesViewsResponse": {
+            "type": "object",
+            "properties": {
+                "series_id": {
+                    "type": "integer"
+                },
+                "series_name": {
+                    "type": "string"
+                },
+                "total_views": {
+                    "type": "integer"
+                },
+                "video_count": {
+                    "description": "シリーズ内の動画数",
+                    "type": "integer"
                 }
             }
         },
@@ -1718,6 +1847,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.VideoRankingResponse": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "series_name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "video_id": {
+                    "type": "integer"
+                },
+                "views": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.VideoResponse": {
             "type": "object",
             "properties": {
@@ -1822,6 +1971,19 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.WatchedHistoryByDateResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "description": "YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "watch_count": {
+                    "description": "その日の視聴数",
+                    "type": "integer"
                 }
             }
         },

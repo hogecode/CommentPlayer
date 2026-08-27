@@ -44,3 +44,5 @@ server/public/screenshots/
 .env.caddy
 
 apps/_web/*
+
+main.exe

@@ -7,6 +7,7 @@ import CapturesPage from '@/app/(photo)/captures/page'
 import MyListPage from '@/app/(video)/mylist/page'
 import WatchedHistoryPage from '@/app/(video)/watched-history/page'
 import SettingsPage from '@/app/(settings)/settings/page'
+import AdminPage from '@/app/(admin)/admin/page'
 import NotFoundPage from '@/app/not-found'
 import RedirectToVideos from '@/app/page'
 import LoginPage from '@/app/(auth)/login/page'
@@ -35,6 +36,7 @@ const pages: { path: string; component: any }[] = [
   { path: '/mylist', component: MyListPage },
   { path: '/watched-history', component: WatchedHistoryPage },
   { path: '/settings', component: SettingsPage },
+  { path: '/admin', component: AdminPage },
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
   { path: '/', component: RedirectToVideos }, 

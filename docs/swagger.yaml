@@ -1,4 +1,29 @@
 definitions:
+  dto.AdminStatsResponse:
+    properties:
+      daily_views:
+        items:
+          $ref: '#/definitions/dto.DailyViewsResponse'
+        type: array
+      month:
+        type: integer
+      monthly_summary:
+        $ref: '#/definitions/dto.MonthlyStatsResponse'
+      series_views:
+        items:
+          $ref: '#/definitions/dto.SeriesViewsResponse'
+        type: array
+      video_ranking:
+        items:
+          $ref: '#/definitions/dto.VideoRankingResponse'
+        type: array
+      watched_history_by_date:
+        items:
+          $ref: '#/definitions/dto.WatchedHistoryByDateResponse'
+        type: array
+      year:
+        type: integer
+    type: object
   dto.ApiComment:
     properties:
       author:
@@ -144,6 +169,15 @@ definitions:
           $ref: '#/definitions/dto.WatchedHistoryItem'
         type: array
     type: object
+  dto.DailyViewsResponse:
+    properties:
+      date:
+        description: YYYY-MM-DD format
+        type: string
+      view_count:
+        description: その日の再生数
+        type: integer
+    type: object
   dto.ErrorResponse:
     properties:
       code:
@@ -186,6 +220,18 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.MonthlyStatsResponse:
+    properties:
+      days_with_views:
+        description: 再生があった日数
+        type: integer
+      total_views_month:
+        description: 月間再生数
+        type: integer
+      unique_videos_watched:
+        description: ユニーク動画数
+        type: integer
     type: object
   dto.MutedCommentKeyword:
     properties:
@@ -249,6 +295,18 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.SeriesViewsResponse:
+    properties:
+      series_id:
+        type: integer
+      series_name:
+        type: string
+      total_views:
+        type: integer
+      video_count:
+        description: シリーズ内の動画数
+        type: integer
     type: object
   dto.SeriesWithVideosResponse:
     properties:
@@ -398,6 +456,19 @@ definitions:
       pagination:
         $ref: '#/definitions/dto.Pagination'
     type: object
+  dto.VideoRankingResponse:
+    properties:
+      file_name:
+        type: string
+      series_name:
+        type: string
+      updated_at:
+        type: string
+      video_id:
+        type: integer
+      views:
+        type: integer
+    type: object
   dto.VideoResponse:
     properties:
       channel_id:
@@ -469,6 +540,15 @@ definitions:
         items:
           type: integer
         type: array
+    type: object
+  dto.WatchedHistoryByDateResponse:
+    properties:
+      date:
+        description: YYYY-MM-DD format
+        type: string
+      watch_count:
+        description: その日の視聴数
+        type: integer
     type: object
   dto.WatchedHistoryItem:
     properties:
@@ -636,6 +716,34 @@ info:
   title: commentPlayer API
   version: 1.0.0
 paths:
+  /api/v1/admin/stats/monthly:
+    get:
+      description: 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
+      parameters:
+      - description: '年（デフォルト: 当年）'
+        in: query
+        name: year
+        type: integer
+      - description: '月（デフォルト: 当月, 1-12）'
+        in: query
+        name: month
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AdminStatsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: 月別統計を取得
+      tags:
+      - Admin
   /api/v1/captures:
     get:
       description: キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order

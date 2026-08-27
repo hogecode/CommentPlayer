@@ -14,6 +14,7 @@
 
 
 
+export * from './apis/admin-api';
 export * from './apis/captures-api';
 export * from './apis/debug-api';
 export * from './apis/folders-api';

@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * commentPlayer API
- * ビデオ管理アプリケーションのREST API
+ * Watch commentPlayer API documentation
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -12,9 +12,13 @@
  * Do not edit the class manually.
  */
 
-export * from './admin-api';
-export * from './captures-api';
-export * from './debug-api';
-export * from './folders-api';
-export * from './static-files-api';
-export * from './videos-api';
+
+
+export interface DtoVideoRankingResponse {
+    'file_name'?: string;
+    'series_name'?: string;
+    'updated_at'?: string;
+    'video_id'?: number;
+    'views'?: number;
+}
+

@@ -93,6 +93,7 @@ func migrateDB(db *gorm.DB) error {
 		&entity.Series{},
 		&entity.Capture{},
 		&entity.User{},
+		&entity.WatchedHistory{},
 	)
 }
 

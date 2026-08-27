@@ -153,16 +153,26 @@ export default function DPlayer({
       }
 
       // ビデオ視聴を記録（再生開始時に1回のみ）
+      // dp.on('play', ...) が機能しないため、HTML5ネイティブイベントを使用
       const recordViewOnceHandler = () => {
+        console.log('[DPlayer] play event fired. hasRecorded:', hasRecordedViewRef.current, 'videoId:', videoIdRef.current);
         if (!hasRecordedViewRef.current && videoIdRef.current) {
+          console.log('[DPlayer] Recording video view for videoId:', videoIdRef.current);
           hasRecordedViewRef.current = true;
           // ビデオ視聴記録を送信（非同期、エラーは無視）
           recordVideoViewMutation.mutate(videoIdRef.current);
+        } else {
+          console.log('[DPlayer] Skipping view record - already recorded or no videoId');
         }
       };
       
-      // 再生開始時にハンドラーを呼び出す
-      dp.on('play', recordViewOnceHandler);
+      // HTML5ネイティブの play イベントを使用（DPlayerのイベント機構より確実）
+      if (dp.video) {
+        console.log('[DPlayer] Adding play event listener to video element');
+        dp.video.addEventListener('play', recordViewOnceHandler);
+      } else {
+        console.warn('[DPlayer] video element not found on dp object');
+      }
 
       // スクリーンショットボタンのクリックイベントをカスタマイズ
       setTimeout(() => {
@@ -648,6 +658,7 @@ export default function DPlayer({
       // クリーンアップ関数を保存
       DPlayerRef.current._cleanup = () => {
         if (dp.video) {
+          dp.video.removeEventListener('play', recordViewOnceHandler);
           dp.video.removeEventListener('timeupdate', handleTimeUpdate);
           dp.video.removeEventListener('ended', handleVideoEnded);
         }

@@ -784,7 +784,7 @@ func (a *App) buildVideoURL(folderID int, fileName string) string {
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /api/v1/videos/{id}/view [post]
 func (a *App) RecordVideoView(videosGroup *gin.RouterGroup) {
-	videosGroup.POST("/view/:id", func(ctx *gin.Context) {
+	videosGroup.POST("/:id/view", func(ctx *gin.Context) {
 		// ロケール情報を取得
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
