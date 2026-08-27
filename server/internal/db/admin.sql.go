@@ -87,7 +87,7 @@ func (q *Queries) GetMonthlyStats(ctx context.Context, arg GetMonthlyStatsParams
 const getSeriesViews = `-- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.series_name_file, 'No Series') AS series_name,
+    COALESCE(s.syobocal_title_name, 'No Series') AS series_name,
     SUM(v.views) AS total_views,
     COUNT(v.id) AS video_count
 FROM video v
@@ -138,7 +138,7 @@ SELECT
     v.file_name,
     v.views,
     v.updated_at,
-    s.series_name_file AS series_name
+    s.syobocal_title_name AS series_name
 FROM video v
 LEFT JOIN series s ON v.series_id = s.id
 WHERE v.is_deleted = 0
