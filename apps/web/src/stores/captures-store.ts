@@ -28,7 +28,7 @@ interface CapturesState {
 export const useCapturesStore = create<CapturesState>((set) => ({
   captureList: [],
   sortKey: 'id',
-  sortOrder: 'asc',
+  sortOrder: 'desc',
   currentPage: 1,
   limit: 24,
   currentSeriesId: null,

@@ -92,7 +92,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
           {/* カレンダー */}
           <div>
             {/* 曜日ヘッダー */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            <div className="grid grid-cols-7 gap-1 mb-2 max-w-[30rem]">
               {weekDays.map((day) => (
                 <div
                   key={day}
@@ -104,7 +104,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
             </div>
 
             {/* カレンダーセル */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-1 max-w-[30rem]">
               {calendarDays.map((day, idx) => (
                 <button
                   key={idx}
@@ -119,9 +119,9 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
                   `}
                 >
                   <div className="font-semibold">{day.day}</div>
-                  {day.views > 0 && day.isCurrentMonth && (
+                  {/*{day.views > 0 && day.isCurrentMonth && (
                     <div className="text-xs">{day.views}件</div>
-                  )}
+                  )}*/}
                 </button>
               ))}
             </div>
@@ -129,7 +129,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
 
           {/* 選択日の詳細 */}
           {selectedDate && (
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className=" max-w-[30rem]">
               <AccordionItem
                 value={`date-${selectedDate}`}
                 className="border border-gray-300 rounded bg-muted"
