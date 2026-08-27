@@ -166,3 +166,28 @@ export function useVideoDownload() {
     }
   };
 }
+
+/**
+ * ビデオの視聴を記録するミューテーション
+ * 再生開始時に views を増加させ、watched_history に行を追加
+ */
+export function useRecordVideoViewMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (videoId: number) => {
+      const response = await videosApi.apiV1VideosIdViewPost(videoId);
+      return response.data;
+    },
+    onSuccess: (_response: any, videoId: number) => {
+      // ビデオ詳細情報を無効化して再フェッチ
+      queryClient.invalidateQueries({ queryKey: ['video', videoId] });
+      // ビデオ一覧も無効化
+      queryClient.invalidateQueries({ queryKey: ['videos'] });
+    },
+    onError: (error: any) => {
+      // エラーはコンソールに出力するが、ユーザーには表示しない（非同期で記録するため）
+      console.error('Failed to record video view:', error);
+    },
+  });
+}

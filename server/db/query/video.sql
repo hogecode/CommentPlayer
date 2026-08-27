@@ -88,3 +88,9 @@ SET jikkyo_comment_count = ?,
     jikkyo_date = ?,
     updated_at = ?
 WHERE id = ?;
+
+-- name: IncrementVideoViews :exec
+UPDATE video
+SET views = views + 1,
+    updated_at = ?
+WHERE id = ?;

@@ -16,10 +16,13 @@ type Querier interface {
 	CountSearchVideosNoFilter(ctx context.Context, arg CountSearchVideosNoFilterParams) (int64, error)
 	CountVideoListByStatus(ctx context.Context, status sql.NullString) (int64, error)
 	CountVideoListByYear(ctx context.Context, jikkyoDate sql.NullTime) (int64, error)
+	CountWatchedHistoryByVideoID(ctx context.Context, videoID int64) (int64, error)
 	CreateCapture(ctx context.Context, arg CreateCaptureParams) error
 	CreateSeries(ctx context.Context, arg CreateSeriesParams) error
+	CreateWatchedHistory(ctx context.Context, arg CreateWatchedHistoryParams) error
 	DeleteCapture(ctx context.Context, id int64) error
 	DeleteSeries(ctx context.Context, id int64) error
+	DeleteWatchedHistoryByVideoID(ctx context.Context, videoID int64) error
 	GetAllCaptures(ctx context.Context, arg GetAllCapturesParams) ([]Capture, error)
 	GetAllCapturesCreatedAtAsc(ctx context.Context, arg GetAllCapturesCreatedAtAscParams) ([]Capture, error)
 	GetAllCapturesIdAsc(ctx context.Context, arg GetAllCapturesIdAscParams) ([]Capture, error)
@@ -31,6 +34,7 @@ type Querier interface {
 	GetCaptureListByVideoCreatedAtAsc(ctx context.Context, arg GetCaptureListByVideoCreatedAtAscParams) ([]Capture, error)
 	GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCaptureListByVideoIdAscParams) ([]Capture, error)
 	GetCaptureListByVideoIdDesc(ctx context.Context, arg GetCaptureListByVideoIdDescParams) ([]Capture, error)
+	GetRecentWatchedHistory(ctx context.Context, arg GetRecentWatchedHistoryParams) ([]WatchedHistory, error)
 	GetSeriesByID(ctx context.Context, id int64) (Series, error)
 	GetSeriesByName(ctx context.Context, seriesNameFile sql.NullString) (Series, error)
 	GetVideoByID(ctx context.Context, id int64) (Video, error)
@@ -38,6 +42,8 @@ type Querier interface {
 	GetVideoListByYear(ctx context.Context, arg GetVideoListByYearParams) ([]Video, error)
 	GetVideoYears(ctx context.Context) ([]int64, error)
 	GetVideosForSeries(ctx context.Context, seriesID sql.NullInt64) ([]Video, error)
+	GetWatchedHistoryByVideoID(ctx context.Context, arg GetWatchedHistoryByVideoIDParams) ([]WatchedHistory, error)
+	IncrementVideoViews(ctx context.Context, arg IncrementVideoViewsParams) error
 	SearchVideos(ctx context.Context, arg SearchVideosParams) ([]Video, error)
 	SearchVideosNoFilter(ctx context.Context, arg SearchVideosNoFilterParams) ([]Video, error)
 	UpdateCapture(ctx context.Context, arg UpdateCaptureParams) error

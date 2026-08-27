@@ -6,6 +6,7 @@ import { usePlayerHeaderStore } from '@/stores/player-header-store';
 import { useEffect, useRef, useCallback } from 'react';
 import Message from '@/message';
 import { useCreateCaptureMutation } from '@/services/useCaptures';
+import { useRecordVideoViewMutation } from '@/services/useVideos';
 import { SeriesApi } from '@/generated';
 import VideoHeader from '@/components/video/VideoHeader';
 
@@ -78,6 +79,10 @@ export default function DPlayer({
   const { settings } = useSettingsStore();
   const { showHeader: toggleHeaderVisibility, hideHeader } = usePlayerHeaderStore();
   const createCaptureMutation = useCreateCaptureMutation();
+  const recordVideoViewMutation = useRecordVideoViewMutation();
+  
+  // ビデオ視聴記録フラグ（重複記録を防ぐ）
+  const hasRecordedViewRef = useRef<boolean>(false);
 
   // danList が変わったら ref を同期
   useEffect(() => {
@@ -146,6 +151,18 @@ export default function DPlayer({
       if (dp.danmaku) {
         dp.danmaku.options.time = () => dp.video.currentTime - delayOffset;
       }
+
+      // ビデオ視聴を記録（再生開始時に1回のみ）
+      const recordViewOnceHandler = () => {
+        if (!hasRecordedViewRef.current && videoIdRef.current) {
+          hasRecordedViewRef.current = true;
+          // ビデオ視聴記録を送信（非同期、エラーは無視）
+          recordVideoViewMutation.mutate(videoIdRef.current);
+        }
+      };
+      
+      // 再生開始時にハンドラーを呼び出す
+      dp.on('play', recordViewOnceHandler);
 
       // スクリーンショットボタンのクリックイベントをカスタマイズ
       setTimeout(() => {

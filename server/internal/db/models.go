@@ -85,3 +85,9 @@ type Video struct {
 	CreatedAt          sql.NullTime
 	UpdatedAt          sql.NullTime
 }
+
+type WatchedHistory struct {
+	ID        int64
+	VideoID   int64
+	WatchedAt sql.NullTime
+}

@@ -345,6 +345,23 @@ func (q *Queries) GetVideosForSeries(ctx context.Context, seriesID sql.NullInt64
 	return items, nil
 }
 
+const incrementVideoViews = `-- name: IncrementVideoViews :exec
+UPDATE video
+SET views = views + 1,
+    updated_at = ?
+WHERE id = ?
+`
+
+type IncrementVideoViewsParams struct {
+	UpdatedAt sql.NullTime
+	ID        int64
+}
+
+func (q *Queries) IncrementVideoViews(ctx context.Context, arg IncrementVideoViewsParams) error {
+	_, err := q.db.ExecContext(ctx, incrementVideoViews, arg.UpdatedAt, arg.ID)
+	return err
+}
+
 const searchVideos = `-- name: SearchVideos :many
 SELECT v.id, v.file_name, v.folder_id, v.series_id, v.episode, v.subtitle, v.file_path, v.description, v.status, v.file_hash, v.file_size, v.jikkyo_comment_count, v.jikkyo_date, v.views, v.liked, v.screenshot_file_path, v.duration, v.thumbnail_info_json, v.channel_id, v.prog_start_time, v.prog_end_time, v.is_deleted, v.created_at, v.updated_at
 FROM video v

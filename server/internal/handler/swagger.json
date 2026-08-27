@@ -1064,6 +1064,44 @@
                 }
             }
         },
+        "/api/v1/videos/{id}/view": {
+            "post": {
+                "description": "ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します",
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオの視聴を記録",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ビデオID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/swagger.json": {
             "get": {
                 "description": "デバッグビルドでの埋め込みSwagger JSONドキュメント",

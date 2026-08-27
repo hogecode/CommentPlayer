@@ -35,6 +35,7 @@ func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 	a.GetVideos(videosGroup)
 	a.GetVideoYears(videosGroup) // /:idより前に登録して、/yearsが/:idに引っかからないようにする
 	a.SearchVideos(videosGroup)  // /searchも/:idより前に登録
+	a.RecordVideoView(videosGroup) // /:idより前に登録
 	a.GetVideoByID(videosGroup)  // 可変パラメータは最後に登録
 	a.DownloadVideo(videosGroup)
 	a.RegenerateThumbnail(videosGroup)
@@ -771,4 +772,75 @@ func (a *App) chatJikkyoXMLToApiComment(chat models.JikkyoChatXML) dto.ApiCommen
 // フォルダID とファイル名から、http://localhost:8000/api/v1/files/{folderID}/{fileName} のような形式の URL を構築
 func (a *App) buildVideoURL(folderID int, fileName string) string {
 	return "/api/v1/files/" + strconv.Itoa(folderID) + "/" + fileName
+}
+
+// RecordVideoView - ビデオの視聴を記録
+// @Summary ビデオの視聴を記録
+// @Description ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+// @Tags Videos
+// @Param id path integer true "ビデオID"
+// @Success 200 {object} dto.SuccessResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/videos/{id}/view [post]
+func (a *App) RecordVideoView(videosGroup *gin.RouterGroup) {
+	videosGroup.POST("/view/:id", func(ctx *gin.Context) {
+		// ロケール情報を取得
+		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+
+		// ビデオID を取得
+		idStr := ctx.Param("id")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "invalid_video_id"),
+				Code:  "INVALID_ID",
+			})
+			return
+		}
+
+		// 現在時刻をタイムスタンプとして使用
+		now := time.Now()
+
+		// views を増加
+		if a.Queries != nil {
+			if err := a.Queries.IncrementVideoViews(context.Background(), db.IncrementVideoViewsParams{
+				UpdatedAt: sql.NullTime{Time: now, Valid: true},
+				ID:        id,
+			}); err != nil {
+				slog.Error("Failed to increment video views",
+					slog.Int64("video_id", id),
+					slog.Any("error", err),
+				)
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_record_view"),
+					Code:  "DATABASE_ERROR",
+				})
+				return
+			}
+		}
+
+		// watched_history に行を追加
+		if a.Queries != nil {
+			if err := a.Queries.CreateWatchedHistory(context.Background(), db.CreateWatchedHistoryParams{
+				VideoID:   id,
+				WatchedAt: sql.NullTime{Time: now, Valid: true},
+			}); err != nil {
+				slog.Error("Failed to create watched history record",
+					slog.Int64("video_id", id),
+					slog.Any("error", err),
+				)
+				// watched_history の失敗は警告レベルで、レスポンスは成功とする
+			}
+		}
+
+		slog.Info("Video view recorded successfully",
+			slog.Int64("video_id", id),
+			slog.String("watched_at", now.String()),
+		)
+
+		ctx.JSON(http.StatusOK, dto.SuccessResponse{
+			Message: i18n.GetSuccessMessage(locale, "video_view_recorded"),
+		})
+	})
 }

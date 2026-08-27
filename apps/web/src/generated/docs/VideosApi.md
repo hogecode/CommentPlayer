@@ -8,6 +8,7 @@ All URIs are relative to *http://localhost*
 |[**apiV1VideosIdDownloadGet**](#apiv1videosiddownloadget) | **GET** /api/v1/videos/{id}/download | ビデオをダウンロード|
 |[**apiV1VideosIdGet**](#apiv1videosidget) | **GET** /api/v1/videos/{id} | ビデオ詳細を取得|
 |[**apiV1VideosIdThumbnailRegeneratePost**](#apiv1videosidthumbnailregeneratepost) | **POST** /api/v1/videos/{id}/thumbnail/regenerate | サムネイルを再生成|
+|[**apiV1VideosIdViewPost**](#apiv1videosidviewpost) | **POST** /api/v1/videos/{id}/view | ビデオの視聴を記録|
 |[**apiV1VideosSearchGet**](#apiv1videossearchget) | **GET** /api/v1/videos/search | ビデオを検索|
 |[**apiV1VideosYearsGet**](#apiv1videosyearsget) | **GET** /api/v1/videos/years | ビデオの年一覧を取得|
 
@@ -234,6 +235,59 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiV1VideosIdViewPost**
+> DtoSuccessResponse apiV1VideosIdViewPost()
+
+ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+
+### Example
+
+```typescript
+import {
+    VideosApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideosApi(configuration);
+
+let id: number; //ビデオID (default to undefined)
+
+const { status, data } = await apiInstance.apiV1VideosIdViewPost(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | ビデオID | defaults to undefined|
+
+
+### Return type
+
+**DtoSuccessResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
 
 
 ### HTTP response details

@@ -1270,6 +1270,31 @@ paths:
       summary: サムネイルを再生成
       tags:
       - Videos
+  /api/v1/videos/{id}/view:
+    post:
+      description: ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+      parameters:
+      - description: ビデオID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: ビデオの視聴を記録
+      tags:
+      - Videos
   /api/v1/videos/search:
     get:
       description: キーワードでビデオを検索します

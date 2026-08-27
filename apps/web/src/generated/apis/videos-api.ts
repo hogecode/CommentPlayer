@@ -24,6 +24,8 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 // @ts-ignore
 import type { DtoErrorResponse } from '../models';
 // @ts-ignore
+import type { DtoSuccessResponse } from '../models';
+// @ts-ignore
 import type { DtoThumbnailRegenerateRequest } from '../models';
 // @ts-ignore
 import type { DtoThumbnailRegenerateResponse } from '../models';
@@ -209,6 +211,40 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * @summary ビデオの視聴を記録
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdViewPost: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiV1VideosIdViewPost', 'id', id)
+            const localVarPath = `/api/v1/videos/{id}/view`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * キーワードでビデオを検索します
          * @summary ビデオを検索
          * @param {string} q 検索キーワード
@@ -364,6 +400,19 @@ export const VideosApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * @summary ビデオの視聴を記録
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VideosIdViewPost(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VideosIdViewPost(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideosApi.apiV1VideosIdViewPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * キーワードでビデオを検索します
          * @summary ビデオを検索
          * @param {string} q 検索キーワード
@@ -449,6 +498,16 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.apiV1VideosIdThumbnailRegeneratePost(id, body, options).then((request) => request(axios, basePath));
         },
         /**
+         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * @summary ビデオの視聴を記録
+         * @param {number} id ビデオID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VideosIdViewPost(id: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoSuccessResponse> {
+            return localVarFp.apiV1VideosIdViewPost(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * キーワードでビデオを検索します
          * @summary ビデオを検索
          * @param {string} q 検索キーワード
@@ -527,6 +586,17 @@ export class VideosApi extends BaseAPI {
      */
     public apiV1VideosIdThumbnailRegeneratePost(id: number, body?: DtoThumbnailRegenerateRequest, options?: RawAxiosRequestConfig) {
         return VideosApiFp(this.configuration).apiV1VideosIdThumbnailRegeneratePost(id, body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+     * @summary ビデオの視聴を記録
+     * @param {number} id ビデオID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1VideosIdViewPost(id: number, options?: RawAxiosRequestConfig) {
+        return VideosApiFp(this.configuration).apiV1VideosIdViewPost(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
