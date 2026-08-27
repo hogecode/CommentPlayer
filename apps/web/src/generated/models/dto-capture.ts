@@ -13,15 +13,14 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { DtoCapture } from './dto-capture';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { DtoPagination } from './dto-pagination';
 
-export interface DtoCaptureListResponse {
-    'data'?: Array<DtoCapture>;
-    'pagination'?: DtoPagination;
+export interface DtoCapture {
+    '_'?: string;
+    'comment_delay'?: number;
+    'created_at'?: string;
+    'filename'?: string;
+    'id'?: number;
+    'playback_position'?: number;
+    'video_id'?: number;
 }
 

@@ -117,6 +117,138 @@ func (q *Queries) GetAllCaptures(ctx context.Context, arg GetAllCapturesParams) 
 	return items, nil
 }
 
+const getAllCapturesCreatedAtAsc = `-- name: GetAllCapturesCreatedAtAsc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+ORDER BY created_at ASC
+LIMIT ? OFFSET ?
+`
+
+type GetAllCapturesCreatedAtAscParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetAllCapturesCreatedAtAsc(ctx context.Context, arg GetAllCapturesCreatedAtAscParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCapturesCreatedAtAsc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllCapturesIdAsc = `-- name: GetAllCapturesIdAsc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+ORDER BY id ASC
+LIMIT ? OFFSET ?
+`
+
+type GetAllCapturesIdAscParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetAllCapturesIdAsc(ctx context.Context, arg GetAllCapturesIdAscParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCapturesIdAsc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllCapturesIdDesc = `-- name: GetAllCapturesIdDesc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+ORDER BY id DESC
+LIMIT ? OFFSET ?
+`
+
+type GetAllCapturesIdDescParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetAllCapturesIdDesc(ctx context.Context, arg GetAllCapturesIdDescParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCapturesIdDesc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCaptureByID = `-- name: GetCaptureByID :one
 SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
 FROM capture
@@ -155,6 +287,144 @@ type GetCaptureListByVideoParams struct {
 
 func (q *Queries) GetCaptureListByVideo(ctx context.Context, arg GetCaptureListByVideoParams) ([]Capture, error) {
 	rows, err := q.db.QueryContext(ctx, getCaptureListByVideo, arg.VideoID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCaptureListByVideoCreatedAtAsc = `-- name: GetCaptureListByVideoCreatedAtAsc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+WHERE video_id = ?
+ORDER BY created_at ASC
+LIMIT ? OFFSET ?
+`
+
+type GetCaptureListByVideoCreatedAtAscParams struct {
+	VideoID sql.NullInt64
+	Limit   int64
+	Offset  int64
+}
+
+func (q *Queries) GetCaptureListByVideoCreatedAtAsc(ctx context.Context, arg GetCaptureListByVideoCreatedAtAscParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getCaptureListByVideoCreatedAtAsc, arg.VideoID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCaptureListByVideoIdAsc = `-- name: GetCaptureListByVideoIdAsc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+WHERE video_id = ?
+ORDER BY id ASC
+LIMIT ? OFFSET ?
+`
+
+type GetCaptureListByVideoIdAscParams struct {
+	VideoID sql.NullInt64
+	Limit   int64
+	Offset  int64
+}
+
+func (q *Queries) GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCaptureListByVideoIdAscParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getCaptureListByVideoIdAsc, arg.VideoID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Capture
+	for rows.Next() {
+		var i Capture
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filename,
+			&i.VideoID,
+			&i.SaveDir,
+			&i.SavePath,
+			&i.CreatedAt,
+			&i.PlaybackPosition,
+			&i.CommentDelay,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCaptureListByVideoIdDesc = `-- name: GetCaptureListByVideoIdDesc :many
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+FROM capture
+WHERE video_id = ?
+ORDER BY id DESC
+LIMIT ? OFFSET ?
+`
+
+type GetCaptureListByVideoIdDescParams struct {
+	VideoID sql.NullInt64
+	Limit   int64
+	Offset  int64
+}
+
+func (q *Queries) GetCaptureListByVideoIdDesc(ctx context.Context, arg GetCaptureListByVideoIdDescParams) ([]Capture, error) {
+	rows, err := q.db.QueryContext(ctx, getCaptureListByVideoIdDesc, arg.VideoID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -1,1908 +1,1955 @@
 {
-	"schemes": [
-		"http"
-	],
-	"swagger": "2.0",
-	"info": {
-		"description": "Watch commentPlayer API documentation",
-		"title": "commentPlayer API",
-		"contact": {},
-		"version": "1.0.0"
-	},
-	"host": "100.72.160.115:8000",
-	"paths": {
-		"/api/v1/captures": {
-			"get": {
-				"description": "キャプチャ一覧をページネーション付きで取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Captures"
-				],
-				"summary": "キャプチャ一覧を取得",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "ビデオID（フィルタリング用）",
-						"name": "video_id",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"default": 1,
-						"description": "ページ番号",
-						"name": "page",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"default": 20,
-						"description": "1ページあたりのアイテム数",
-						"name": "limit",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.CaptureListResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			},
-			"post": {
-				"description": "新しいキャプチャを作成します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Captures"
-				],
-				"summary": "キャプチャを作成",
-				"parameters": [
-					{
-						"type": "file",
-						"description": "キャプチャファイル",
-						"name": "file",
-						"in": "formData",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"description": "ビデオID",
-						"name": "video_id",
-						"in": "formData",
-						"required": true
-					},
-					{
-						"type": "number",
-						"description": "ビデオの再生位置（秒）",
-						"name": "playback_position",
-						"in": "formData"
-					},
-					{
-						"type": "number",
-						"description": "コメント遅延秒数",
-						"name": "comment_delay",
-						"in": "formData"
-					}
-				],
-				"responses": {
-					"201": {
-						"description": "Created",
-						"schema": {
-							"$ref": "#/definitions/entity.Capture"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/captures/{id}": {
-			"get": {
-				"description": "キャプチャをIDで取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Captures"
-				],
-				"summary": "キャプチャを取得",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "キャプチャID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/entity.Capture"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			},
-			"delete": {
-				"description": "キャプチャをファイルシステムとDBから削除します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Captures"
-				],
-				"summary": "キャプチャを削除",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "キャプチャID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.SuccessResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/files/{folderID}/{filepath}": {
-			"get": {
-				"description": "指定されたフォルダ内のファイルを取得します",
-				"produces": [
-					"application/octet-stream"
-				],
-				"tags": [
-					"Static Files"
-				],
-				"summary": "フォルダ内のファイルを取得",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "フォルダID",
-						"name": "folderID",
-						"in": "path",
-						"required": true
-					},
-					{
-						"type": "string",
-						"description": "ファイルパス",
-						"name": "filepath",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "file"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/folders": {
-			"get": {
-				"description": "監視対象フォルダの一覧を取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Folders"
-				],
-				"summary": "監視対象フォルダ一覧を取得",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FolderListResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			},
-			"post": {
-				"description": "新しいフォルダを監視対象に追加します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Folders"
-				],
-				"summary": "監視対象フォルダを追加",
-				"parameters": [
-					{
-						"description": "フォルダパス",
-						"name": "body",
-						"in": "body",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.FolderRequest"
-						}
-					}
-				],
-				"responses": {
-					"201": {
-						"description": "Created",
-						"schema": {
-							"$ref": "#/definitions/dto.FolderActionResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/folders/{id}": {
-			"delete": {
-				"description": "フォルダを監視対象から削除します（ソフトデリート）",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Folders"
-				],
-				"summary": "監視対象フォルダを削除",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "フォルダID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FolderActionResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/series": {
-			"get": {
-				"description": "全てのシリーズの一覧を取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Series"
-				],
-				"summary": "シリーズ一覧を取得",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.SeriesListResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/series/resync": {
-			"post": {
-				"description": "全てのビデオをシリーズと再同期します。ファイル名パターンからシリーズを抽出し、ビデオに割り当てます。",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Series"
-				],
-				"summary": "すべてのビデオをシリーズと同期",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/series/{id}": {
-			"get": {
-				"description": "指定されたシリーズIDに関連する全てのビデオを取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Series"
-				],
-				"summary": "シリーズとそのビデオを取得",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "シリーズID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.SeriesWithVideosResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/gin.H"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/settings/client": {
-			"get": {
-				"security": [
-					{
-						"Bearer": []
-					}
-				],
-				"description": "ログイン中のユーザーアカウントのクライアント設定を取得する",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Settings"
-				],
-				"summary": "クライアント設定取得 API",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.ClientSettingsDTO"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			},
-			"put": {
-				"security": [
-					{
-						"Bearer": []
-					}
-				],
-				"description": "ログイン中のユーザーアカウントのクライアント設定を更新する",
-				"tags": [
-					"Settings"
-				],
-				"summary": "クライアント設定更新 API",
-				"parameters": [
-					{
-						"description": "更新するクライアント設定のデータ",
-						"name": "body",
-						"in": "body",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.ClientSettingsDTO"
-						}
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "No Content"
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/syobocal": {
-			"get": {
-				"description": "指定されたタイトルを Syobocal から検索し、複数候補を返す",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Syobocal"
-				],
-				"summary": "Syobocal からタイトル候補を検索",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "検索するタイトル",
-						"name": "title",
-						"in": "query",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalTitleSearchResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalErrorResponse"
-						}
-					}
-				}
-			},
-			"post": {
-				"description": "TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新",
-				"consumes": [
-					"application/json"
-				],
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Syobocal"
-				],
-				"summary": "Syobocal タイトル情報を Series に更新",
-				"parameters": [
-					{
-						"description": "保存するタイトル情報（tid, title, series_id）",
-						"name": "request",
-						"in": "body",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalSaveTitleRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalSaveTitleResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.SyobocalErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/users": {
-			"post": {
-				"description": "新しいユーザーアカウントを作成します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Users"
-				],
-				"summary": "ユーザーアカウント作成",
-				"parameters": [
-					{
-						"description": "ユーザー作成リクエスト",
-						"name": "body",
-						"in": "body",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.UserCreateRequest"
-						}
-					}
-				],
-				"responses": {
-					"201": {
-						"description": "Created",
-						"schema": {
-							"$ref": "#/definitions/entity.User"
-						}
-					},
-					"422": {
-						"description": "Unprocessable Entity",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/users/token": {
-			"post": {
-				"description": "ユーザーの認証情報を検証し、JWT トークンを発行します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Users"
-				],
-				"summary": "アクセストークン発行 API (OAuth2 準拠)",
-				"parameters": [
-					{
-						"description": "ユーザー名とパスワード",
-						"name": "body",
-						"in": "body",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.UserAccessTokenRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.UserAccessToken"
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos": {
-			"get": {
-				"description": "ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "ビデオ一覧を取得",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "ビデオID（複数指定可能、コンマ区切り、例：",
-						"name": "ids",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"description": "フィルター",
-						"name": "filterBy",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"description": "年フィルター（例：2023）",
-						"name": "year",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"default": 1,
-						"description": "ページ番号",
-						"name": "page",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"default": 20,
-						"description": "1ページあたりのアイテム数",
-						"name": "limit",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"default": "created_at",
-						"description": "ソート対象フィールド",
-						"name": "sort",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"default": "desc",
-						"description": "ソート順序",
-						"name": "order",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.VideoListResponse"
-						}
-					},
-					"422": {
-						"description": "Unprocessable Entity",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos/search": {
-			"get": {
-				"description": "キーワードでビデオを検索します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "ビデオを検索",
-				"parameters": [
-					{
-						"type": "string",
-						"description": "検索キーワード",
-						"name": "q",
-						"in": "query",
-						"required": true
-					},
-					{
-						"type": "integer",
-						"default": 1,
-						"description": "ページ番号",
-						"name": "page",
-						"in": "query"
-					},
-					{
-						"type": "integer",
-						"default": 20,
-						"description": "1ページあたりのアイテム数",
-						"name": "limit",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"default": "desc",
-						"description": "ソート順序",
-						"name": "order",
-						"in": "query"
-					},
-					{
-						"type": "string",
-						"description": "フィルター",
-						"name": "filterBy",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.VideoListResponse"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos/years": {
-			"get": {
-				"description": "jikkyo_dateから抽出した年の一覧を降順で返します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "ビデオの年一覧を取得",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.VideoYearsResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos/{id}": {
-			"get": {
-				"description": "特定のビデオの詳細情報を取得します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "ビデオ詳細を取得",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "ビデオID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/entity.Video"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos/{id}/download": {
-			"get": {
-				"description": "ビデオファイルをダウンロードします",
-				"produces": [
-					"application/octet-stream"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "ビデオをダウンロード",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "ビデオID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "file"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/api/v1/videos/{id}/thumbnail/regenerate": {
-			"post": {
-				"description": "ビデオのサムネイルを再生成します",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Videos"
-				],
-				"summary": "サムネイルを再生成",
-				"parameters": [
-					{
-						"type": "integer",
-						"description": "ビデオID",
-						"name": "id",
-						"in": "path",
-						"required": true
-					},
-					{
-						"description": "リクエストボディ",
-						"name": "body",
-						"in": "body",
-						"schema": {
-							"$ref": "#/definitions/dto.ThumbnailRegenerateRequest"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.ThumbnailRegenerateResponse"
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"schema": {
-							"$ref": "#/definitions/dto.ErrorResponse"
-						}
-					}
-				}
-			}
-		},
-		"/swagger.json": {
-			"get": {
-				"description": "デバッグビルドでの埋め込みSwagger JSONドキュメント",
-				"produces": [
-					"application/json"
-				],
-				"tags": [
-					"Debug"
-				],
-				"summary": "埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）",
-				"responses": {
-					"200": {
-						"description": "Swagger JSON",
-						"schema": {
-							"type": "object",
-							"additionalProperties": true
-						}
-					}
-				}
-			}
-		}
-	},
-	"definitions": {
-		"dto.ApiComment": {
-			"type": "object",
-			"required": [
-				"color",
-				"size",
-				"text",
-				"time",
-				"type"
-			],
-			"properties": {
-				"author": {
-					"description": "コメント投稿者ID（匿名の場合はnil）",
-					"type": "string"
-				},
-				"color": {
-					"description": "コメント色（16進数カラーコード）",
-					"type": "string"
-				},
-				"size": {
-					"description": "コメントサイズ",
-					"type": "string",
-					"enum": [
-						"big",
-						"medium",
-						"small"
-					]
-				},
-				"text": {
-					"description": "コメント本文",
-					"type": "string"
-				},
-				"time": {
-					"description": "コメント表示時刻（秒）",
-					"type": "number",
-					"minimum": 0
-				},
-				"type": {
-					"description": "コメント位置",
-					"type": "string",
-					"enum": [
-						"right",
-						"top",
-						"bottom"
-					]
-				}
-			}
-		},
-		"dto.CaptureListResponse": {
-			"type": "object",
-			"properties": {
-				"data": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/entity.Capture"
-					}
-				},
-				"pagination": {
-					"$ref": "#/definitions/dto.Pagination"
-				}
-			}
-		},
-		"dto.ClientSettingsDTO": {
-			"type": "object",
-			"properties": {
-				"close_comment_form_after_sending": {
-					"type": "boolean"
-				},
-				"comment_font_size": {
-					"type": "integer"
-				},
-				"comment_speed_rate": {
-					"description": "コメント設定",
-					"type": "number"
-				},
-				"default_comment_color": {
-					"type": "string"
-				},
-				"enable_playback_button": {
-					"description": "ビデオ再生設定",
-					"type": "boolean"
-				},
-				"last_synced_at": {
-					"description": "Unix timestamp (ms)",
-					"type": "integer"
-				},
-				"max_comments_display_count": {
-					"type": "integer"
-				},
-				"mute_abusive_discriminatory_prejudiced_comments": {
-					"type": "boolean"
-				},
-				"mute_big_size_comments": {
-					"type": "boolean"
-				},
-				"mute_colored_comments": {
-					"type": "boolean"
-				},
-				"mute_comment_keywords_normalize_alphanumeric_width_case": {
-					"type": "boolean"
-				},
-				"mute_consecutive_same_characters_comments": {
-					"type": "boolean"
-				},
-				"mute_fixed_comments": {
-					"description": "コメントNG設定",
-					"type": "boolean"
-				},
-				"mute_vulgar_comments": {
-					"type": "boolean"
-				},
-				"muted_comment_keywords": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.MutedCommentKeyword"
-					}
-				},
-				"muted_niconico_user_ids": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					}
-				},
-				"mylist": {
-					"description": "マイリスト情報",
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.MylistItem"
-					}
-				},
-				"sync_settings": {
-					"description": "設定の同期",
-					"type": "boolean"
-				},
-				"video_watched_history_max_count": {
-					"description": "動画履歴",
-					"type": "integer"
-				},
-				"watched_history": {
-					"description": "動画視聴履歴",
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.WatchedHistoryItem"
-					}
-				}
-			}
-		},
-		"dto.ErrorResponse": {
-			"type": "object",
-			"properties": {
-				"code": {
-					"type": "string"
-				},
-				"error": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.FolderActionResponse": {
-			"type": "object",
-			"properties": {
-				"data": {
-					"$ref": "#/definitions/dto.FolderResponse"
-				},
-				"message": {
-					"type": "string"
-				},
-				"success": {
-					"type": "boolean"
-				}
-			}
-		},
-		"dto.FolderListResponse": {
-			"type": "object",
-			"properties": {
-				"data": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.FolderResponse"
-					}
-				}
-			}
-		},
-		"dto.FolderRequest": {
-			"type": "object",
-			"required": [
-				"path"
-			],
-			"properties": {
-				"path": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.FolderResponse": {
-			"type": "object",
-			"properties": {
-				"created_at": {
-					"type": "string"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"is_watched": {
-					"type": "boolean"
-				},
-				"path": {
-					"type": "string"
-				},
-				"updated_at": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.MutedCommentKeyword": {
-			"type": "object",
-			"properties": {
-				"match": {
-					"description": "partial, forward, backward, exact, regex",
-					"type": "string"
-				},
-				"pattern": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.MylistItem": {
-			"type": "object",
-			"properties": {
-				"created_at": {
-					"description": "Unix timestamp (ms)",
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				}
-			}
-		},
-		"dto.Pagination": {
-			"type": "object",
-			"properties": {
-				"limit": {
-					"type": "integer"
-				},
-				"page": {
-					"type": "integer"
-				},
-				"total": {
-					"type": "integer"
-				},
-				"total_pages": {
-					"type": "integer"
-				}
-			}
-		},
-		"dto.SeriesListResponse": {
-			"type": "object",
-			"properties": {
-				"series": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.SeriesResponse"
-					}
-				},
-				"total": {
-					"type": "integer"
-				}
-			}
-		},
-		"dto.SeriesResponse": {
-			"type": "object",
-			"properties": {
-				"comment": {},
-				"created_at": {
-					"type": "string"
-				},
-				"first_end_month": {
-					"type": "integer"
-				},
-				"first_end_year": {
-					"type": "integer"
-				},
-				"first_month": {
-					"type": "integer"
-				},
-				"first_year": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"series_name_file": {
-					"type": "string"
-				},
-				"subtitles": {},
-				"syobocal_title_id": {
-					"type": "integer"
-				},
-				"syobocal_title_name": {
-					"type": "string"
-				},
-				"syobocal_title_name_en": {
-					"type": "string"
-				},
-				"updated_at": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.SeriesWithVideosResponse": {
-			"type": "object",
-			"properties": {
-				"series": {
-					"$ref": "#/definitions/dto.SeriesResponse"
-				},
-				"videos": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.VideoResponse"
-					}
-				}
-			}
-		},
-		"dto.SuccessResponse": {
-			"type": "object",
-			"properties": {
-				"message": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.SyobocalErrorResponse": {
-			"type": "object",
-			"properties": {
-				"error": {
-					"type": "string"
-				},
-				"message": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.SyobocalSaveTitleRequest": {
-			"type": "object",
-			"required": [
-				"series_id",
-				"tid",
-				"title"
-			],
-			"properties": {
-				"series_id": {
-					"description": "シリーズID",
-					"type": "integer"
-				},
-				"tid": {
-					"description": "Syobocal TID (Title ID)",
-					"type": "string"
-				},
-				"title": {
-					"description": "タイトル名",
-					"type": "string"
-				}
-			}
-		},
-		"dto.SyobocalSaveTitleResponse": {
-			"type": "object",
-			"properties": {
-				"message": {
-					"type": "string"
-				},
-				"series_id": {
-					"type": "integer"
-				},
-				"success": {
-					"type": "boolean"
-				}
-			}
-		},
-		"dto.SyobocalTitleResponse": {
-			"type": "object",
-			"properties": {
-				"comment": {
-					"description": "コメント",
-					"type": "string"
-				},
-				"first_end_month": {
-					"description": "最終放送月",
-					"type": "integer"
-				},
-				"first_end_year": {
-					"description": "最終放送年",
-					"type": "integer"
-				},
-				"first_month": {
-					"description": "初回放送月",
-					"type": "string"
-				},
-				"first_year": {
-					"description": "初回放送年",
-					"type": "string"
-				},
-				"short_title": {
-					"description": "短いタイトル",
-					"type": "string"
-				},
-				"tid": {
-					"description": "Title ID",
-					"type": "string"
-				},
-				"title": {
-					"description": "タイトル名",
-					"type": "string"
-				},
-				"title_en": {
-					"description": "英語タイトル",
-					"type": "string"
-				}
-			}
-		},
-		"dto.SyobocalTitleSearchResponse": {
-			"type": "object",
-			"properties": {
-				"titles": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.SyobocalTitleResponse"
-					}
-				},
-				"total": {
-					"type": "integer"
-				}
-			}
-		},
-		"dto.ThumbnailRegenerateRequest": {
-			"type": "object",
-			"properties": {
-				"height": {
-					"type": "integer",
-					"minimum": 1
-				},
-				"timestamp": {
-					"type": "number",
-					"minimum": 0
-				},
-				"width": {
-					"type": "integer",
-					"minimum": 1
-				}
-			}
-		},
-		"dto.ThumbnailRegenerateResponse": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"type": "integer"
-				},
-				"message": {
-					"type": "string"
-				},
-				"thumbnail_info": {
-					"$ref": "#/definitions/entity.ThumbnailInfo"
-				}
-			}
-		},
-		"dto.UserAccessToken": {
-			"type": "object",
-			"properties": {
-				"access_token": {
-					"type": "string"
-				},
-				"token_type": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.UserAccessTokenRequest": {
-			"type": "object",
-			"required": [
-				"password",
-				"username"
-			],
-			"properties": {
-				"password": {
-					"type": "string"
-				},
-				"username": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.UserCreateRequest": {
-			"type": "object",
-			"required": [
-				"confirm_password",
-				"password",
-				"username"
-			],
-			"properties": {
-				"confirm_password": {
-					"type": "string",
-					"minLength": 1
-				},
-				"password": {
-					"type": "string",
-					"minLength": 1
-				},
-				"username": {
-					"type": "string",
-					"minLength": 1
-				}
-			}
-		},
-		"dto.VideoListResponse": {
-			"type": "object",
-			"properties": {
-				"data": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/entity.Video"
-					}
-				},
-				"pagination": {
-					"$ref": "#/definitions/dto.Pagination"
-				}
-			}
-		},
-		"dto.VideoResponse": {
-			"type": "object",
-			"properties": {
-				"channel_id": {
-					"description": "Syobocal チャンネルID（ChID）",
-					"type": "integer"
-				},
-				"comments": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/dto.ApiComment"
-					}
-				},
-				"created_at": {
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"duration": {
-					"type": "number"
-				},
-				"episode": {
-					"description": "エピソード番号",
-					"type": "integer"
-				},
-				"file_name": {
-					"type": "string"
-				},
-				"file_size": {
-					"type": "integer"
-				},
-				"folder_id": {
-					"description": "Folderテーブルへの外部キー",
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"is_deleted": {
-					"type": "boolean"
-				},
-				"jikkyo_comment_count": {
-					"type": "integer"
-				},
-				"jikkyo_date": {
-					"type": "string"
-				},
-				"liked": {
-					"type": "boolean"
-				},
-				"prog_end_time": {
-					"description": "放送終了時刻",
-					"type": "string"
-				},
-				"prog_start_time": {
-					"description": "放送開始時刻",
-					"type": "string"
-				},
-				"screenshot_file_path": {
-					"type": "string"
-				},
-				"series": {
-					"description": "Series関連付け",
-					"allOf": [
-						{
-							"$ref": "#/definitions/entity.Series"
-						}
-					]
-				},
-				"series_id": {
-					"description": "Seriesテーブルへの外部キー",
-					"type": "integer"
-				},
-				"src": {
-					"type": "string"
-				},
-				"status": {
-					"description": "ready, processing, error",
-					"type": "string"
-				},
-				"subtitle": {
-					"description": "エピソードサブタイトル",
-					"type": "string"
-				},
-				"thumbnail_info": {
-					"$ref": "#/definitions/entity.ThumbnailInfo"
-				},
-				"updated_at": {
-					"type": "string"
-				},
-				"views": {
-					"type": "integer"
-				}
-			}
-		},
-		"dto.VideoYearsResponse": {
-			"type": "object",
-			"properties": {
-				"data": {
-					"type": "array",
-					"items": {
-						"type": "integer"
-					}
-				}
-			}
-		},
-		"dto.WatchedHistoryItem": {
-			"type": "object",
-			"properties": {
-				"created_at": {
-					"type": "integer"
-				},
-				"jikkyo_comment_offset": {
-					"type": "integer"
-				},
-				"last_playback_position": {
-					"description": "ミリ秒",
-					"type": "number"
-				},
-				"updated_at": {
-					"type": "integer"
-				},
-				"video_id": {
-					"type": "integer"
-				}
-			}
-		},
-		"entity.Capture": {
-			"type": "object",
-			"properties": {
-				"_": {
-					"type": "string"
-				},
-				"comment_delay": {
-					"type": "number"
-				},
-				"created_at": {
-					"type": "string"
-				},
-				"filename": {
-					"type": "string"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"playback_position": {
-					"type": "number"
-				},
-				"video_id": {
-					"type": "integer"
-				}
-			}
-		},
-		"entity.JSONMap": {
-			"type": "object",
-			"additionalProperties": true
-		},
-		"entity.Series": {
-			"type": "object",
-			"properties": {
-				"comment": {
-					"$ref": "#/definitions/entity.JSONMap"
-				},
-				"created_at": {
-					"type": "string"
-				},
-				"first_end_month": {
-					"type": "integer"
-				},
-				"first_end_year": {
-					"type": "integer"
-				},
-				"first_month": {
-					"type": "integer"
-				},
-				"first_year": {
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"series_name_file": {
-					"description": "{title} 部分",
-					"type": "string"
-				},
-				"subtitles": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"additionalProperties": true
-					}
-				},
-				"syobocal_title_id": {
-					"type": "integer"
-				},
-				"syobocal_title_name": {
-					"type": "string"
-				},
-				"syobocal_title_name_en": {
-					"type": "string"
-				},
-				"updated_at": {
-					"type": "string"
-				}
-			}
-		},
-		"entity.ThumbnailInfo": {
-			"type": "object",
-			"properties": {
-				"generated_at": {
-					"type": "string"
-				},
-				"height": {
-					"type": "integer"
-				},
-				"width": {
-					"type": "integer"
-				}
-			}
-		},
-		"entity.User": {
-			"type": "object",
-			"properties": {
-				"client_settings": {
-					"type": "object",
-					"additionalProperties": true
-				},
-				"created_at": {
-					"type": "string"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"is_admin": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
-				},
-				"niconico_user_id": {
-					"type": "integer"
-				},
-				"niconico_user_name": {
-					"type": "string"
-				},
-				"niconico_user_premium": {
-					"type": "integer"
-				},
-				"updated_at": {
-					"type": "string"
-				}
-			}
-		},
-		"entity.Video": {
-			"type": "object",
-			"properties": {
-				"channel_id": {
-					"description": "Syobocal チャンネルID（ChID）",
-					"type": "integer"
-				},
-				"created_at": {
-					"type": "string"
-				},
-				"description": {
-					"type": "string"
-				},
-				"duration": {
-					"type": "number"
-				},
-				"episode": {
-					"description": "エピソード番号",
-					"type": "integer"
-				},
-				"file_name": {
-					"type": "string"
-				},
-				"file_size": {
-					"type": "integer"
-				},
-				"folder_id": {
-					"description": "Folderテーブルへの外部キー",
-					"type": "integer"
-				},
-				"id": {
-					"type": "integer"
-				},
-				"is_deleted": {
-					"type": "boolean"
-				},
-				"jikkyo_comment_count": {
-					"type": "integer"
-				},
-				"jikkyo_date": {
-					"type": "string"
-				},
-				"liked": {
-					"type": "boolean"
-				},
-				"prog_end_time": {
-					"description": "放送終了時刻",
-					"type": "string"
-				},
-				"prog_start_time": {
-					"description": "放送開始時刻",
-					"type": "string"
-				},
-				"screenshot_file_path": {
-					"type": "string"
-				},
-				"series": {
-					"description": "Series関連付け",
-					"allOf": [
-						{
-							"$ref": "#/definitions/entity.Series"
-						}
-					]
-				},
-				"series_id": {
-					"description": "Seriesテーブルへの外部キー",
-					"type": "integer"
-				},
-				"status": {
-					"description": "ready, processing, error",
-					"type": "string"
-				},
-				"subtitle": {
-					"description": "エピソードサブタイトル",
-					"type": "string"
-				},
-				"thumbnail_info": {
-					"$ref": "#/definitions/entity.ThumbnailInfo"
-				},
-				"updated_at": {
-					"type": "string"
-				},
-				"views": {
-					"type": "integer"
-				}
-			}
-		},
-		"gin.H": {
-			"type": "object",
-			"additionalProperties": {}
-		}
-	}
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Watch commentPlayer API documentation",
+        "title": "commentPlayer API",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/captures": {
+            "get": {
+                "description": "キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャ一覧を取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ビデオID（フィルタリング用）",
+                        "name": "video_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "ページ番号",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "1ページあたりのアイテム数",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "id",
+                            "created_at"
+                        ],
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "ソート対象フィールド (id または created_at)",
+                        "name": "sort_key",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "desc",
+                        "description": "ソート順序 (asc または desc)",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CaptureListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新しいキャプチャを作成します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャを作成",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "キャプチャファイル",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ビデオID",
+                        "name": "video_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "ビデオの再生位置（秒）",
+                        "name": "playback_position",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "コメント遅延秒数",
+                        "name": "comment_delay",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Capture"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/captures/{id}": {
+            "get": {
+                "description": "キャプチャをIDで取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャを取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "キャプチャID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Capture"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "キャプチャをファイルシステムとDBから削除します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャを削除",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "キャプチャID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/files/{folderID}/{filepath}": {
+            "get": {
+                "description": "指定されたフォルダ内のファイルを取得します",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Static Files"
+                ],
+                "summary": "フォルダ内のファイルを取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "フォルダID",
+                        "name": "folderID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ファイルパス",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/folders": {
+            "get": {
+                "description": "監視対象フォルダの一覧を取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Folders"
+                ],
+                "summary": "監視対象フォルダ一覧を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FolderListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新しいフォルダを監視対象に追加します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Folders"
+                ],
+                "summary": "監視対象フォルダを追加",
+                "parameters": [
+                    {
+                        "description": "フォルダパス",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FolderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FolderActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/folders/{id}": {
+            "delete": {
+                "description": "フォルダを監視対象から削除します（ソフトデリート）",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Folders"
+                ],
+                "summary": "監視対象フォルダを削除",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "フォルダID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FolderActionResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/series": {
+            "get": {
+                "description": "全てのシリーズの一覧を取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "シリーズ一覧を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SeriesListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/series/resync": {
+            "post": {
+                "description": "全てのビデオをシリーズと再同期します。ファイル名パターンからシリーズを抽出し、ビデオに割り当てます。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "すべてのビデオをシリーズと同期",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/series/{id}": {
+            "get": {
+                "description": "指定されたシリーズIDに関連する全てのビデオを取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "シリーズとそのビデオを取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "シリーズID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SeriesWithVideosResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/settings/client": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "ログイン中のユーザーアカウントのクライアント設定を取得する",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "クライアント設定取得 API",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientSettingsDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "ログイン中のユーザーアカウントのクライアント設定を更新する",
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "クライアント設定更新 API",
+                "parameters": [
+                    {
+                        "description": "更新するクライアント設定のデータ",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientSettingsDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/syobocal": {
+            "get": {
+                "description": "指定されたタイトルを Syobocal から検索し、複数候補を返す",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Syobocal"
+                ],
+                "summary": "Syobocal からタイトル候補を検索",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "検索するタイトル",
+                        "name": "title",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalTitleSearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "TID、タイトル名、シリーズIDを受け取り、Syobocal API から詳細情報を取得してシリーズを更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Syobocal"
+                ],
+                "summary": "Syobocal タイトル情報を Series に更新",
+                "parameters": [
+                    {
+                        "description": "保存するタイトル情報（tid, title, series_id）",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalSaveTitleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalSaveTitleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyobocalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "post": {
+                "description": "新しいユーザーアカウントを作成します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "ユーザーアカウント作成",
+                "parameters": [
+                    {
+                        "description": "ユーザー作成リクエスト",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/token": {
+            "post": {
+                "description": "ユーザーの認証情報を検証し、JWT トークンを発行します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "アクセストークン発行 API (OAuth2 準拠)",
+                "parameters": [
+                    {
+                        "description": "ユーザー名とパスワード",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserAccessTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserAccessToken"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos": {
+            "get": {
+                "description": "ページネーション対応のビデオ一覧を取得します。IDsはコンマ区切りで複数指定可能です",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオ一覧を取得",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ビデオID（複数指定可能、コンマ区切り、例：",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "フィルター",
+                        "name": "filterBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "年フィルター（例：2023）",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "ページ番号",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "1ページあたりのアイテム数",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "ソート対象フィールド",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "desc",
+                        "description": "ソート順序",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VideoListResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/search": {
+            "get": {
+                "description": "キーワードでビデオを検索します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオを検索",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "検索キーワード",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "ページ番号",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "1ページあたりのアイテム数",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "desc",
+                        "description": "ソート順序",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "フィルター",
+                        "name": "filterBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VideoListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/years": {
+            "get": {
+                "description": "jikkyo_dateから抽出した年の一覧を降順で返します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオの年一覧を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VideoYearsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/{id}": {
+            "get": {
+                "description": "特定のビデオの詳細情報を取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオ詳細を取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ビデオID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Video"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/{id}/download": {
+            "get": {
+                "description": "ビデオファイルをダウンロードします",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "ビデオをダウンロード",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ビデオID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/videos/{id}/thumbnail/regenerate": {
+            "post": {
+                "description": "ビデオのサムネイルを再生成します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "サムネイルを再生成",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ビデオID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "リクエストボディ",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ThumbnailRegenerateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ThumbnailRegenerateResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger.json": {
+            "get": {
+                "description": "デバッグビルドでの埋め込みSwagger JSONドキュメント",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Debug"
+                ],
+                "summary": "埋め込み Swagger ドキュメントを提供（デバッグビルドのみ）",
+                "responses": {
+                    "200": {
+                        "description": "Swagger JSON",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.ApiComment": {
+            "type": "object",
+            "required": [
+                "color",
+                "size",
+                "text",
+                "time",
+                "type"
+            ],
+            "properties": {
+                "author": {
+                    "description": "コメント投稿者ID（匿名の場合はnil）",
+                    "type": "string"
+                },
+                "color": {
+                    "description": "コメント色（16進数カラーコード）",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "コメントサイズ",
+                    "type": "string",
+                    "enum": [
+                        "big",
+                        "medium",
+                        "small"
+                    ]
+                },
+                "text": {
+                    "description": "コメント本文",
+                    "type": "string"
+                },
+                "time": {
+                    "description": "コメント表示時刻（秒）",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "type": {
+                    "description": "コメント位置",
+                    "type": "string",
+                    "enum": [
+                        "right",
+                        "top",
+                        "bottom"
+                    ]
+                }
+            }
+        },
+        "dto.Capture": {
+            "type": "object",
+            "properties": {
+                "_": {
+                    "type": "string"
+                },
+                "comment_delay": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "playback_position": {
+                    "type": "number"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CaptureListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Capture"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/dto.Pagination"
+                }
+            }
+        },
+        "dto.ClientSettingsDTO": {
+            "type": "object",
+            "properties": {
+                "close_comment_form_after_sending": {
+                    "type": "boolean"
+                },
+                "comment_font_size": {
+                    "type": "integer"
+                },
+                "comment_speed_rate": {
+                    "description": "コメント設定",
+                    "type": "number"
+                },
+                "default_comment_color": {
+                    "type": "string"
+                },
+                "enable_playback_button": {
+                    "description": "ビデオ再生設定",
+                    "type": "boolean"
+                },
+                "last_synced_at": {
+                    "description": "Unix timestamp (ms)",
+                    "type": "integer"
+                },
+                "max_comments_display_count": {
+                    "type": "integer"
+                },
+                "mute_abusive_discriminatory_prejudiced_comments": {
+                    "type": "boolean"
+                },
+                "mute_big_size_comments": {
+                    "type": "boolean"
+                },
+                "mute_colored_comments": {
+                    "type": "boolean"
+                },
+                "mute_comment_keywords_normalize_alphanumeric_width_case": {
+                    "type": "boolean"
+                },
+                "mute_consecutive_same_characters_comments": {
+                    "type": "boolean"
+                },
+                "mute_fixed_comments": {
+                    "description": "コメントNG設定",
+                    "type": "boolean"
+                },
+                "mute_vulgar_comments": {
+                    "type": "boolean"
+                },
+                "muted_comment_keywords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MutedCommentKeyword"
+                    }
+                },
+                "muted_niconico_user_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mylist": {
+                    "description": "マイリスト情報",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MylistItem"
+                    }
+                },
+                "sync_settings": {
+                    "description": "設定の同期",
+                    "type": "boolean"
+                },
+                "video_watched_history_max_count": {
+                    "description": "動画履歴",
+                    "type": "integer"
+                },
+                "watched_history": {
+                    "description": "動画視聴履歴",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.WatchedHistoryItem"
+                    }
+                }
+            }
+        },
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FolderActionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.FolderResponse"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.FolderListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.FolderResponse"
+                    }
+                }
+            }
+        },
+        "dto.FolderRequest": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FolderResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_watched": {
+                    "type": "boolean"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MutedCommentKeyword": {
+            "type": "object",
+            "properties": {
+                "match": {
+                    "description": "partial, forward, backward, exact, regex",
+                    "type": "string"
+                },
+                "pattern": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MylistItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "Unix timestamp (ms)",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Pagination": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SeriesListResponse": {
+            "type": "object",
+            "properties": {
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SeriesResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SeriesResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {},
+                "created_at": {
+                    "type": "string"
+                },
+                "first_end_month": {
+                    "type": "integer"
+                },
+                "first_end_year": {
+                    "type": "integer"
+                },
+                "first_month": {
+                    "type": "integer"
+                },
+                "first_year": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "series_name_file": {
+                    "type": "string"
+                },
+                "subtitles": {},
+                "syobocal_title_id": {
+                    "type": "integer"
+                },
+                "syobocal_title_name": {
+                    "type": "string"
+                },
+                "syobocal_title_name_en": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SeriesWithVideosResponse": {
+            "type": "object",
+            "properties": {
+                "series": {
+                    "$ref": "#/definitions/dto.SeriesResponse"
+                },
+                "videos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VideoResponse"
+                    }
+                }
+            }
+        },
+        "dto.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalSaveTitleRequest": {
+            "type": "object",
+            "required": [
+                "series_id",
+                "tid",
+                "title"
+            ],
+            "properties": {
+                "series_id": {
+                    "description": "シリーズID",
+                    "type": "integer"
+                },
+                "tid": {
+                    "description": "Syobocal TID (Title ID)",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "タイトル名",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalSaveTitleResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "series_id": {
+                    "type": "integer"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.SyobocalTitleResponse": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "description": "コメント",
+                    "type": "string"
+                },
+                "first_end_month": {
+                    "description": "最終放送月",
+                    "type": "integer"
+                },
+                "first_end_year": {
+                    "description": "最終放送年",
+                    "type": "integer"
+                },
+                "first_month": {
+                    "description": "初回放送月",
+                    "type": "string"
+                },
+                "first_year": {
+                    "description": "初回放送年",
+                    "type": "string"
+                },
+                "short_title": {
+                    "description": "短いタイトル",
+                    "type": "string"
+                },
+                "tid": {
+                    "description": "Title ID",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "タイトル名",
+                    "type": "string"
+                },
+                "title_en": {
+                    "description": "英語タイトル",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SyobocalTitleSearchResponse": {
+            "type": "object",
+            "properties": {
+                "titles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SyobocalTitleResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ThumbnailRegenerateRequest": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "timestamp": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "width": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "dto.ThumbnailRegenerateResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "thumbnail_info": {
+                    "$ref": "#/definitions/entity.ThumbnailInfo"
+                }
+            }
+        },
+        "dto.UserAccessToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserAccessTokenRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserCreateRequest": {
+            "type": "object",
+            "required": [
+                "confirm_password",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "confirm_password": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "username": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "dto.VideoListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Video"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/dto.Pagination"
+                }
+            }
+        },
+        "dto.VideoResponse": {
+            "type": "object",
+            "properties": {
+                "channel_id": {
+                    "description": "Syobocal チャンネルID（ChID）",
+                    "type": "integer"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ApiComment"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "number"
+                },
+                "episode": {
+                    "description": "エピソード番号",
+                    "type": "integer"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "folder_id": {
+                    "description": "Folderテーブルへの外部キー",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "jikkyo_comment_count": {
+                    "type": "integer"
+                },
+                "jikkyo_date": {
+                    "type": "string"
+                },
+                "liked": {
+                    "type": "boolean"
+                },
+                "prog_end_time": {
+                    "description": "放送終了時刻",
+                    "type": "string"
+                },
+                "prog_start_time": {
+                    "description": "放送開始時刻",
+                    "type": "string"
+                },
+                "screenshot_file_path": {
+                    "type": "string"
+                },
+                "series": {
+                    "description": "Series関連付け",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.Series"
+                        }
+                    ]
+                },
+                "series_id": {
+                    "description": "Seriesテーブルへの外部キー",
+                    "type": "integer"
+                },
+                "src": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "ready, processing, error",
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "エピソードサブタイトル",
+                    "type": "string"
+                },
+                "thumbnail_info": {
+                    "$ref": "#/definitions/entity.ThumbnailInfo"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "views": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.VideoYearsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.WatchedHistoryItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "jikkyo_comment_offset": {
+                    "type": "number"
+                },
+                "last_playback_position": {
+                    "description": "ミリ秒",
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "integer"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.Capture": {
+            "type": "object",
+            "properties": {
+                "_": {
+                    "type": "string"
+                },
+                "comment_delay": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "playback_position": {
+                    "type": "number"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.JSONMap": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "entity.Series": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "$ref": "#/definitions/entity.JSONMap"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "first_end_month": {
+                    "type": "integer"
+                },
+                "first_end_year": {
+                    "type": "integer"
+                },
+                "first_month": {
+                    "type": "integer"
+                },
+                "first_year": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "series_name_file": {
+                    "description": "{title} 部分",
+                    "type": "string"
+                },
+                "subtitles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "syobocal_title_id": {
+                    "type": "integer"
+                },
+                "syobocal_title_name": {
+                    "type": "string"
+                },
+                "syobocal_title_name_en": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ThumbnailInfo": {
+            "type": "object",
+            "properties": {
+                "generated_at": {
+                    "type": "string"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "client_settings": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_admin": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "niconico_user_id": {
+                    "type": "integer"
+                },
+                "niconico_user_name": {
+                    "type": "string"
+                },
+                "niconico_user_premium": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Video": {
+            "type": "object",
+            "properties": {
+                "channel_id": {
+                    "description": "Syobocal チャンネルID（ChID）",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "number"
+                },
+                "episode": {
+                    "description": "エピソード番号",
+                    "type": "integer"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "folder_id": {
+                    "description": "Folderテーブルへの外部キー",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "jikkyo_comment_count": {
+                    "type": "integer"
+                },
+                "jikkyo_date": {
+                    "type": "string"
+                },
+                "liked": {
+                    "type": "boolean"
+                },
+                "prog_end_time": {
+                    "description": "放送終了時刻",
+                    "type": "string"
+                },
+                "prog_start_time": {
+                    "description": "放送開始時刻",
+                    "type": "string"
+                },
+                "screenshot_file_path": {
+                    "type": "string"
+                },
+                "series": {
+                    "description": "Series関連付け",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entity.Series"
+                        }
+                    ]
+                },
+                "series_id": {
+                    "description": "Seriesテーブルへの外部キー",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "ready, processing, error",
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "エピソードサブタイトル",
+                    "type": "string"
+                },
+                "thumbnail_info": {
+                    "$ref": "#/definitions/entity.ThumbnailInfo"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "views": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": {}
+        }
+    }
 }

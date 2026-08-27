@@ -35,15 +35,17 @@ import type { EntityCapture } from '../models';
 export const CapturesApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * キャプチャ一覧をページネーション付きで取得します
+         * キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
          * @summary キャプチャ一覧を取得
          * @param {number} [videoId] ビデオID（フィルタリング用）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {ApiV1CapturesGetSortKeyEnum} [sortKey] ソート対象フィールド (id または created_at)
+         * @param {ApiV1CapturesGetSortOrderEnum} [sortOrder] ソート順序 (asc または desc)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesGet: async (videoId?: number, page?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1CapturesGet: async (videoId?: number, page?: number, limit?: number, sortKey?: ApiV1CapturesGetSortKeyEnum, sortOrder?: ApiV1CapturesGetSortOrderEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/captures`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -66,6 +68,14 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (sortKey !== undefined) {
+                localVarQueryParameter['sort_key'] = sortKey;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sort_order'] = sortOrder;
             }
 
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -214,16 +224,18 @@ export const CapturesApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CapturesApiAxiosParamCreator(configuration)
     return {
         /**
-         * キャプチャ一覧をページネーション付きで取得します
+         * キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
          * @summary キャプチャ一覧を取得
          * @param {number} [videoId] ビデオID（フィルタリング用）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {ApiV1CapturesGetSortKeyEnum} [sortKey] ソート対象フィールド (id または created_at)
+         * @param {ApiV1CapturesGetSortOrderEnum} [sortOrder] ソート順序 (asc または desc)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoCaptureListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesGet(videoId, page, limit, options);
+        async apiV1CapturesGet(videoId?: number, page?: number, limit?: number, sortKey?: ApiV1CapturesGetSortKeyEnum, sortOrder?: ApiV1CapturesGetSortOrderEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoCaptureListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesGet(videoId, page, limit, sortKey, sortOrder, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -280,16 +292,18 @@ export const CapturesApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = CapturesApiFp(configuration)
     return {
         /**
-         * キャプチャ一覧をページネーション付きで取得します
+         * キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
          * @summary キャプチャ一覧を取得
          * @param {number} [videoId] ビデオID（フィルタリング用）
          * @param {number} [page] ページ番号
          * @param {number} [limit] 1ページあたりのアイテム数
+         * @param {ApiV1CapturesGetSortKeyEnum} [sortKey] ソート対象フィールド (id または created_at)
+         * @param {ApiV1CapturesGetSortOrderEnum} [sortOrder] ソート順序 (asc または desc)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoCaptureListResponse> {
-            return localVarFp.apiV1CapturesGet(videoId, page, limit, options).then((request) => request(axios, basePath));
+        apiV1CapturesGet(videoId?: number, page?: number, limit?: number, sortKey?: ApiV1CapturesGetSortKeyEnum, sortOrder?: ApiV1CapturesGetSortOrderEnum, options?: RawAxiosRequestConfig): AxiosPromise<DtoCaptureListResponse> {
+            return localVarFp.apiV1CapturesGet(videoId, page, limit, sortKey, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * キャプチャをファイルシステムとDBから削除します
@@ -332,16 +346,18 @@ export const CapturesApiFactory = function (configuration?: Configuration, baseP
  */
 export class CapturesApi extends BaseAPI {
     /**
-     * キャプチャ一覧をページネーション付きで取得します
+     * キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
      * @summary キャプチャ一覧を取得
      * @param {number} [videoId] ビデオID（フィルタリング用）
      * @param {number} [page] ページ番号
      * @param {number} [limit] 1ページあたりのアイテム数
+     * @param {ApiV1CapturesGetSortKeyEnum} [sortKey] ソート対象フィールド (id または created_at)
+     * @param {ApiV1CapturesGetSortOrderEnum} [sortOrder] ソート順序 (asc または desc)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1CapturesGet(videoId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig) {
-        return CapturesApiFp(this.configuration).apiV1CapturesGet(videoId, page, limit, options).then((request) => request(this.axios, this.basePath));
+    public apiV1CapturesGet(videoId?: number, page?: number, limit?: number, sortKey?: ApiV1CapturesGetSortKeyEnum, sortOrder?: ApiV1CapturesGetSortOrderEnum, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesGet(videoId, page, limit, sortKey, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -381,3 +397,13 @@ export class CapturesApi extends BaseAPI {
     }
 }
 
+export const ApiV1CapturesGetSortKeyEnum = {
+    Id: 'id',
+    CreatedAt: 'created_at',
+} as const;
+export type ApiV1CapturesGetSortKeyEnum = typeof ApiV1CapturesGetSortKeyEnum[keyof typeof ApiV1CapturesGetSortKeyEnum];
+export const ApiV1CapturesGetSortOrderEnum = {
+    Asc: 'asc',
+    Desc: 'desc',
+} as const;
+export type ApiV1CapturesGetSortOrderEnum = typeof ApiV1CapturesGetSortOrderEnum[keyof typeof ApiV1CapturesGetSortOrderEnum];

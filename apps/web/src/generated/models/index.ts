@@ -1,4 +1,5 @@
 export * from './dto-api-comment';
+export * from './dto-capture';
 export * from './dto-capture-list-response';
 export * from './dto-client-settings-dto';
 export * from './dto-error-response';

@@ -35,11 +35,28 @@ definitions:
     - time
     - type
     type: object
+  dto.Capture:
+    properties:
+      _:
+        type: string
+      comment_delay:
+        type: number
+      created_at:
+        type: string
+      filename:
+        type: string
+      id:
+        type: integer
+      playback_position:
+        type: number
+      video_id:
+        type: integer
+    type: object
   dto.CaptureListResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/entity.Capture'
+          $ref: '#/definitions/dto.Capture'
         type: array
       pagination:
         $ref: '#/definitions/dto.Pagination'
@@ -434,7 +451,7 @@ definitions:
       created_at:
         type: integer
       jikkyo_comment_offset:
-        type: integer
+        type: number
       last_playback_position:
         description: ミリ秒
         type: number
@@ -589,7 +606,6 @@ definitions:
   gin.H:
     additionalProperties: {}
     type: object
-host: 100.72.160.115:8000
 info:
   contact: {}
   description: Watch commentPlayer API documentation
@@ -598,7 +614,7 @@ info:
 paths:
   /api/v1/captures:
     get:
-      description: キャプチャ一覧をページネーション付きで取得します
+      description: キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
       parameters:
       - description: ビデオID（フィルタリング用）
         in: query
@@ -614,6 +630,22 @@ paths:
         in: query
         name: limit
         type: integer
+      - default: created_at
+        description: ソート対象フィールド (id または created_at)
+        enum:
+        - id
+        - created_at
+        in: query
+        name: sort_key
+        type: string
+      - default: desc
+        description: ソート順序 (asc または desc)
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
       produces:
       - application/json
       responses:

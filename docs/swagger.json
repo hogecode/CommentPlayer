@@ -9,11 +9,10 @@
         "contact": {},
         "version": "1.0.0"
     },
-    "host": "100.72.160.115:8000",
     "paths": {
         "/api/v1/captures": {
             "get": {
-                "description": "キャプチャ一覧をページネーション付きで取得します",
+                "description": "キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます",
                 "produces": [
                     "application/json"
                 ],
@@ -40,6 +39,28 @@
                         "default": 20,
                         "description": "1ページあたりのアイテム数",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "id",
+                            "created_at"
+                        ],
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "ソート対象フィールド (id または created_at)",
+                        "name": "sort_key",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "desc",
+                        "description": "ソート順序 (asc または desc)",
+                        "name": "sort_order",
                         "in": "query"
                     }
                 ],
@@ -1081,13 +1102,39 @@
                 }
             }
         },
+        "dto.Capture": {
+            "type": "object",
+            "properties": {
+                "_": {
+                    "type": "string"
+                },
+                "comment_delay": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "playback_position": {
+                    "type": "number"
+                },
+                "video_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.CaptureListResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.Capture"
+                        "$ref": "#/definitions/dto.Capture"
                     }
                 },
                 "pagination": {
@@ -1673,7 +1720,7 @@
                     "type": "integer"
                 },
                 "jikkyo_comment_offset": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "last_playback_position": {
                     "description": "ミリ秒",

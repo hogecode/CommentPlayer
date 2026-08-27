@@ -1,3 +1,31 @@
+-- name: GetAllCaptures :many
+SELECT *
+FROM capture
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: GetAllCapturesCreatedAtAsc :many
+SELECT *
+FROM capture
+ORDER BY created_at ASC
+LIMIT ? OFFSET ?;
+
+-- name: GetAllCapturesIdAsc :many
+SELECT *
+FROM capture
+ORDER BY id ASC
+LIMIT ? OFFSET ?;
+
+-- name: GetAllCapturesIdDesc :many
+SELECT *
+FROM capture
+ORDER BY id DESC
+LIMIT ? OFFSET ?;
+
+-- name: CountAllCaptures :one
+SELECT COUNT(*) as count
+FROM capture;
+
 -- name: GetCaptureListByVideo :many
 SELECT *
 FROM capture
@@ -5,20 +33,31 @@ WHERE video_id = ?
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?;
 
+-- name: GetCaptureListByVideoCreatedAtAsc :many
+SELECT *
+FROM capture
+WHERE video_id = ?
+ORDER BY created_at ASC
+LIMIT ? OFFSET ?;
+
+-- name: GetCaptureListByVideoIdAsc :many
+SELECT *
+FROM capture
+WHERE video_id = ?
+ORDER BY id ASC
+LIMIT ? OFFSET ?;
+
+-- name: GetCaptureListByVideoIdDesc :many
+SELECT *
+FROM capture
+WHERE video_id = ?
+ORDER BY id DESC
+LIMIT ? OFFSET ?;
+
 -- name: CountCaptureListByVideo :one
 SELECT COUNT(*) as count
 FROM capture
 WHERE video_id = ?;
-
--- name: GetAllCaptures :many
-SELECT *
-FROM capture
-ORDER BY created_at DESC
-LIMIT ? OFFSET ?;
-
--- name: CountAllCaptures :one
-SELECT COUNT(*) as count
-FROM capture;
 
 -- name: CreateCapture :exec
 INSERT INTO capture (filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay)

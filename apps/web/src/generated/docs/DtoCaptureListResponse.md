@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**Array&lt;EntityCapture&gt;**](EntityCapture.md) |  | [optional] [default to undefined]
+**data** | [**Array&lt;DtoCapture&gt;**](DtoCapture.md) |  | [optional] [default to undefined]
 **pagination** | [**DtoPagination**](DtoPagination.md) |  | [optional] [default to undefined]
 
 ## Example

@@ -1,6 +1,6 @@
 # CapturesApi
 
-All URIs are relative to *http://100.72.160.115:8000*
+All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
@@ -12,7 +12,7 @@ All URIs are relative to *http://100.72.160.115:8000*
 # **apiV1CapturesGet**
 > DtoCaptureListResponse apiV1CapturesGet()
 
-キャプチャ一覧をページネーション付きで取得します
+キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
 
 ### Example
 
@@ -28,11 +28,15 @@ const apiInstance = new CapturesApi(configuration);
 let videoId: number; //ビデオID（フィルタリング用） (optional) (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
 let limit: number; //1ページあたりのアイテム数 (optional) (default to 20)
+let sortKey: 'id' | 'created_at'; //ソート対象フィールド (id または created_at) (optional) (default to 'created_at')
+let sortOrder: 'asc' | 'desc'; //ソート順序 (asc または desc) (optional) (default to 'desc')
 
 const { status, data } = await apiInstance.apiV1CapturesGet(
     videoId,
     page,
-    limit
+    limit,
+    sortKey,
+    sortOrder
 );
 ```
 
@@ -43,6 +47,8 @@ const { status, data } = await apiInstance.apiV1CapturesGet(
 | **videoId** | [**number**] | ビデオID（フィルタリング用） | (optional) defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|
 | **limit** | [**number**] | 1ページあたりのアイテム数 | (optional) defaults to 20|
+| **sortKey** | [**&#39;id&#39; | &#39;created_at&#39;**]**Array<&#39;id&#39; &#124; &#39;created_at&#39;>** | ソート対象フィールド (id または created_at) | (optional) defaults to 'created_at'|
+| **sortOrder** | [**&#39;asc&#39; | &#39;desc&#39;**]**Array<&#39;asc&#39; &#124; &#39;desc&#39;>** | ソート順序 (asc または desc) | (optional) defaults to 'desc'|
 
 
 ### Return type

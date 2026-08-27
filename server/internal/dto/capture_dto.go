@@ -5,9 +5,11 @@ package dto
 // CaptureList
 // CaptureListRequest - キャプチャ一覧取得リクエスト
 type CaptureListRequest struct {
-	VideoID int `form:"video_id" validate:"omitempty,min=1"`
-	Page    int `form:"page" validate:"min=1"`
-	Limit   int `form:"limit" validate:"min=1,max=100"`
+	VideoID  int    `form:"video_id" validate:"omitempty,min=1"`
+	Page     int    `form:"page" validate:"min=1"`
+	Limit    int    `form:"limit" validate:"min=1,max=100"`
+	SortKey  string `form:"sort_key" validate:"omitempty,oneof=id created_at"`
+	SortOrder string `form:"sort_order" validate:"omitempty,oneof=asc desc"`
 }
 
 // SetDefaults - デフォルト値を設定
@@ -17,6 +19,13 @@ func (c *CaptureListRequest) SetDefaults() {
 	}
 	if c.Limit == 0 {
 		c.Limit = 20
+	}
+	// ソートのデフォルト値（新しい順）
+	if c.SortKey == "" {
+		c.SortKey = "created_at"
+	}
+	if c.SortOrder == "" {
+		c.SortOrder = "desc"
 	}
 }
 

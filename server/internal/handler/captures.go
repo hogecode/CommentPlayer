@@ -28,11 +28,13 @@ func (a *App) RegisterCaptureRoutes(capturesGroup *gin.RouterGroup) {
 
 // GetCaptures - キャプチャ一覧を取得
 // @Summary キャプチャ一覧を取得
-// @Description キャプチャ一覧をページネーション付きで取得します
+// @Description キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
 // @Tags Captures
 // @Param video_id query int false "ビデオID（フィルタリング用）"
 // @Param page query int false "ページ番号" default(1)
 // @Param limit query int false "1ページあたりのアイテム数" default(20)
+// @Param sort_key query string false "ソート対象フィールド (id または created_at)" default(created_at) Enums(id,created_at)
+// @Param sort_order query string false "ソート順序 (asc または desc)" default(desc) Enums(asc,desc)
 // @Produce json
 // @Success 200 {object} dto.CaptureListResponse
 // @Failure 500 {object} dto.ErrorResponse
@@ -70,14 +72,43 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 		var total int64
 		var err error
 
+		// ソートキーとソート順序に応じて適切なクエリを選択
+		// デフォルト: created_at DESC（新しい順）
+		sortKey := req.SortKey
+		sortOrder := req.SortOrder
+
 		if req.VideoID > 0 {
 			// VideoIDでフィルター
 			videoIDNull := sql.NullInt64{Int64: int64(req.VideoID), Valid: true}
-			dbCaptures, err = a.Queries.GetCaptureListByVideo(ctx, db.GetCaptureListByVideoParams{
-				VideoID: videoIDNull,
-				Limit:   int64(req.Limit),
-				Offset:  offset,
-			})
+			
+			// ソートキーとソート順序の組み合わせに応じてクエリを切り替え
+			if sortKey == "id" && sortOrder == "asc" {
+				dbCaptures, err = a.Queries.GetCaptureListByVideoIdAsc(ctx, db.GetCaptureListByVideoIdAscParams{
+					VideoID: videoIDNull,
+					Limit:   int64(req.Limit),
+					Offset:  offset,
+				})
+			} else if sortKey == "id" && sortOrder == "desc" {
+				dbCaptures, err = a.Queries.GetCaptureListByVideoIdDesc(ctx, db.GetCaptureListByVideoIdDescParams{
+					VideoID: videoIDNull,
+					Limit:   int64(req.Limit),
+					Offset:  offset,
+				})
+			} else if sortKey == "created_at" && sortOrder == "asc" {
+				dbCaptures, err = a.Queries.GetCaptureListByVideoCreatedAtAsc(ctx, db.GetCaptureListByVideoCreatedAtAscParams{
+					VideoID: videoIDNull,
+					Limit:   int64(req.Limit),
+					Offset:  offset,
+				})
+			} else {
+				// created_at DESC がデフォルト
+				dbCaptures, err = a.Queries.GetCaptureListByVideo(ctx, db.GetCaptureListByVideoParams{
+					VideoID: videoIDNull,
+					Limit:   int64(req.Limit),
+					Offset:  offset,
+				})
+			}
+			
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
@@ -88,10 +119,31 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 			total, err = a.Queries.CountCaptureListByVideo(ctx, videoIDNull)
 		} else {
 			// 全件取得
-			dbCaptures, err = a.Queries.GetAllCaptures(ctx, db.GetAllCapturesParams{
-				Limit:  int64(req.Limit),
-				Offset: offset,
-			})
+			
+			// ソートキーとソート順序の組み合わせに応じてクエリを切り替え
+			if sortKey == "id" && sortOrder == "asc" {
+				dbCaptures, err = a.Queries.GetAllCapturesIdAsc(ctx, db.GetAllCapturesIdAscParams{
+					Limit:  int64(req.Limit),
+					Offset: offset,
+				})
+			} else if sortKey == "id" && sortOrder == "desc" {
+				dbCaptures, err = a.Queries.GetAllCapturesIdDesc(ctx, db.GetAllCapturesIdDescParams{
+					Limit:  int64(req.Limit),
+					Offset: offset,
+				})
+			} else if sortKey == "created_at" && sortOrder == "asc" {
+				dbCaptures, err = a.Queries.GetAllCapturesCreatedAtAsc(ctx, db.GetAllCapturesCreatedAtAscParams{
+					Limit:  int64(req.Limit),
+					Offset: offset,
+				})
+			} else {
+				// created_at DESC がデフォルト
+				dbCaptures, err = a.Queries.GetAllCaptures(ctx, db.GetAllCapturesParams{
+					Limit:  int64(req.Limit),
+					Offset: offset,
+				})
+			}
+			
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),

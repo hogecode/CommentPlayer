@@ -21,10 +21,16 @@ type Querier interface {
 	DeleteCapture(ctx context.Context, id int64) error
 	DeleteSeries(ctx context.Context, id int64) error
 	GetAllCaptures(ctx context.Context, arg GetAllCapturesParams) ([]Capture, error)
+	GetAllCapturesCreatedAtAsc(ctx context.Context, arg GetAllCapturesCreatedAtAscParams) ([]Capture, error)
+	GetAllCapturesIdAsc(ctx context.Context, arg GetAllCapturesIdAscParams) ([]Capture, error)
+	GetAllCapturesIdDesc(ctx context.Context, arg GetAllCapturesIdDescParams) ([]Capture, error)
 	GetAllSeries(ctx context.Context) ([]Series, error)
 	GetAllSeriesWithCount(ctx context.Context) ([]GetAllSeriesWithCountRow, error)
 	GetCaptureByID(ctx context.Context, id int64) (Capture, error)
 	GetCaptureListByVideo(ctx context.Context, arg GetCaptureListByVideoParams) ([]Capture, error)
+	GetCaptureListByVideoCreatedAtAsc(ctx context.Context, arg GetCaptureListByVideoCreatedAtAscParams) ([]Capture, error)
+	GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCaptureListByVideoIdAscParams) ([]Capture, error)
+	GetCaptureListByVideoIdDesc(ctx context.Context, arg GetCaptureListByVideoIdDescParams) ([]Capture, error)
 	GetSeriesByID(ctx context.Context, id int64) (Series, error)
 	GetSeriesByName(ctx context.Context, seriesNameFile sql.NullString) (Series, error)
 	GetVideoByID(ctx context.Context, id int64) (Video, error)
