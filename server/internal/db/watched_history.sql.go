@@ -83,6 +83,22 @@ func (q *Queries) GetRecentWatchedHistory(ctx context.Context, arg GetRecentWatc
 	return items, nil
 }
 
+const getRecentWatchedHistoryWithin1Hour = `-- name: GetRecentWatchedHistoryWithin1Hour :one
+SELECT id
+FROM watched_history
+WHERE video_id = ? 
+  AND watched_at > datetime('now', '-1 hour')
+ORDER BY watched_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetRecentWatchedHistoryWithin1Hour(ctx context.Context, videoID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getRecentWatchedHistoryWithin1Hour, videoID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getWatchedHistoryByVideoID = `-- name: GetWatchedHistoryByVideoID :many
 SELECT id, video_id, watched_at
 FROM watched_history

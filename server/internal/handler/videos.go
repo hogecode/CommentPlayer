@@ -776,7 +776,7 @@ func (a *App) buildVideoURL(folderID int, fileName string) string {
 
 // RecordVideoView - ビデオの視聴を記録
 // @Summary ビデオの視聴を記録
-// @Description ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+// @Description ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
 // @Tags Videos
 // @Param id path integer true "ビデオID"
 // @Success 200 {object} dto.SuccessResponse
@@ -797,6 +797,23 @@ func (a *App) RecordVideoView(videosGroup *gin.RouterGroup) {
 				Code:  "INVALID_ID",
 			})
 			return
+		}
+
+		// 冪等性を確保するため、過去1時間以内に同じビデオの視聴履歴がある場合はスキップ
+		// これにより、複数回の同じリクエストが views と watched_history に重複した行を追加するのを防止
+		if a.Queries != nil {
+			_, err := a.Queries.GetRecentWatchedHistoryWithin1Hour(context.Background(), id)
+			if err == nil {
+				// 1時間以内の視聴履歴が存在する場合、何もしないで成功レスポンスを返す（冪等性）
+				slog.Info("Video view already recorded within 1 hour, skipping duplicate record",
+					slog.Int64("video_id", id),
+				)
+				ctx.JSON(http.StatusOK, dto.SuccessResponse{
+					Message: i18n.GetSuccessMessage(locale, "video_view_recorded"),
+				})
+				return
+			}
+			// sql.ErrNoRows の場合は1時間以内の履歴がないので、以降の処理を続行
 		}
 
 		// 現在時刻をタイムスタンプとして使用

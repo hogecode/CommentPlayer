@@ -23,3 +23,11 @@ LIMIT ? OFFSET ?;
 -- name: DeleteWatchedHistoryByVideoID :exec
 DELETE FROM watched_history
 WHERE video_id = ?;
+
+-- name: GetRecentWatchedHistoryWithin1Hour :one
+SELECT id
+FROM watched_history
+WHERE video_id = ? 
+  AND watched_at > datetime('now', '-1 hour')
+ORDER BY watched_at DESC
+LIMIT 1;

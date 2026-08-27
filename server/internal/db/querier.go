@@ -38,6 +38,7 @@ type Querier interface {
 	GetDailyViewsWithDetails(ctx context.Context, arg GetDailyViewsWithDetailsParams) ([]GetDailyViewsWithDetailsRow, error)
 	GetMonthlyStats(ctx context.Context, arg GetMonthlyStatsParams) (GetMonthlyStatsRow, error)
 	GetRecentWatchedHistory(ctx context.Context, arg GetRecentWatchedHistoryParams) ([]WatchedHistory, error)
+	GetRecentWatchedHistoryWithin1Hour(ctx context.Context, videoID int64) (int64, error)
 	GetSeriesByID(ctx context.Context, id int64) (Series, error)
 	GetSeriesByName(ctx context.Context, seriesNameFile sql.NullString) (Series, error)
 	GetSeriesViews(ctx context.Context) ([]GetSeriesViewsRow, error)
