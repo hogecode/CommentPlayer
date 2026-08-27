@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log/slog"
+	"sort"
 	"time"
 
 	"github.com/hogecode/commentPlayer/internal/db"
@@ -35,16 +36,16 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 		slog.String("endDate", endDate.Format(time.RFC3339)),
 	)
 
-	// 日付ごとの再生数を取得
-	dailyViews, err := s.queries.GetDailyViews(ctx, db.GetDailyViewsParams{
+	// 日付ごとの再生数（詳細データ付き）を取得
+	dailyViewsWithDetails, err := s.queries.GetDailyViewsWithDetails(ctx, db.GetDailyViewsWithDetailsParams{
 		WatchedAt:   sql.NullTime{Time: startDate, Valid: true},
 		WatchedAt_2: sql.NullTime{Time: endDate, Valid: true},
 	})
 	if err != nil {
-		slog.Error("Failed to get daily views", slog.Any("error", err))
+		slog.Error("Failed to get daily views with details", slog.Any("error", err))
 		return nil, err
 	}
-	slog.Info("Daily views fetched", slog.Int("count", len(dailyViews)))
+	slog.Info("Daily views with details fetched", slog.Int("count", len(dailyViewsWithDetails)))
 
 	// シリーズごとの再生数を取得
 	seriesViews, err := s.queries.GetSeriesViews(ctx)
@@ -91,9 +92,10 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 		},
 	}
 
-	// 日付ごとの再生数を変換
-	response.DailyViews = make([]dto.DailyViewsResponse, 0)
-	for _, dv := range dailyViews {
+	// 日付ごとの再生数を変換（詳細データ付き）
+	// 日付ごとに動画情報をグループ化
+	dailyViewsMap := make(map[string]*dto.DailyViewsResponse)
+	for _, dv := range dailyViewsWithDetails {
 		dateStr := ""
 		// dv.DateはNULL可能なため、interface{}で返される
 		if dv.Date != nil {
@@ -101,11 +103,46 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 				dateStr = date
 			}
 		}
-		response.DailyViews = append(response.DailyViews, dto.DailyViewsResponse{
-			Date:      dateStr,
-			ViewCount: dv.ViewCount,
+
+		// 日付ごとのエントリを初期化または取得
+		if _, exists := dailyViewsMap[dateStr]; !exists {
+			dailyViewsMap[dateStr] = &dto.DailyViewsResponse{
+				Date:   dateStr,
+				Videos: make([]dto.DailyVideoViewResponse, 0),
+			}
+		}
+
+		// 総再生数を加算
+		dailyViewsMap[dateStr].ViewCount += dv.ViewCount
+
+		// 動画詳細を追加
+		fileName := ""
+		if dv.FileName.Valid {
+			fileName = dv.FileName.String
+		}
+		subtitle := ""
+		if dv.Subtitle.Valid {
+			subtitle = dv.Subtitle.String
+		}
+		dailyViewsMap[dateStr].Videos = append(dailyViewsMap[dateStr].Videos, dto.DailyVideoViewResponse{
+			VideoID:    int(dv.ID),
+			FileName:   fileName,
+			Subtitle:   subtitle,
+			SeriesName: dv.SeriesName,
+			ViewCount:  dv.ViewCount,
 		})
 	}
+
+	// マップをスライスに変換
+	response.DailyViews = make([]dto.DailyViewsResponse, 0)
+	for _, dv := range dailyViewsMap {
+		response.DailyViews = append(response.DailyViews, *dv)
+	}
+
+	// 日付の降順（新しい日付が先）でソート
+	sort.Slice(response.DailyViews, func(i, j int) bool {
+		return response.DailyViews[i].Date > response.DailyViews[j].Date
+	})
 
 	// シリーズごとの再生数を変換
 	response.SeriesViews = make([]dto.SeriesViewsResponse, 0)

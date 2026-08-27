@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/hogecode/commentPlayer/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/hogecode/commentPlayer/internal/service"
 )
 
 func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {

@@ -17,9 +17,9 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
       )}
 
       {/* カレンダービュー */}
-      {stats?.watched_history_by_date && (
+      {stats?.daily_views && (
         <CalendarView
-          data={stats.watched_history_by_date}
+          data={stats.daily_views}
           year={stats.year}
           month={stats.month}
         />

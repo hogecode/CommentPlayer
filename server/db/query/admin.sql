@@ -10,6 +10,24 @@ GROUP BY strftime('%Y-%m-%d', substr(watched_at, 1, 26))
 ORDER BY date DESC;
 
 
+-- name: GetDailyViewsWithDetails :many
+SELECT
+    strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)) AS date,
+    COUNT(*) AS view_count,
+    wh.id,
+    v.file_name,
+    v.subtitle,
+    COALESCE(s.syobocal_title_name, 'No Series') AS series_name
+FROM watched_history wh
+LEFT JOIN video v ON wh.video_id = v.id
+LEFT JOIN series s ON v.series_id = s.id
+WHERE substr(wh.watched_at, 1, 26) >= ?
+  AND substr(wh.watched_at, 1, 26) < ?
+  AND wh.watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, s.syobocal_title_name
+ORDER BY date DESC, wh.video_id DESC;
+
+
 -- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/service"
-	"github.com/gin-gonic/gin"
 )
 
 // AdminStatsHandler - 管理画面統計ハンドラー

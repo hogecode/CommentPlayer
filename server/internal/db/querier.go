@@ -35,6 +35,7 @@ type Querier interface {
 	GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCaptureListByVideoIdAscParams) ([]Capture, error)
 	GetCaptureListByVideoIdDesc(ctx context.Context, arg GetCaptureListByVideoIdDescParams) ([]Capture, error)
 	GetDailyViews(ctx context.Context, arg GetDailyViewsParams) ([]GetDailyViewsRow, error)
+	GetDailyViewsWithDetails(ctx context.Context, arg GetDailyViewsWithDetailsParams) ([]GetDailyViewsWithDetailsRow, error)
 	GetMonthlyStats(ctx context.Context, arg GetMonthlyStatsParams) (GetMonthlyStatsRow, error)
 	GetRecentWatchedHistory(ctx context.Context, arg GetRecentWatchedHistoryParams) ([]WatchedHistory, error)
 	GetSeriesByID(ctx context.Context, id int64) (Series, error)

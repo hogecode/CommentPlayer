@@ -122,7 +122,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 			// シリーズIDでフィルター：GORM使用（複雑なJOIN対応）
 			var captures []entity.Capture
 			var total int64
-			
+
 			// GetCapturesBySeries で取得
 			captures, err := a.CaptureQuery.GetCapturesBySeries(query.GetCapturesBySeriesParams{
 				SeriesID:  int64(req.SeriesID),
@@ -131,7 +131,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 				Limit:     int64(req.Limit),
 				Offset:    offset,
 			})
-			
+
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
@@ -139,7 +139,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 				})
 				return
 			}
-			
+
 			// 総数を取得
 			total, err = a.CaptureQuery.CountCapturesBySeries(int64(req.SeriesID))
 			if err != nil {
@@ -149,7 +149,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 				})
 				return
 			}
-			
+
 			// entity.Capture を dto.Capture に変換
 			capturesDTOs := make([]dto.Capture, len(captures))
 			for i, c := range captures {
@@ -164,13 +164,13 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 					CommentDelay:     c.CommentDelay,
 				}
 			}
-			
+
 			// レスポンス作成
 			totalPages := (int(total) + req.Limit - 1) / req.Limit
 			if totalPages == 0 {
 				totalPages = 1
 			}
-			
+
 			ctx.JSON(http.StatusOK, dto.CaptureListResponse{
 				Data: capturesDTOs,
 				Pagination: dto.Pagination{
@@ -191,7 +191,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 		if req.VideoID > 0 {
 			// VideoIDでフィルター
 			videoIDNull := sql.NullInt64{Int64: int64(req.VideoID), Valid: true}
-			
+
 			// ソートキーとソート順序の組み合わせに応じてクエリを切り替え
 			if sortKey == "id" && sortOrder == "asc" {
 				dbCaptures, err = a.Queries.GetCaptureListByVideoIdAsc(ctx, db.GetCaptureListByVideoIdAscParams{
@@ -219,7 +219,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 					Offset:  offset,
 				})
 			}
-			
+
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
@@ -230,7 +230,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 			total, err = a.Queries.CountCaptureListByVideo(ctx, videoIDNull)
 		} else {
 			// 全件取得
-			
+
 			// ソートキーとソート順序の組み合わせに応じてクエリを切り替え
 			if sortKey == "id" && sortOrder == "asc" {
 				dbCaptures, err = a.Queries.GetAllCapturesIdAsc(ctx, db.GetAllCapturesIdAscParams{
@@ -254,7 +254,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 					Offset: offset,
 				})
 			}
-			
+
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
@@ -327,30 +327,30 @@ func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
 			return
 		}
 
-	// sqlcで生成されたGetCaptureByIDを呼び出す
-	dbCapture, err := a.Queries.GetCaptureByID(ctx, int64(id))
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error: i18n.GetErrorMessage(locale, "capture_not_found"),
-			Code:  "NOT_FOUND",
-		})
-		return
-	}
+		// sqlcで生成されたGetCaptureByIDを呼び出す
+		dbCapture, err := a.Queries.GetCaptureByID(ctx, int64(id))
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "capture_not_found"),
+				Code:  "NOT_FOUND",
+			})
+			return
+		}
 
-	// DB モデル（db.Capture）をエンティティ（entity.Capture）に変換
-	capture := entity.Capture{
-		ID:               int(dbCapture.ID),
-		Filename:         dbCapture.Filename.String,
-		VideoID:          int(dbCapture.VideoID.Int64),
-		SaveDir:          dbCapture.SaveDir.String,
-		SavePath:         dbCapture.SavePath.String,
-		CreatedAt:        dbCapture.CreatedAt.Time,
-		PlaybackPosition: dbCapture.PlaybackPosition.Float64,
-		CommentDelay:     dbCapture.CommentDelay.Float64,
-	}
+		// DB モデル（db.Capture）をエンティティ（entity.Capture）に変換
+		capture := entity.Capture{
+			ID:               int(dbCapture.ID),
+			Filename:         dbCapture.Filename.String,
+			VideoID:          int(dbCapture.VideoID.Int64),
+			SaveDir:          dbCapture.SaveDir.String,
+			SavePath:         dbCapture.SavePath.String,
+			CreatedAt:        dbCapture.CreatedAt.Time,
+			PlaybackPosition: dbCapture.PlaybackPosition.Float64,
+			CommentDelay:     dbCapture.CommentDelay.Float64,
+		}
 
-	// レスポンス
-	ctx.JSON(http.StatusOK, capture)
+		// レスポンス
+		ctx.JSON(http.StatusOK, capture)
 	})
 }
 
@@ -373,43 +373,43 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 	capturesGroup.POST("", func(ctx *gin.Context) {
 		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
 
-	// MultipartForm から video_id を取得
-	videoIDStr := ctx.PostForm("video_id")
-	if videoIDStr == "" {
-		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: i18n.GetErrorMessage(locale, "video_id_required"),
-			Code:  "VALIDATION_ERROR",
-		})
-		return
-	}
-
-	videoID, err := strconv.Atoi(videoIDStr)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
-			Code:  "VALIDATION_ERROR",
-		})
-		return
-	}
-
-	// playback_position と comment_delay を取得（オプション）
-	playbackPositionStr := ctx.PostForm("playback_position")
-	var playbackPosition float64
-	if playbackPositionStr != "" {
-		pos, err := strconv.ParseFloat(playbackPositionStr, 64)
-		if err == nil {
-			playbackPosition = pos
+		// MultipartForm から video_id を取得
+		videoIDStr := ctx.PostForm("video_id")
+		if videoIDStr == "" {
+			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "video_id_required"),
+				Code:  "VALIDATION_ERROR",
+			})
+			return
 		}
-	}
 
-	commentDelayStr := ctx.PostForm("comment_delay")
-	var commentDelay float64
-	if commentDelayStr != "" {
-		delay, err := strconv.ParseFloat(commentDelayStr, 64)
-		if err == nil {
-			commentDelay = delay
+		videoID, err := strconv.Atoi(videoIDStr)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "invalid_query_params"),
+				Code:  "VALIDATION_ERROR",
+			})
+			return
 		}
-	}
+
+		// playback_position と comment_delay を取得（オプション）
+		playbackPositionStr := ctx.PostForm("playback_position")
+		var playbackPosition float64
+		if playbackPositionStr != "" {
+			pos, err := strconv.ParseFloat(playbackPositionStr, 64)
+			if err == nil {
+				playbackPosition = pos
+			}
+		}
+
+		commentDelayStr := ctx.PostForm("comment_delay")
+		var commentDelay float64
+		if commentDelayStr != "" {
+			delay, err := strconv.ParseFloat(commentDelayStr, 64)
+			if err == nil {
+				commentDelay = delay
+			}
+		}
 
 		// ビデオの存在確認
 		video, err := a.VideoQuery.GetVideoByID(videoID)

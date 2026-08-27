@@ -68,7 +68,7 @@ type GetCapturesBySeriesParams struct {
 // sortOrder: "asc" または "desc"
 func (q *CaptureQuery) GetCapturesBySeries(params GetCapturesBySeriesParams) ([]entity.Capture, error) {
 	var captures []entity.Capture
-	
+
 	// ソートキーとソート順序に基づいてORDER BY句を構築
 	var orderBy string
 	if params.SortKey == "id" {
@@ -85,7 +85,7 @@ func (q *CaptureQuery) GetCapturesBySeries(params GetCapturesBySeriesParams) ([]
 			orderBy = "capture.created_at DESC"
 		}
 	}
-	
+
 	// JOINを使ってシリーズIDでフィルターしたキャプチャを取得
 	if err := q.db.
 		Joins("JOIN video ON capture.video_id = video.id").

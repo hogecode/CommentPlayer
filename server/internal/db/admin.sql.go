@@ -55,6 +55,68 @@ func (q *Queries) GetDailyViews(ctx context.Context, arg GetDailyViewsParams) ([
 	return items, nil
 }
 
+const getDailyViewsWithDetails = `-- name: GetDailyViewsWithDetails :many
+SELECT
+    strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)) AS date,
+    COUNT(*) AS view_count,
+    wh.id,
+    v.file_name,
+    v.subtitle,
+    COALESCE(s.syobocal_title_name, 'No Series') AS series_name
+FROM watched_history wh
+LEFT JOIN video v ON wh.video_id = v.id
+LEFT JOIN series s ON v.series_id = s.id
+WHERE substr(wh.watched_at, 1, 26) >= ?
+  AND substr(wh.watched_at, 1, 26) < ?
+  AND wh.watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, s.syobocal_title_name
+ORDER BY date DESC, wh.video_id DESC
+`
+
+type GetDailyViewsWithDetailsParams struct {
+	WatchedAt   sql.NullTime
+	WatchedAt_2 sql.NullTime
+}
+
+type GetDailyViewsWithDetailsRow struct {
+	Date       interface{}
+	ViewCount  int64
+	ID         int64
+	FileName   sql.NullString
+	Subtitle   sql.NullString
+	SeriesName string
+}
+
+func (q *Queries) GetDailyViewsWithDetails(ctx context.Context, arg GetDailyViewsWithDetailsParams) ([]GetDailyViewsWithDetailsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDailyViewsWithDetails, arg.WatchedAt, arg.WatchedAt_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDailyViewsWithDetailsRow
+	for rows.Next() {
+		var i GetDailyViewsWithDetailsRow
+		if err := rows.Scan(
+			&i.Date,
+			&i.ViewCount,
+			&i.ID,
+			&i.FileName,
+			&i.Subtitle,
+			&i.SeriesName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMonthlyStats = `-- name: GetMonthlyStats :one
 SELECT
     COUNT(DISTINCT strftime('%Y-%m-%d', substr(watched_at, 1, 26))) AS days_with_views,

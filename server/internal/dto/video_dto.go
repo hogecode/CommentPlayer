@@ -43,8 +43,8 @@ func (v *VideoListRequest) SetDefaults() {
 
 // VideoListResponse - ビデオ一覧取得レスポンス
 type VideoListResponse struct {
-	Data       []entity.Video    `json:"data"`
-	Pagination Pagination `json:"pagination"`
+	Data       []entity.Video `json:"data"`
+	Pagination Pagination     `json:"pagination"`
 }
 
 // VideoSearch
@@ -89,9 +89,9 @@ type ThumbnailRegenerateRequest struct {
 
 // ThumbnailRegenerateResponse - サムネイル再生成レスポンス
 type ThumbnailRegenerateResponse struct {
-	ID            int            `json:"id"`
+	ID            int                   `json:"id"`
 	ThumbnailInfo *entity.ThumbnailInfo `json:"thumbnail_info"`
-	Message       string         `json:"message"`
+	Message       string                `json:"message"`
 }
 
 // ---VideoYears---

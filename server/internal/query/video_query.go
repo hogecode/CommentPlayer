@@ -83,7 +83,7 @@ func (q *VideoQuery) GetVideoList(ids []int, filterBy string, year, page, limit 
 // 検索対象: file_name, description, Series.SyobocalTitleName, subtitle
 func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy string) ([]entity.Video, int64, error) {
 	searchParam := "%" + q_str + "%"
-	
+
 	// LEFT JOINでSeriesを結合し、複数カラムで検索
 	query := q.db.Preload("Series").
 		Joins("LEFT JOIN series ON video.series_id = series.id").
@@ -121,13 +121,13 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 func (q *VideoQuery) GetVideoYears() ([]int, error) {
 	var years []*int
 	// 生のSQLで実行：NULLになる可能性があるので *int で受け取る
-err := q.db.Raw(
-	"SELECT DISTINCT CAST(SUBSTR(jikkyo_date, 1, 4) AS INTEGER) as year " +
-		"FROM video " +
-		"WHERE is_deleted = 0 " +
-		"AND jikkyo_date IS NOT NULL " +
-		"ORDER BY year DESC",
-).Scan(&years).Error
+	err := q.db.Raw(
+		"SELECT DISTINCT CAST(SUBSTR(jikkyo_date, 1, 4) AS INTEGER) as year " +
+			"FROM video " +
+			"WHERE is_deleted = 0 " +
+			"AND jikkyo_date IS NOT NULL " +
+			"ORDER BY year DESC",
+	).Scan(&years).Error
 
 	if err != nil {
 		return nil, err

@@ -1420,6 +1420,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DailyVideoViewResponse": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "series_name": {
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "動画のサブタイトル",
+                    "type": "string"
+                },
+                "video_id": {
+                    "type": "integer"
+                },
+                "view_count": {
+                    "description": "その動画のその日の再生数",
+                    "type": "integer"
+                }
+            }
+        },
         "dto.DailyViewsResponse": {
             "type": "object",
             "properties": {
@@ -1427,8 +1449,15 @@ const docTemplate = `{
                     "description": "YYYY-MM-DD format",
                     "type": "string"
                 },
+                "videos": {
+                    "description": "その日に視聴された動画の詳細",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DailyVideoViewResponse"
+                    }
+                },
                 "view_count": {
-                    "description": "その日の再生数",
+                    "description": "その日の総再生数",
                     "type": "integer"
                 }
             }

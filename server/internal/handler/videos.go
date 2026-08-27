@@ -33,10 +33,10 @@ import (
 // @basePath /
 func (a *App) RegisterVideoRoutes(videosGroup *gin.RouterGroup) {
 	a.GetVideos(videosGroup)
-	a.GetVideoYears(videosGroup) // /:idより前に登録して、/yearsが/:idに引っかからないようにする
-	a.SearchVideos(videosGroup)  // /searchも/:idより前に登録
+	a.GetVideoYears(videosGroup)   // /:idより前に登録して、/yearsが/:idに引っかからないようにする
+	a.SearchVideos(videosGroup)    // /searchも/:idより前に登録
 	a.RecordVideoView(videosGroup) // /:idより前に登録
-	a.GetVideoByID(videosGroup)  // 可変パラメータは最後に登録
+	a.GetVideoByID(videosGroup)    // 可変パラメータは最後に登録
 	a.DownloadVideo(videosGroup)
 	a.RegenerateThumbnail(videosGroup)
 }
@@ -686,7 +686,7 @@ func (a *App) getCommentsFromJikkyo(video *entity.Video, baseFileName string, fo
 	if marshalErr == nil {
 		xmlBytes = normalizedXmlBytes
 	}
-	
+
 	commentPath := filepath.Join(folderPath, baseFileName+".xml")
 	if err := os.WriteFile(commentPath, xmlBytes, 0644); err != nil {
 		slog.Warn("Failed to save comment XML file",

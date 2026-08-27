@@ -32,8 +32,8 @@ func (c *CaptureListRequest) SetDefaults() {
 
 // CaptureListResponse - キャプチャ一覧取得レスポンス
 type CaptureListResponse struct {
-	Data       []Capture `json:"data"`
-	Pagination Pagination       `json:"pagination"`
+	Data       []Capture  `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }
 
 // CapturesSeriesListResponse - キャプチャ対応シリーズ一覧レスポンス

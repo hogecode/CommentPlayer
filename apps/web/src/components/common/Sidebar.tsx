@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocation, Link } from "@tanstack/react-router";
-import { Home, Film, Image, ListMusic, History, Settings, Info } from "lucide-react";
+import { Home, Film, Image, ListMusic, History, Settings, Info, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface SidebarProps {
   /**
@@ -20,6 +20,7 @@ const navigationLinks = [
   { path: "/captures", label: "キャプチャ", Icon: Image },
   { path: "/mylist", label: "マイリスト", Icon: ListMusic },
   { path: "/watched-history", label: "視聴履歴", Icon: History },
+  { path: "/admin", label: "管理", Icon: ShieldCheck },
 ];
 
 export default function Sidebar({ iconOnly = true }: SidebarProps) {
