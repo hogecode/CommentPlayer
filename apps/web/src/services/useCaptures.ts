@@ -6,6 +6,7 @@ import Message from "@/message";
 
 // APIクライアントのセットアップ（共通設定を使用）
 const capturesApi = new CapturesApi(apiConfiguration);
+
 /**
  * キャプチャ一覧を取得
  */
@@ -22,9 +23,26 @@ export function useCapturesQuery(
     queryFn: async () => {
       const response = await capturesApi.apiV1CapturesGet(
         params?.video_id,
+        undefined,
         params?.page,
         params?.limit,
       );
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+}
+
+/**
+ * キャプチャが存在するシリーズ一覧を取得
+ * Swagger自動生成の apiV1CapturesSeriesGet を使用
+ */
+export function useGetCapturesSeriesList(options?: any) {
+  return useQuery({
+    queryKey: ["captures", "series"],
+    queryFn: async () => {
+      const response = await capturesApi.apiV1CapturesSeriesGet();
       return response.data;
     },
     staleTime: 1000 * 60 * 5,
@@ -38,6 +56,7 @@ export function useCapturesQuery(
 export function useCapturesInfiniteQuery(
   params?: {
     video_id?: number;
+    series_id?: number;
     limit?: number;
     sort_key?: ApiV1CapturesGetSortKeyEnum;
     sort_order?: ApiV1CapturesGetSortOrderEnum;
@@ -48,8 +67,11 @@ export function useCapturesInfiniteQuery(
     queryKey: ["captures", "infinite", params],
     queryFn: async ({ pageParam = 1 }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
+      
+      // パラメータ: videoId, seriesId, page, limit, sortKey, sortOrder
       const response = await capturesApi.apiV1CapturesGet(
         params?.video_id,
+        params?.series_id,
         page,
         params?.limit || 12,
         params?.sort_key,
@@ -162,7 +184,15 @@ export function useGetAdjacentCapture(captureId: number) {
   const loadNextPage = async () => {
     try {
       const nextPage = Math.floor(captureList.length / limit) + 1;
-      const response = await capturesApi.apiV1CapturesGet(undefined, nextPage, limit);
+      // パラメータ: videoId, seriesId, page, limit, sortKey, sortOrder
+      const response = await capturesApi.apiV1CapturesGet(
+        undefined,
+        undefined,
+        nextPage,
+        limit,
+        sortKey as any,
+        sortOrder as any,
+      );
       
       if (response.data?.data && response.data.data.length > 0) {
         // ストアに追加

@@ -1,0 +1,20 @@
+# DtoCapturesSeriesListResponse
+
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**data** | [**Array&lt;DtoCaptureSeriesInfo&gt;**](DtoCaptureSeriesInfo.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { DtoCapturesSeriesListResponse } from './api';
+
+const instance: DtoCapturesSeriesListResponse = {
+    data,
+};
+```
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

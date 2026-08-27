@@ -61,6 +61,30 @@ definitions:
       pagination:
         $ref: '#/definitions/dto.Pagination'
     type: object
+  dto.CaptureSeriesInfo:
+    properties:
+      first_month:
+        type: integer
+      first_year:
+        type: integer
+      id:
+        type: integer
+      series_name_file:
+        type: string
+      syobocal_title_id:
+        type: integer
+      syobocal_title_name:
+        type: string
+      syobocal_title_name_en:
+        type: string
+    type: object
+  dto.CapturesSeriesListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.CaptureSeriesInfo'
+        type: array
+    type: object
   dto.ClientSettingsDTO:
     properties:
       close_comment_form_after_sending:
@@ -614,11 +638,16 @@ info:
 paths:
   /api/v1/captures:
     get:
-      description: キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
+      description: キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order
+        でソートをカスタマイズできます
       parameters:
       - description: ビデオID（フィルタリング用）
         in: query
         name: video_id
+        type: integer
+      - description: シリーズID（フィルタリング用）
+        in: query
+        name: series_id
         type: integer
       - default: 1
         description: ページ番号
@@ -754,6 +783,23 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: キャプチャを取得
+      tags:
+      - Captures
+  /api/v1/captures/series:
+    get:
+      description: キャプチャが存在するシリーズのみの一覧を返します
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CapturesSeriesListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: キャプチャ対応シリーズ一覧を取得
       tags:
       - Captures
   /api/v1/files/{folderID}/{filepath}:

@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/api/v1/captures": {
             "get": {
-                "description": "キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます",
+                "description": "キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order でソートをカスタマイズできます",
                 "produces": [
                     "application/json"
                 ],
@@ -30,6 +30,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "ビデオID（フィルタリング用）",
                         "name": "video_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "シリーズID（フィルタリング用）",
+                        "name": "series_id",
                         "in": "query"
                     },
                     {
@@ -138,6 +144,32 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/captures/series": {
+            "get": {
+                "description": "キャプチャが存在するシリーズのみの一覧を返します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Captures"
+                ],
+                "summary": "キャプチャ対応シリーズ一覧を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CapturesSeriesListResponse"
                         }
                     },
                     "500": {
@@ -1144,6 +1176,43 @@ const docTemplate = `{
                 },
                 "pagination": {
                     "$ref": "#/definitions/dto.Pagination"
+                }
+            }
+        },
+        "dto.CaptureSeriesInfo": {
+            "type": "object",
+            "properties": {
+                "first_month": {
+                    "type": "integer"
+                },
+                "first_year": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "series_name_file": {
+                    "type": "string"
+                },
+                "syobocal_title_id": {
+                    "type": "integer"
+                },
+                "syobocal_title_name": {
+                    "type": "string"
+                },
+                "syobocal_title_name_en": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CapturesSeriesListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CaptureSeriesInfo"
+                    }
                 }
             }
         },

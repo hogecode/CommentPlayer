@@ -8,11 +8,12 @@ All URIs are relative to *http://localhost*
 |[**apiV1CapturesIdDelete**](#apiv1capturesiddelete) | **DELETE** /api/v1/captures/{id} | キャプチャを削除|
 |[**apiV1CapturesIdGet**](#apiv1capturesidget) | **GET** /api/v1/captures/{id} | キャプチャを取得|
 |[**apiV1CapturesPost**](#apiv1capturespost) | **POST** /api/v1/captures | キャプチャを作成|
+|[**apiV1CapturesSeriesGet**](#apiv1capturesseriesget) | **GET** /api/v1/captures/series | キャプチャ対応シリーズ一覧を取得|
 
 # **apiV1CapturesGet**
 > DtoCaptureListResponse apiV1CapturesGet()
 
-キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
+キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order でソートをカスタマイズできます
 
 ### Example
 
@@ -26,6 +27,7 @@ const configuration = new Configuration();
 const apiInstance = new CapturesApi(configuration);
 
 let videoId: number; //ビデオID（フィルタリング用） (optional) (default to undefined)
+let seriesId: number; //シリーズID（フィルタリング用） (optional) (default to undefined)
 let page: number; //ページ番号 (optional) (default to 1)
 let limit: number; //1ページあたりのアイテム数 (optional) (default to 20)
 let sortKey: 'id' | 'created_at'; //ソート対象フィールド (id または created_at) (optional) (default to 'created_at')
@@ -33,6 +35,7 @@ let sortOrder: 'asc' | 'desc'; //ソート順序 (asc または desc) (optional)
 
 const { status, data } = await apiInstance.apiV1CapturesGet(
     videoId,
+    seriesId,
     page,
     limit,
     sortKey,
@@ -45,6 +48,7 @@ const { status, data } = await apiInstance.apiV1CapturesGet(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **videoId** | [**number**] | ビデオID（フィルタリング用） | (optional) defaults to undefined|
+| **seriesId** | [**number**] | シリーズID（フィルタリング用） | (optional) defaults to undefined|
 | **page** | [**number**] | ページ番号 | (optional) defaults to 1|
 | **limit** | [**number**] | 1ページあたりのアイテム数 | (optional) defaults to 20|
 | **sortKey** | [**&#39;id&#39; | &#39;created_at&#39;**]**Array<&#39;id&#39; &#124; &#39;created_at&#39;>** | ソート対象フィールド (id または created_at) | (optional) defaults to 'created_at'|
@@ -238,6 +242,51 @@ No authorization required
 |**201** | Created |  -  |
 |**400** | Bad Request |  -  |
 |**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiV1CapturesSeriesGet**
+> DtoCapturesSeriesListResponse apiV1CapturesSeriesGet()
+
+キャプチャが存在するシリーズのみの一覧を返します
+
+### Example
+
+```typescript
+import {
+    CapturesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new CapturesApi(configuration);
+
+const { status, data } = await apiInstance.apiV1CapturesSeriesGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**DtoCapturesSeriesListResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
 |**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

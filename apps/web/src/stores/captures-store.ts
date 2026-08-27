@@ -13,12 +13,16 @@ interface CapturesState {
   currentPage: number
   limit: number
   
+  // シリーズ情報
+  currentSeriesId: number | null
+  
   // Actions
   setCaptureList: (captures: EntityCapture[]) => void
   setSortConfig: (sortKey: 'id' | 'created_at', sortOrder: 'asc' | 'desc') => void
   setPaginationInfo: (page: number, limit: number) => void
   addCaptures: (captures: EntityCapture[]) => void
   clearCaptureList: () => void
+  setCurrentSeriesId: (seriesId: number | null) => void
 }
 
 export const useCapturesStore = create<CapturesState>((set) => ({
@@ -27,6 +31,7 @@ export const useCapturesStore = create<CapturesState>((set) => ({
   sortOrder: 'asc',
   currentPage: 1,
   limit: 24,
+  currentSeriesId: null,
 
   setCaptureList: (captures) =>
     set({
@@ -55,6 +60,13 @@ export const useCapturesStore = create<CapturesState>((set) => ({
   clearCaptureList: () =>
     set({
       captureList: [],
+      currentPage: 1,
+    }),
+
+  setCurrentSeriesId: (seriesId) =>
+    set({
+      currentSeriesId: seriesId,
+      // シリーズ変更時はページをリセット
       currentPage: 1,
     }),
 }))

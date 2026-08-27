@@ -14,23 +14,68 @@ import (
 	"github.com/hogecode/commentPlayer/internal/dto"
 	"github.com/hogecode/commentPlayer/internal/entity"
 	"github.com/hogecode/commentPlayer/internal/i18n"
+	"github.com/hogecode/commentPlayer/internal/query"
 )
 
 // ============ Router Registration ============
 
 // RegisterCaptureRoutes - キャプチャ関連ルートを登録
 func (a *App) RegisterCaptureRoutes(capturesGroup *gin.RouterGroup) {
+	a.GetCapturesSeriesList(capturesGroup)
 	a.GetCaptures(capturesGroup)
 	a.GetCaptureByID(capturesGroup)
 	a.CreateCapture(capturesGroup)
 	a.DeleteCapture(capturesGroup)
 }
 
+// GetCapturesSeriesList - キャプチャが存在するシリーズ一覧を取得
+// @Summary キャプチャ対応シリーズ一覧を取得
+// @Description キャプチャが存在するシリーズのみの一覧を返します
+// @Tags Captures
+// @Produce json
+// @Success 200 {object} dto.CapturesSeriesListResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/captures/series [get]
+func (a *App) GetCapturesSeriesList(capturesGroup *gin.RouterGroup) {
+	capturesGroup.GET("/series", func(ctx *gin.Context) {
+		locale := i18n.GetLocaleFromRequest(ctx.GetHeader("Accept-Language"))
+
+		// キャプチャが存在するシリーズ一覧を取得
+		series, err := a.CaptureQuery.GetCapturesSeriesList()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+				Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
+				Code:  "INTERNAL_ERROR",
+			})
+			return
+		}
+
+		// entity.Series から dto.CaptureSeriesInfo に変換
+		seriesInfo := make([]dto.CaptureSeriesInfo, len(series))
+		for i, s := range series {
+			seriesInfo[i] = dto.CaptureSeriesInfo{
+				ID:                  s.ID,
+				SeriesNameFile:      s.SeriesNameFile,
+				SyobocalTitleID:     s.SyobocalTitleID,
+				SyobocalTitleName:   s.SyobocalTitleName,
+				SyobocalTitleNameEn: s.SyobocalTitleNameEn,
+				FirstYear:           s.FirstYear,
+				FirstMonth:          s.FirstMonth,
+			}
+		}
+
+		ctx.JSON(http.StatusOK, dto.CapturesSeriesListResponse{
+			Data: seriesInfo,
+		})
+	})
+}
+
 // GetCaptures - キャプチャ一覧を取得
 // @Summary キャプチャ一覧を取得
-// @Description キャプチャ一覧をページネーション付きで取得します。sort_key と sort_order でソートをカスタマイズできます
+// @Description キャプチャ一覧をページネーション付きで取得します。series_id でシリーズ別フィルター、sort_key と sort_order でソートをカスタマイズできます
 // @Tags Captures
 // @Param video_id query int false "ビデオID（フィルタリング用）"
+// @Param series_id query int false "シリーズID（フィルタリング用）"
 // @Param page query int false "ページ番号" default(1)
 // @Param limit query int false "1ページあたりのアイテム数" default(20)
 // @Param sort_key query string false "ソート対象フィールド (id または created_at)" default(created_at) Enums(id,created_at)
@@ -67,15 +112,81 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 		// ページネーション計算
 		offset := int64((req.Page - 1) * req.Limit)
 
-		// sqlcで生成されたキャプチャ取得・カウント関数を呼び出す
-		var dbCaptures []db.Capture
-		var total int64
-		var err error
-
 		// ソートキーとソート順序に応じて適切なクエリを選択
 		// デフォルト: created_at DESC（新しい順）
 		sortKey := req.SortKey
 		sortOrder := req.SortOrder
+
+		// シリーズIDでのフィルター優先（シリーズID > ビデオID）
+		if req.SeriesID > 0 {
+			// シリーズIDでフィルター：GORM使用（複雑なJOIN対応）
+			var captures []entity.Capture
+			var total int64
+			
+			// GetCapturesBySeries で取得
+			captures, err := a.CaptureQuery.GetCapturesBySeries(query.GetCapturesBySeriesParams{
+				SeriesID:  int64(req.SeriesID),
+				SortKey:   sortKey,
+				SortOrder: sortOrder,
+				Limit:     int64(req.Limit),
+				Offset:    offset,
+			})
+			
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
+					Code:  "INTERNAL_ERROR",
+				})
+				return
+			}
+			
+			// 総数を取得
+			total, err = a.CaptureQuery.CountCapturesBySeries(int64(req.SeriesID))
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+					Error: i18n.GetErrorMessage(locale, "failed_fetch_captures"),
+					Code:  "INTERNAL_ERROR",
+				})
+				return
+			}
+			
+			// entity.Capture を dto.Capture に変換
+			capturesDTOs := make([]dto.Capture, len(captures))
+			for i, c := range captures {
+				capturesDTOs[i] = dto.Capture{
+					ID:               int(c.ID),
+					Filename:         c.Filename,
+					VideoID:          int(c.VideoID),
+					SaveDir:          c.SaveDir,
+					SavePath:         c.SavePath,
+					CreatedAt:        c.CreatedAt,
+					PlaybackPosition: c.PlaybackPosition,
+					CommentDelay:     c.CommentDelay,
+				}
+			}
+			
+			// レスポンス作成
+			totalPages := (int(total) + req.Limit - 1) / req.Limit
+			if totalPages == 0 {
+				totalPages = 1
+			}
+			
+			ctx.JSON(http.StatusOK, dto.CaptureListResponse{
+				Data: capturesDTOs,
+				Pagination: dto.Pagination{
+					Page:       req.Page,
+					Limit:      req.Limit,
+					Total:      int(total),
+					TotalPages: totalPages,
+				},
+			})
+			return
+		}
+
+		// sqlcで生成されたキャプチャ取得・カウント関数を呼び出す
+		var dbCaptures []db.Capture
+		var total int64
+		var err error
 
 		if req.VideoID > 0 {
 			// VideoIDでフィルター

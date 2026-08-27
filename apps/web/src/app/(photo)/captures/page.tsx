@@ -2,7 +2,7 @@
 
 import { RootLayout } from '@/components/common/RootLayout'
 import { PageBreadcrumb } from '@/components/common/PageBreadcrumb'
-import { useCapturesInfiniteQuery } from '@/services/useCaptures'
+import { useCapturesInfiniteQuery, useGetCapturesSeriesList } from '@/services/useCaptures'
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { config } from '@/lib/config'
@@ -17,23 +17,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { useCapturesStore } from '@/stores/captures-store'
 import { useQueryClient } from '@tanstack/react-query'
 
 export default function CapturesPage() {
-  const limit = 20
+  const limit = 40
   const navigate = useNavigate({ from: '/captures' })
   const queryClient = useQueryClient()
 
   // ストア
-  const { setCaptureList, addCaptures, setPaginationInfo, sortKey, sortOrder, setSortConfig } = useCapturesStore()
+  const { setCaptureList, addCaptures, setPaginationInfo, sortKey, sortOrder, setSortConfig, currentSeriesId, setCurrentSeriesId } = useCapturesStore()
+  
+  // シリーズ一覧を取得
+  const { data: seriesListData, isLoading: isSeriesLoading } = useGetCapturesSeriesList()
 
   // 削除モーダルの状態管理
   const [deleteModalState, setDeleteModalState] = useState<{
@@ -54,6 +51,7 @@ export default function CapturesPage() {
     hasNextPage,
     fetchNextPage,
   } = useCapturesInfiniteQuery({
+    series_id: currentSeriesId || undefined,
     limit,
     sort_key: sortKey,
     sort_order: sortOrder,
@@ -93,6 +91,17 @@ export default function CapturesPage() {
       captureId: null,
       filename: '',
     })
+  }
+
+  // シリーズ選択変更ハンドラー
+  const handleSeriesChange = (value: string) => {
+    // value が空文字列の場合は null（すべてのシリーズ）
+    const seriesId = value === '' ? null : parseInt(value, 10);
+    setCurrentSeriesId(seriesId)
+    // キャプチャリストをリセット（新しいシリーズで再取得させる）
+    setCaptureList([])
+    // React Query のキャッシュを無効化
+    queryClient.invalidateQueries({ queryKey: ['captures', 'infinite'] })
   }
 
   // ソート変更ハンドラー
@@ -143,8 +152,8 @@ export default function CapturesPage() {
 
         <div className="flex flex-col w-full gap-6">
           {/* ヘッダー */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
               <div className="flex justify-between items-end gap-3">
                 <h2 className="text-2xl font-bold">キャプチャ</h2>
                 {isLoading ? (
@@ -155,19 +164,48 @@ export default function CapturesPage() {
               </div>
             </div>
 
-            {/* ソート選択ドロップダウン */}
-              <Select
-                value={`${sortKey}_${sortOrder}`}
-                onValueChange={handleSortChange}
-              >
-                <SelectTrigger className="w-48" id="sort-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="id_desc" className="bg-black/90 text-white" >降順</SelectItem>
-                  <SelectItem value="id_asc"  className="bg-black/90 text-white">昇順</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* フィルタとソート */}
+            <div className="flex items-center gap-4 flex-wrap">
+              {/* シリーズ選択ドロップダウン */}
+              <div className="flex items-center gap-2">
+                <label htmlFor="series-select" className="text-sm text-muted-foreground">
+                  シリーズ：
+                </label>
+                <NativeSelect
+                  id="series-select"
+                  value={currentSeriesId ? currentSeriesId.toString() : ''}
+                  onChange={(e) => handleSeriesChange(e.currentTarget.value)}
+                  disabled={isSeriesLoading}
+                  className="w-56"
+                >
+                  <NativeSelectOption value=""  className="bg-black/90">すべてのシリーズ</NativeSelectOption>
+                  {(seriesListData as {
+                    data?: Array<{
+                      id: number
+                      syobocal_title_name?: string | null
+                      series_name_file?: string | null
+                    }>
+                  } | undefined)?.data?.map((series) => (
+                    <NativeSelectOption key={series.id} value={series.id.toString()} className="bg-black/90">
+                      {series.syobocal_title_name || series.series_name_file}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </div>
+
+              {/* ソート選択ドロップダウン */}
+              <div className="flex items-center gap-2">
+                <NativeSelect
+                  id="sort-select"
+                  value={`${sortKey}_${sortOrder}`}
+                  onChange={(e) => handleSortChange(e.currentTarget.value)}
+                  className="w-48"
+                >
+                  <NativeSelectOption value="id_desc" className="bg-black/90">降順</NativeSelectOption>
+                  <NativeSelectOption value="id_asc"  className="bg-black/90">昇順</NativeSelectOption>
+                </NativeSelect>
+              </div>
+            </div>
           </div>
 
           {/* コンテンツ */}

@@ -18,6 +18,8 @@ docs/DebugApi.md
 docs/DtoApiComment.md
 docs/DtoCapture.md
 docs/DtoCaptureListResponse.md
+docs/DtoCaptureSeriesInfo.md
+docs/DtoCapturesSeriesListResponse.md
 docs/DtoClientSettingsDTO.md
 docs/DtoErrorResponse.md
 docs/DtoFolderActionResponse.md
@@ -61,7 +63,9 @@ git_push.sh
 index.ts
 models/dto-api-comment.ts
 models/dto-capture-list-response.ts
+models/dto-capture-series-info.ts
 models/dto-capture.ts
+models/dto-captures-series-list-response.ts
 models/dto-client-settings-dto.ts
 models/dto-error-response.ts
 models/dto-folder-action-response.ts
