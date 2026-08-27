@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import { CapturesApi, type DtoCaptureListResponse, type EntityCapture } from "@/generated";
+import { CapturesApi, type DtoCaptureListResponse, type EntityCapture, type ApiV1CapturesGetSortKeyEnum, type ApiV1CapturesGetSortOrderEnum } from "@/generated";
 import { useCapturesStore } from "@/stores/captures-store";
 import { apiConfiguration } from "@/lib/api/api-config";
 import Message from "@/message";
@@ -39,6 +39,8 @@ export function useCapturesInfiniteQuery(
   params?: {
     video_id?: number;
     limit?: number;
+    sort_key?: ApiV1CapturesGetSortKeyEnum;
+    sort_order?: ApiV1CapturesGetSortOrderEnum;
   },
   options?: any,
 ) {
@@ -50,6 +52,8 @@ export function useCapturesInfiniteQuery(
         params?.video_id,
         page,
         params?.limit || 12,
+        params?.sort_key,
+        params?.sort_order,
       );
       return response.data;
     },

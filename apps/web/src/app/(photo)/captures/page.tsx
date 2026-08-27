@@ -8,7 +8,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { config } from '@/lib/config'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty, EmptyContent, EmptyMedia } from '@/components/ui/empty'
-import { Image as ImageIcon, MoreVertical } from 'lucide-react'
+import { Image as ImageIcon, MoreVertical, ChevronDown } from 'lucide-react'
 import { DeleteCaptureModal } from '@/components/capture/DeleteCaptureModal'
 import {
   DropdownMenu,
@@ -17,14 +17,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useCapturesStore } from '@/stores/captures-store'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function CapturesPage() {
   const limit = 20
   const navigate = useNavigate({ from: '/captures' })
+  const queryClient = useQueryClient()
 
   // ストア
-  const { setCaptureList, addCaptures, setPaginationInfo } = useCapturesStore()
+  const { setCaptureList, addCaptures, setPaginationInfo, sortKey, sortOrder, setSortConfig } = useCapturesStore()
 
   // 削除モーダルの状態管理
   const [deleteModalState, setDeleteModalState] = useState<{
@@ -46,6 +55,8 @@ export default function CapturesPage() {
     fetchNextPage,
   } = useCapturesInfiniteQuery({
     limit,
+    sort_key: sortKey,
+    sort_order: sortOrder,
   })
 
   // データをストアに保存
@@ -82,6 +93,21 @@ export default function CapturesPage() {
       captureId: null,
       filename: '',
     })
+  }
+
+  // ソート変更ハンドラー
+  const handleSortChange = (value: string) => {
+    // value のフォーマット: "sortKey_sortOrder" (例: "created_at_desc")
+    const [newSortKey, newSortOrder] = value.split('_')
+    if (newSortKey === 'id' || newSortKey === 'created_at') {
+      if (newSortOrder === 'asc' || newSortOrder === 'desc') {
+        setSortConfig(newSortKey, newSortOrder)
+        // キャプチャリストをリセット（新しいソート設定で再取得させる）
+        setCaptureList([])
+        // React Query のキャッシュを無効化
+        queryClient.invalidateQueries({ queryKey: ['captures', 'infinite'] })
+      }
+    }
   }
 
   // IntersectionObserverを使用した自動ロード
@@ -128,6 +154,20 @@ export default function CapturesPage() {
                 )}
               </div>
             </div>
+
+            {/* ソート選択ドロップダウン */}
+              <Select
+                value={`${sortKey}_${sortOrder}`}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="w-48" id="sort-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="id_desc" className="bg-black/90 text-white" >降順</SelectItem>
+                  <SelectItem value="id_asc"  className="bg-black/90 text-white">昇順</SelectItem>
+                </SelectContent>
+              </Select>
           </div>
 
           {/* コンテンツ */}
