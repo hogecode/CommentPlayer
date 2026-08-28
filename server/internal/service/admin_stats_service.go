@@ -120,6 +120,12 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 		if dv.FileName.Valid {
 			fileName = dv.FileName.String
 		}
+		// エピソード番号を取得（NULL可能）
+		var episode *int
+		if dv.Episode.Valid {
+			episode = new(int)
+			*episode = int(dv.Episode.Int64)
+		}
 		subtitle := ""
 		if dv.Subtitle.Valid {
 			subtitle = dv.Subtitle.String
@@ -127,6 +133,7 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 		dailyViewsMap[dateStr].Videos = append(dailyViewsMap[dateStr].Videos, dto.DailyVideoViewResponse{
 			VideoID:    int(dv.ID),
 			FileName:   fileName,
+			Episode:    episode,
 			Subtitle:   subtitle,
 			SeriesName: dv.SeriesName,
 			ViewCount:  dv.ViewCount,

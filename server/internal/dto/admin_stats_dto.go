@@ -6,6 +6,7 @@ import "time"
 type DailyVideoViewResponse struct {
 	VideoID    int    `json:"video_id"`
 	FileName   string `json:"file_name"`
+	Episode    *int   `json:"episode"`   // エピソード番号
 	Subtitle   string `json:"subtitle"` // 動画のサブタイトル
 	SeriesName string `json:"series_name"`
 	ViewCount  int64  `json:"view_count"` // その動画のその日の再生数

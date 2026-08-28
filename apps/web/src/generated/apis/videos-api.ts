@@ -211,7 +211,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
          * @summary ビデオの視聴を記録
          * @param {number} id ビデオID
          * @param {*} [options] Override http request option.
@@ -400,7 +400,7 @@ export const VideosApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
          * @summary ビデオの視聴を記録
          * @param {number} id ビデオID
          * @param {*} [options] Override http request option.
@@ -498,7 +498,7 @@ export const VideosApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.apiV1VideosIdThumbnailRegeneratePost(id, body, options).then((request) => request(axios, basePath));
         },
         /**
-         * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+         * ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
          * @summary ビデオの視聴を記録
          * @param {number} id ビデオID
          * @param {*} [options] Override http request option.
@@ -589,7 +589,7 @@ export class VideosApi extends BaseAPI {
     }
 
     /**
-     * ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+     * ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
      * @summary ビデオの視聴を記録
      * @param {number} id ビデオID
      * @param {*} [options] Override http request option.

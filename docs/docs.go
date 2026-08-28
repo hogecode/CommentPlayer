@@ -1114,7 +1114,7 @@ const docTemplate = `{
         },
         "/api/v1/videos/{id}/view": {
             "post": {
-                "description": "ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します",
+                "description": "ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します",
                 "tags": [
                     "Videos"
                 ],
@@ -1423,6 +1423,10 @@ const docTemplate = `{
         "dto.DailyVideoViewResponse": {
             "type": "object",
             "properties": {
+                "episode": {
+                    "description": "エピソード番号",
+                    "type": "integer"
+                },
                 "file_name": {
                     "type": "string"
                 },

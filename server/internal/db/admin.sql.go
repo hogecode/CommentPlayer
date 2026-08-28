@@ -61,6 +61,7 @@ SELECT
     COUNT(*) AS view_count,
     wh.id,
     v.file_name,
+    v.episode,
     v.subtitle,
     COALESCE(s.syobocal_title_name, 'No Series') AS series_name
 FROM watched_history wh
@@ -69,7 +70,7 @@ LEFT JOIN series s ON v.series_id = s.id
 WHERE substr(wh.watched_at, 1, 26) >= ?
   AND substr(wh.watched_at, 1, 26) < ?
   AND wh.watched_at IS NOT NULL
-GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, s.syobocal_title_name
+GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, v.episode, s.syobocal_title_name
 ORDER BY date DESC, wh.video_id DESC
 `
 
@@ -83,6 +84,7 @@ type GetDailyViewsWithDetailsRow struct {
 	ViewCount  int64
 	ID         int64
 	FileName   sql.NullString
+	Episode    sql.NullInt64
 	Subtitle   sql.NullString
 	SeriesName string
 }
@@ -101,6 +103,7 @@ func (q *Queries) GetDailyViewsWithDetails(ctx context.Context, arg GetDailyView
 			&i.ViewCount,
 			&i.ID,
 			&i.FileName,
+			&i.Episode,
 			&i.Subtitle,
 			&i.SeriesName,
 		); err != nil {

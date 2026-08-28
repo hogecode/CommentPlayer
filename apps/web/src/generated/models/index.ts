@@ -5,6 +5,7 @@ export * from './dto-capture-list-response';
 export * from './dto-capture-series-info';
 export * from './dto-captures-series-list-response';
 export * from './dto-client-settings-dto';
+export * from './dto-daily-video-view-response';
 export * from './dto-daily-views-response';
 export * from './dto-error-response';
 export * from './dto-folder-action-response';

@@ -24,6 +24,7 @@ docs/DtoCaptureListResponse.md
 docs/DtoCaptureSeriesInfo.md
 docs/DtoCapturesSeriesListResponse.md
 docs/DtoClientSettingsDTO.md
+docs/DtoDailyVideoViewResponse.md
 docs/DtoDailyViewsResponse.md
 docs/DtoErrorResponse.md
 docs/DtoFolderActionResponse.md
@@ -76,6 +77,7 @@ models/dto-capture-series-info.ts
 models/dto-capture.ts
 models/dto-captures-series-list-response.ts
 models/dto-client-settings-dto.ts
+models/dto-daily-video-view-response.ts
 models/dto-daily-views-response.ts
 models/dto-error-response.ts
 models/dto-folder-action-response.ts

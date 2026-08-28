@@ -13,6 +13,7 @@ import { useState } from 'react'
 interface VideoView {
   video_id: number
   file_name: string
+  episode: string
   subtitle: string
   series_name: string
   view_count: number
@@ -129,7 +130,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
 
           {/* 選択日の詳細 */}
           {selectedDate && (
-            <Accordion type="single" collapsible className=" max-w-[30rem]">
+            <Accordion type="single" collapsible className=" max-w-[30rem] max-h-100 overflow-y-auto">
               <AccordionItem
                 value={`date-${selectedDate}`}
                 className="border border-gray-300 rounded bg-muted"
@@ -156,7 +157,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
                             key={`${selectedDate}-${video.video_id}`}
                             className="border border-gray-300 rounded mb-2 bg-white/50"
                           >
-                            <div className="px-3 py-2 hover:bg-white/70 [&[data-state=open]>svg]:rotate-180">
+                            <div className="px-1 py-1 hover:bg-white/70 [&[data-state=open]>svg]:rotate-180">
                               <div className="flex items-start justify-between w-full gap-2 pr-2">
                                 <div className="flex-1 min-w-0 text-left">
                                   <p className="text-xs text-gray-600 truncate">
@@ -164,7 +165,7 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
                                   </p>
                                   <div className="flex gap-2">
                                     <p className="text-xs font-medium truncate">
-                                     {video.file_name}
+                                     #{video.episode}
                                     </p>
                                     {video.subtitle && (
                                       <p className="text-xs text-gray-700 truncate font-semibold">
@@ -173,11 +174,13 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
                                     )}
                                   </div>
                                 </div>
+                                
                                 <div className="shrink-0">
                                   <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
                                     {video.view_count}回
                                   </span>
                                 </div>
+                                 
                               </div>
                             </div>
                           </div>

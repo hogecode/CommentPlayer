@@ -13,21 +13,21 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { DtoDailyVideoViewResponse } from './dto-daily-video-view-response';
 
-export interface DtoDailyViewsResponse {
+export interface DtoDailyVideoViewResponse {
     /**
-     * YYYY-MM-DD format
+     * エピソード番号
      */
-    'date'?: string;
+    'episode'?: number;
+    'file_name'?: string;
+    'series_name'?: string;
     /**
-     * その日に視聴された動画の詳細
+     * 動画のサブタイトル
      */
-    'videos'?: Array<DtoDailyVideoViewResponse>;
+    'subtitle'?: string;
+    'video_id'?: number;
     /**
-     * その日の総再生数
+     * その動画のその日の再生数
      */
     'view_count'?: number;
 }

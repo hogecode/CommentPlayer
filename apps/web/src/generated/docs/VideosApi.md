@@ -249,7 +249,7 @@ No authorization required
 # **apiV1VideosIdViewPost**
 > DtoSuccessResponse apiV1VideosIdViewPost()
 
-ビデオの視聴開始時に呼び出し、views を増加させ watched_history に行を追加します
+ビデオの視聴開始時に呼び出し、過去1時間以内の視聴履歴がない場合のみ views を増加させ watched_history に行を追加します
 
 ### Example
 
