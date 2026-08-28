@@ -83,6 +83,9 @@ export default function DPlayer({
   
   // ビデオ視聴記録フラグ（重複記録を防ぐ）
   const hasRecordedViewRef = useRef<boolean>(false);
+  
+  // 視聴記録 APIコール用のタイムアウト ID（キャンセル・クリーンアップ用）
+  const recordViewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // danList が変わったら ref を同期
   useEffect(() => {
@@ -152,20 +155,37 @@ export default function DPlayer({
         dp.danmaku.options.time = () => dp.video.currentTime - delayOffset;
       }
 
-      // ビデオ視聴を記録（再生開始時に1回のみ）
+      // ビデオ視聴を記録（再生開始から30秒後に1回のみ）
       // dp.on('play', ...) が機能しないため、HTML5ネイティブイベントを使用
       const recordViewOnceHandler = () => {
-        console.log('[DPlayer] play event fired. hasRecorded:', hasRecordedViewRef.current, 'videoId:', videoIdRef.current);
+        // 既存のタイムアウトがあればキャンセル
+        if (recordViewTimeoutRef.current) {
+          clearTimeout(recordViewTimeoutRef.current);
+          recordViewTimeoutRef.current = null;
+        }
+
         if (!hasRecordedViewRef.current && videoIdRef.current) {
-          console.log('[DPlayer] Recording video view for videoId:', videoIdRef.current);
-          hasRecordedViewRef.current = true;
-          // ビデオ視聴記録を送信（非同期、エラーは無視）
-          recordVideoViewMutation.mutate(videoIdRef.current);
+          // 再生開始から30秒後に APIコールを実行
+          recordViewTimeoutRef.current = setTimeout(() => {
+            if (!hasRecordedViewRef.current && videoIdRef.current) {
+              hasRecordedViewRef.current = true;
+              // ビデオ視聴記録を送信（非同期、エラーは無視）
+              recordVideoViewMutation.mutate(videoIdRef.current);
+              console.log(
+                `[DPlayer] Video view recorded after 30 seconds. (Video ID: ${videoIdRef.current})`
+              );
+            }
+            recordViewTimeoutRef.current = null;
+          }, 30000);
+          
+          console.log(
+            `[DPlayer] Play event detected. View record will be sent after 30 seconds. (Video ID: ${videoIdRef.current})`
+          );
         } else {
           console.log('[DPlayer] Skipping view record - already recorded or no videoId');
         }
       };
-      
+
       // HTML5ネイティブの play イベントを使用（DPlayerのイベント機構より確実）
       if (dp.video) {
         console.log('[DPlayer] Adding play event listener to video element');
@@ -657,6 +677,12 @@ export default function DPlayer({
 
       // クリーンアップ関数を保存
       DPlayerRef.current._cleanup = () => {
+        // 視聴記録用のタイムアウトをクリア
+        if (recordViewTimeoutRef.current) {
+          clearTimeout(recordViewTimeoutRef.current);
+          recordViewTimeoutRef.current = null;
+        }
+
         if (dp.video) {
           dp.video.removeEventListener('play', recordViewOnceHandler);
           dp.video.removeEventListener('timeupdate', handleTimeUpdate);
