@@ -28,6 +28,6 @@ WHERE video_id = ?;
 SELECT id
 FROM watched_history
 WHERE video_id = ? 
-  AND watched_at > datetime('now', '-1 hour')
+  AND watched_at > datetime('now', '-1 hour', 'localtime')
 ORDER BY watched_at DESC
 LIMIT 1;
