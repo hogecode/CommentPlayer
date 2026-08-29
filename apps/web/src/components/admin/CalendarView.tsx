@@ -74,12 +74,22 @@ export function CalendarView({ data, year, month }: CalendarViewProps) {
 
   // 日付ごとの背景色を計算
   const getBackgroundColor = (views: number) => {
+    
     if (views === 0) return 'bg-card'
-    if (views > 20) return 'bg-blue-600 text-white'
-    if (views > 10) return 'bg-blue-400 text-white'
-    if (views > 5) return 'bg-blue-200 text-gray-900'
-    return 'bg-blue-100 text-gray-900'
+
+    // viewsを基にTailwindの色クラスを動的に選択
+    // bg-blue-100（少ない） → bg-blue-900（多い）
+    if (views <= 2) return 'bg-blue-100 text-gray-900'
+    if (views <= 5) return 'bg-blue-200 text-gray-900'
+    if (views <= 8) return 'bg-blue-250 text-gray-900'
+    if (views <= 12) return 'bg-blue-300 text-gray-900'
+    if (views <= 16) return 'bg-blue-350 text-white'
+    if (views <= 20) return 'bg-blue-400 text-white'
+    if (views <= 25) return 'bg-blue-450 text-white'
+    if (views <= 30) return 'bg-blue-500 text-white'
+    return 'bg-blue-600 text-white'
   }
+
 
   const weekDays = ['日', '月', '火', '水', '木', '金', '土']
 
