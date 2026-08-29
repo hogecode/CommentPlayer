@@ -71,7 +71,7 @@ WHERE substr(wh.watched_at, 1, 26) >= ?
   AND substr(wh.watched_at, 1, 26) < ?
   AND wh.watched_at IS NOT NULL
 GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, v.episode, s.syobocal_title_name
-ORDER BY date DESC, wh.video_id DESC
+ORDER BY date DESC, MAX(wh.watched_at) DESC
 `
 
 type GetDailyViewsWithDetailsParams struct {
