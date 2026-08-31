@@ -32,14 +32,20 @@ ORDER BY date DESC, MAX(wh.watched_at) DESC;
 -- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'No Series') AS series_name,
-    SUM(v.views) AS total_views,
-    COUNT(v.id) AS video_count
+    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COUNT(DISTINCT wh.id) AS view_count,
+    COUNT(DISTINCT v.id) AS video_count
 FROM video v
-LEFT JOIN series s ON v.series_id = s.id
+LEFT JOIN series s
+    ON v.series_id = s.id
+LEFT JOIN watched_history wh
+    ON wh.video_id = v.id
+    AND substr(wh.watched_at, 1, 26) >= ?
+    AND substr(wh.watched_at, 1, 26) < ?
 WHERE v.is_deleted = 0
-GROUP BY v.series_id
-ORDER BY total_views DESC;
+GROUP BY s.id, s.syobocal_title_name
+ORDER BY view_count DESC;
+
 
 
 -- name: GetVideoRanking :many

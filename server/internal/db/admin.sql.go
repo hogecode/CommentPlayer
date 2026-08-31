@@ -152,25 +152,35 @@ func (q *Queries) GetMonthlyStats(ctx context.Context, arg GetMonthlyStatsParams
 const getSeriesViews = `-- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'No Series') AS series_name,
-    SUM(v.views) AS total_views,
-    COUNT(v.id) AS video_count
+    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COUNT(DISTINCT wh.id) AS view_count,
+    COUNT(DISTINCT v.id) AS video_count
 FROM video v
-LEFT JOIN series s ON v.series_id = s.id
+LEFT JOIN series s
+    ON v.series_id = s.id
+LEFT JOIN watched_history wh
+    ON wh.video_id = v.id
+    AND substr(wh.watched_at, 1, 26) >= ?
+    AND substr(wh.watched_at, 1, 26) < ?
 WHERE v.is_deleted = 0
-GROUP BY v.series_id
-ORDER BY total_views DESC
+GROUP BY s.id, s.syobocal_title_name
+ORDER BY view_count DESC
 `
+
+type GetSeriesViewsParams struct {
+	WatchedAt   sql.NullTime
+	WatchedAt_2 sql.NullTime
+}
 
 type GetSeriesViewsRow struct {
 	SeriesID   int64
 	SeriesName string
-	TotalViews sql.NullFloat64
+	ViewCount  int64
 	VideoCount int64
 }
 
-func (q *Queries) GetSeriesViews(ctx context.Context) ([]GetSeriesViewsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getSeriesViews)
+func (q *Queries) GetSeriesViews(ctx context.Context, arg GetSeriesViewsParams) ([]GetSeriesViewsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSeriesViews, arg.WatchedAt, arg.WatchedAt_2)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +191,7 @@ func (q *Queries) GetSeriesViews(ctx context.Context) ([]GetSeriesViewsRow, erro
 		if err := rows.Scan(
 			&i.SeriesID,
 			&i.SeriesName,
-			&i.TotalViews,
+			&i.ViewCount,
 			&i.VideoCount,
 		); err != nil {
 			return nil, err

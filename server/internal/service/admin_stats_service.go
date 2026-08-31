@@ -48,7 +48,10 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 	slog.Info("Daily views with details fetched", slog.Int("count", len(dailyViewsWithDetails)))
 
 	// シリーズごとの再生数を取得
-	seriesViews, err := s.queries.GetSeriesViews(ctx)
+	seriesViews, err := s.queries.GetSeriesViews(ctx, db.GetSeriesViewsParams{
+		WatchedAt:   sql.NullTime{Time: startDate, Valid: true},
+		WatchedAt_2: sql.NullTime{Time: endDate, Valid: true},
+	})
 	if err != nil {
 		slog.Error("Failed to get series views", slog.Any("error", err))
 		return nil, err
@@ -154,14 +157,10 @@ func (s *AdminStatsService) GetMonthlyStats(ctx context.Context, year int, month
 	// シリーズごとの再生数を変換
 	response.SeriesViews = make([]dto.SeriesViewsResponse, 0)
 	for _, sv := range seriesViews {
-		totalViews := int64(0)
-		if sv.TotalViews.Valid {
-			totalViews = int64(sv.TotalViews.Float64)
-		}
 		response.SeriesViews = append(response.SeriesViews, dto.SeriesViewsResponse{
 			SeriesID:   int(sv.SeriesID),
 			SeriesName: sv.SeriesName,
-			TotalViews: totalViews,
+			TotalViews: sv.ViewCount,
 			VideoCount: sv.VideoCount,
 		})
 	}
