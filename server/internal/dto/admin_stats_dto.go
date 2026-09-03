@@ -6,7 +6,7 @@ import "time"
 type DailyVideoViewResponse struct {
 	VideoID    int    `json:"video_id"`
 	FileName   string `json:"file_name"`
-	Episode    *int   `json:"episode"`   // エピソード番号
+	Episode    *int   `json:"episode"`  // エピソード番号
 	Subtitle   string `json:"subtitle"` // 動画のサブタイトル
 	SeriesName string `json:"series_name"`
 	ViewCount  int64  `json:"view_count"` // その動画のその日の再生数
@@ -58,4 +58,26 @@ type AdminStatsResponse struct {
 	SeriesViews          []SeriesViewsResponse          `json:"series_views"`
 	VideoRanking         []VideoRankingResponse         `json:"video_ranking"`
 	WatchedHistoryByDate []WatchedHistoryByDateResponse `json:"watched_history_by_date"`
+}
+
+// SeriesEpisodeWatchHistoryItem - エピソード内の視聴履歴アイテム
+type SeriesEpisodeWatchHistoryItem struct {
+	ID        int64  `json:"id"`         // 視聴履歴ID
+	WatchedAt string `json:"watched_at"` // 視聴日時（ISO 8601形式）
+}
+
+// SeriesEpisodeResponse - エピソード別の視聴履歴レスポンス
+type SeriesEpisodeResponse struct {
+	VideoID      int64                           `json:"video_id"`      // ビデオID
+	Episode      *int                            `json:"episode"`       // エピソード番号
+	Subtitle     string                          `json:"subtitle"`      // エピソードのサブタイトル
+	FileName     string                          `json:"file_name"`     // ファイル名
+	Views        int64                           `json:"views"`         // 動画の総再生数
+	WatchHistory []SeriesEpisodeWatchHistoryItem `json:"watch_history"` // 視聴履歴
+}
+
+// SeriesEpisodeWatchHistoryResponse - シリーズのエピソード別視聴履歴レスポンス
+type SeriesEpisodeWatchHistoryResponse struct {
+	SeriesID int64                   `json:"series_id"` // シリーズID
+	Episodes []SeriesEpisodeResponse `json:"episodes"`  // エピソード別データ
 }

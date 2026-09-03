@@ -149,6 +149,64 @@ func (q *Queries) GetMonthlyStats(ctx context.Context, arg GetMonthlyStatsParams
 	return i, err
 }
 
+const getSeriesEpisodeWatchHistory = `-- name: GetSeriesEpisodeWatchHistory :many
+SELECT
+    v.id,
+    v.episode,
+    v.subtitle,
+    v.file_name,
+    v.views,
+    wh.id AS watch_history_id,
+    wh.watched_at
+FROM video v
+LEFT JOIN watched_history wh ON v.id = wh.video_id
+WHERE v.series_id = ?
+  AND v.is_deleted = 0
+ORDER BY v.episode ASC, wh.watched_at DESC
+`
+
+type GetSeriesEpisodeWatchHistoryRow struct {
+	ID             int64
+	Episode        sql.NullInt64
+	Subtitle       sql.NullString
+	FileName       sql.NullString
+	Views          sql.NullInt64
+	WatchHistoryID sql.NullInt64
+	WatchedAt      sql.NullTime
+}
+
+// 特定シリーズのエピソード別視聴履歴を取得
+func (q *Queries) GetSeriesEpisodeWatchHistory(ctx context.Context, seriesID sql.NullInt64) ([]GetSeriesEpisodeWatchHistoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSeriesEpisodeWatchHistory, seriesID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSeriesEpisodeWatchHistoryRow
+	for rows.Next() {
+		var i GetSeriesEpisodeWatchHistoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Episode,
+			&i.Subtitle,
+			&i.FileName,
+			&i.Views,
+			&i.WatchHistoryID,
+			&i.WatchedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSeriesViews = `-- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,

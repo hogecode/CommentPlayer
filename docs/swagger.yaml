@@ -283,6 +283,49 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.SeriesEpisodeResponse:
+    properties:
+      episode:
+        description: エピソード番号
+        type: integer
+      file_name:
+        description: ファイル名
+        type: string
+      subtitle:
+        description: エピソードのサブタイトル
+        type: string
+      video_id:
+        description: ビデオID
+        type: integer
+      views:
+        description: 動画の総再生数
+        type: integer
+      watch_history:
+        description: 視聴履歴
+        items:
+          $ref: '#/definitions/dto.SeriesEpisodeWatchHistoryItem'
+        type: array
+    type: object
+  dto.SeriesEpisodeWatchHistoryItem:
+    properties:
+      id:
+        description: 視聴履歴ID
+        type: integer
+      watched_at:
+        description: 視聴日時（ISO 8601形式）
+        type: string
+    type: object
+  dto.SeriesEpisodeWatchHistoryResponse:
+    properties:
+      episodes:
+        description: エピソード別データ
+        items:
+          $ref: '#/definitions/dto.SeriesEpisodeResponse'
+        type: array
+      series_id:
+        description: シリーズID
+        type: integer
+    type: object
   dto.SeriesListResponse:
     properties:
       series:
@@ -739,6 +782,31 @@ info:
   title: commentPlayer API
   version: 1.0.0
 paths:
+  /api/v1/admin/series/{series_id}/watch-history:
+    get:
+      description: 指定したシリーズIDのエピソード別視聴履歴を取得
+      parameters:
+      - description: シリーズID
+        in: path
+        name: series_id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SeriesEpisodeWatchHistoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: シリーズのエピソード別視聴履歴を取得
+      tags:
+      - Admin
   /api/v1/admin/stats/monthly:
     get:
       description: 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得

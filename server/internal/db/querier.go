@@ -41,6 +41,8 @@ type Querier interface {
 	GetRecentWatchedHistoryWithin1Hour(ctx context.Context, videoID int64) (int64, error)
 	GetSeriesByID(ctx context.Context, id int64) (Series, error)
 	GetSeriesByName(ctx context.Context, seriesNameFile sql.NullString) (Series, error)
+	// 特定シリーズのエピソード別視聴履歴を取得
+	GetSeriesEpisodeWatchHistory(ctx context.Context, seriesID sql.NullInt64) ([]GetSeriesEpisodeWatchHistoryRow, error)
 	GetSeriesViews(ctx context.Context, arg GetSeriesViewsParams) ([]GetSeriesViewsRow, error)
 	GetVideoByID(ctx context.Context, id int64) (Video, error)
 	GetVideoListByStatus(ctx context.Context, arg GetVideoListByStatusParams) ([]Video, error)

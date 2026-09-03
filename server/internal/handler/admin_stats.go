@@ -73,3 +73,47 @@ func (h *AdminStatsHandler) GetMonthlyStats(c *gin.Context) {
 
 	c.JSON(http.StatusOK, stats)
 }
+
+// GetSeriesEpisodeWatchHistory - 特定シリーズのエピソード別視聴履歴を取得
+// @Summary シリーズのエピソード別視聴履歴を取得
+// @Description 指定したシリーズIDのエピソード別視聴履歴を取得
+// @Tags Admin
+// @Param series_id path integer true "シリーズID"
+// @Success 200 {object} dto.SeriesEpisodeWatchHistoryResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/admin/series/{series_id}/watch-history [get]
+func (h *AdminStatsHandler) GetSeriesEpisodeWatchHistory(c *gin.Context) {
+	// シリーズIDをパスパラメータから取得
+	seriesIDStr := c.Param("series_id")
+	seriesID, err := strconv.ParseInt(seriesIDStr, 10, 64)
+	if err != nil {
+		slog.Warn("Invalid series ID format",
+			slog.String("series_id", seriesIDStr),
+			slog.Any("error", err),
+		)
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "Invalid series ID format",
+		})
+		return
+	}
+
+	slog.Info("GetSeriesEpisodeWatchHistory requested",
+		slog.Int64("series_id", seriesID),
+	)
+
+	// シリーズのエピソード別視聴履歴を取得
+	watchHistory, err := h.statsService.GetSeriesEpisodeWatchHistory(c.Request.Context(), seriesID)
+	if err != nil {
+		slog.Error("Failed to get series episode watch history",
+			slog.Int64("series_id", seriesID),
+			slog.Any("error", err),
+		)
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "Failed to retrieve series episode watch history",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, watchHistory)
+}

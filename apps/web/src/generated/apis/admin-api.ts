@@ -25,11 +25,47 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 import type { DtoAdminStatsResponse } from '../models';
 // @ts-ignore
 import type { DtoErrorResponse } from '../models';
+// @ts-ignore
+import type { DtoSeriesEpisodeWatchHistoryResponse } from '../models';
 /**
  * AdminApi - axios parameter creator
  */
 export const AdminApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 指定したシリーズIDのエピソード別視聴履歴を取得
+         * @summary シリーズのエピソード別視聴履歴を取得
+         * @param {number} seriesId シリーズID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1AdminSeriesSeriesIdWatchHistoryGet: async (seriesId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'seriesId' is not null or undefined
+            assertParamExists('apiV1AdminSeriesSeriesIdWatchHistoryGet', 'seriesId', seriesId)
+            const localVarPath = `/api/v1/admin/series/{series_id}/watch-history`
+                .replace(`{${"series_id"}}`, encodeURIComponent(String(seriesId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
          * @summary 月別統計を取得
@@ -80,6 +116,19 @@ export const AdminApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AdminApiAxiosParamCreator(configuration)
     return {
         /**
+         * 指定したシリーズIDのエピソード別視聴履歴を取得
+         * @summary シリーズのエピソード別視聴履歴を取得
+         * @param {number} seriesId シリーズID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DtoSeriesEpisodeWatchHistoryResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.apiV1AdminSeriesSeriesIdWatchHistoryGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
          * @summary 月別統計を取得
          * @param {number} [year] 年（デフォルト: 当年）
@@ -103,6 +152,16 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = AdminApiFp(configuration)
     return {
         /**
+         * 指定したシリーズIDのエピソード別視聴履歴を取得
+         * @summary シリーズのエピソード別視聴履歴を取得
+         * @param {number} seriesId シリーズID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId: number, options?: RawAxiosRequestConfig): AxiosPromise<DtoSeriesEpisodeWatchHistoryResponse> {
+            return localVarFp.apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
          * @summary 月別統計を取得
          * @param {number} [year] 年（デフォルト: 当年）
@@ -120,6 +179,17 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
  * AdminApi - object-oriented interface
  */
 export class AdminApi extends BaseAPI {
+    /**
+     * 指定したシリーズIDのエピソード別視聴履歴を取得
+     * @summary シリーズのエピソード別視聴履歴を取得
+     * @param {number} seriesId シリーズID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId: number, options?: RawAxiosRequestConfig) {
+        return AdminApiFp(this.configuration).apiV1AdminSeriesSeriesIdWatchHistoryGet(seriesId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
      * @summary 月別統計を取得

@@ -83,3 +83,19 @@ FROM watched_history
 WHERE substr(watched_at, 1, 26) >= ?
   AND substr(watched_at, 1, 26) < ?
   AND watched_at IS NOT NULL;
+
+-- name: GetSeriesEpisodeWatchHistory :many
+-- 特定シリーズのエピソード別視聴履歴を取得
+SELECT
+    v.id,
+    v.episode,
+    v.subtitle,
+    v.file_name,
+    v.views,
+    wh.id AS watch_history_id,
+    wh.watched_at
+FROM video v
+LEFT JOIN watched_history wh ON v.id = wh.video_id
+WHERE v.series_id = ?
+  AND v.is_deleted = 0
+ORDER BY v.episode ASC, wh.watched_at DESC;

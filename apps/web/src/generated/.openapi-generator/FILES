@@ -35,6 +35,9 @@ docs/DtoMonthlyStatsResponse.md
 docs/DtoMutedCommentKeyword.md
 docs/DtoMylistItem.md
 docs/DtoPagination.md
+docs/DtoSeriesEpisodeResponse.md
+docs/DtoSeriesEpisodeWatchHistoryItem.md
+docs/DtoSeriesEpisodeWatchHistoryResponse.md
 docs/DtoSeriesListResponse.md
 docs/DtoSeriesResponse.md
 docs/DtoSeriesViewsResponse.md
@@ -88,6 +91,9 @@ models/dto-monthly-stats-response.ts
 models/dto-muted-comment-keyword.ts
 models/dto-mylist-item.ts
 models/dto-pagination.ts
+models/dto-series-episode-response.ts
+models/dto-series-episode-watch-history-item.ts
+models/dto-series-episode-watch-history-response.ts
 models/dto-series-list-response.ts
 models/dto-series-response.ts
 models/dto-series-views-response.ts

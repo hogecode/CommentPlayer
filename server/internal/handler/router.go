@@ -52,12 +52,15 @@ func (a *App) RegisterRoutes(engine *gin.Engine, jwtSecret string) {
 
 // RegisterAdminRoutes - 管理画面関連ルートを登録
 func (a *App) RegisterAdminRoutes(group *gin.RouterGroup) {
-	statsGroup := group.Group("/stats")
-
 	// 統計サービスを初期化
 	statsService := service.NewAdminStatsService(a.Queries)
 	statsHandler := NewAdminStatsHandler(statsService)
 
-	// ルートを登録
+	// 統計ルートグループ
+	statsGroup := group.Group("/stats")
 	statsGroup.GET("/monthly", statsHandler.GetMonthlyStats)
+
+	// シリーズ関連ルート
+	seriesGroup := group.Group("/series")
+	seriesGroup.GET("/:series_id/watch-history", statsHandler.GetSeriesEpisodeWatchHistory)
 }
