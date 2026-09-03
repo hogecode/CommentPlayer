@@ -26,9 +26,8 @@ interface SeriesStatsTableProps {
 
 export function SeriesStatsTable({ data }: SeriesStatsTableProps) {
   const [expandedSeriesId, setExpandedSeriesId] = useState<number | null>(null)
-  const [expandedVideoIds, setExpandedVideoIds] = useState<Set<number>>(
-    new Set(),
-  )
+  // 展開中のビデオIDは一度に1つだけ（新しいビデオを展開すると他は自動的に閉じる）
+  const [expandedVideoId, setExpandedVideoId] = useState<number | null>(null)
 
   // TanStack Query でシリーズのエピソード別視聴履歴を取得
   const { data: watchHistoryData, isLoading, error } =
@@ -38,23 +37,21 @@ export function SeriesStatsTable({ data }: SeriesStatsTableProps) {
   const handleSeriesRowClick = (seriesId: number) => {
     if (expandedSeriesId === seriesId) {
       setExpandedSeriesId(null)
-      setExpandedVideoIds(new Set())
+      setExpandedVideoId(null)
       return
     }
 
     setExpandedSeriesId(seriesId)
-    setExpandedVideoIds(new Set())
+    setExpandedVideoId(null)
   }
 
-  // ビデオIDの展開/非展開をトグル
+  // ビデオIDの展開/非展開をトグル（展開時は他のビデオは自動的に閉じる）
   const toggleEpisodeExpanded = (videoId: number) => {
-    const newExpanded = new Set(expandedVideoIds)
-    if (newExpanded.has(videoId)) {
-      newExpanded.delete(videoId)
+    if (expandedVideoId === videoId) {
+      setExpandedVideoId(null)
     } else {
-      newExpanded.add(videoId)
+      setExpandedVideoId(videoId)
     }
-    setExpandedVideoIds(newExpanded)
   }
 
   // 視聴日時をフォーマット
@@ -97,7 +94,7 @@ export function SeriesStatsTable({ data }: SeriesStatsTableProps) {
                   }
                   isLoading={expandedSeriesId === series.series_id && isLoading}
                   error={expandedSeriesId === series.series_id ? error : null}
-                  expandedVideoIds={expandedVideoIds}
+                  expandedVideoId={expandedVideoId}
                   onToggleEpisode={toggleEpisodeExpanded}
                   formatWatchedAt={formatWatchedAt}
                 />
@@ -122,7 +119,7 @@ interface SeriesRowWithEpisodesProps {
   watchHistoryData: any
   isLoading: boolean
   error: Error | null
-  expandedVideoIds: Set<number>
+  expandedVideoId: number | null
   onToggleEpisode: (videoId: number) => void
   formatWatchedAt: (watchedAt: string | undefined) => string
 }
@@ -134,7 +131,7 @@ function SeriesRowWithEpisodes({
   watchHistoryData,
   isLoading,
   error,
-  expandedVideoIds,
+  expandedVideoId,
   onToggleEpisode,
   formatWatchedAt,
 }: SeriesRowWithEpisodesProps) {
@@ -176,7 +173,7 @@ function SeriesRowWithEpisodes({
               <EpisodeRow
                 key={episode.video_id}
                 episode={episode}
-                isExpanded={expandedVideoIds.has(episode.video_id || 0)}
+                isExpanded={expandedVideoId === (episode.video_id || 0)}
                 onToggle={() => onToggleEpisode(episode.video_id || 0)}
                 formatWatchedAt={formatWatchedAt}
               />
