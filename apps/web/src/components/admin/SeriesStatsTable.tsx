@@ -232,8 +232,8 @@ function EpisodeRow({
           &nbsp;&nbsp;&nbsp;&nbsp; 第{episode.episode ?? "N/A"}話
           &nbsp;&nbsp;&nbsp;&nbsp;
           <span className="text-gray-300 truncate">
-            {(episode.subtitle || "（サブタイトルなし）").length > 35
-              ? (episode.subtitle || "（サブタイトルなし）").slice(0, 35) + "…"
+            {(episode.subtitle || "（サブタイトルなし）").length > 25
+              ? (episode.subtitle || "（サブタイトルなし）").slice(0, 25) + "…"
               : episode.subtitle || "（サブタイトルなし）"}
           </span>
         </TableCell>
