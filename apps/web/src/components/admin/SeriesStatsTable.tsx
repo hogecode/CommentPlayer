@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import {
   Table,
@@ -206,20 +206,13 @@ function EpisodeRow({
   onToggle,
   formatWatchedAt,
 }: EpisodeRowProps) {
-  // ISO 8601フォーマットで日時を表示
+  // ISO 8601フォーマットで日時を表示（曜日付き）
   const formatWatchedAtISO = (watchedAt: string | undefined) => {
     if (!watchedAt) return '—'
     try {
       const date = new Date(watchedAt)
-      return date.toLocaleString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      })
+      // フォーマット: 2000-1-11(水) 20:15:14
+      return format(date, 'yyyy-M-dd(eee) HH:mm:ss', { locale: ja })
     } catch {
       return watchedAt
     }
