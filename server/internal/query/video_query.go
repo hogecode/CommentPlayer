@@ -90,6 +90,9 @@ func (q *VideoQuery) SearchVideos(q_str string, page, limit int, order, filterBy
 		Where("video.file_name LIKE ? OR video.description LIKE ? OR series.syobocal_title_name LIKE ? OR video.subtitle LIKE ?",
 			searchParam, searchParam, searchParam, searchParam)
 
+	// is_deletedフラグでフィルター（削除されたビデオは除外）
+	query = query.Where("video.is_deleted = 0")
+
 	// FilterBy でフィルター
 	if filterBy != "" {
 		query = query.Where("video.status = ?", filterBy)
@@ -146,7 +149,8 @@ func (q *VideoQuery) GetVideoYears() ([]int, error) {
 // GetVideoByID - IDでビデオを取得
 func (q *VideoQuery) GetVideoByID(id int) (*entity.Video, error) {
 	var video entity.Video
-	if err := q.db.Preload("Series").First(&video, id).Error; err != nil {
+	// is_deleted = 0（削除されていない）のビデオのみを取得
+	if err := q.db.Preload("Series").Where("is_deleted = 0").First(&video, id).Error; err != nil {
 		return nil, err
 	}
 	return &video, nil
