@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSettingsStore } from '@/stores/settings-store'
+import { useUpdateSettingsMutation } from '@/services/useSettings'
 import type { DtoMutedCommentKeyword } from '@/types/settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,9 +11,9 @@ import { Spinner } from '@/components/ui/spinner'
 
 export function MutedKeywordsSettings() {
   const { settings, updateSettings } = useSettingsStore()
+  const updateSettingsMutation = useUpdateSettingsMutation()
   const [newKeyword, setNewKeyword] = useState('')
   const [matchType, setMatchType] = useState<'partial' | 'forward' | 'backward' | 'exact' | 'regex'>('partial')
-  const [isAdding, setIsAdding] = useState(false)
   // NGワードの表示/非表示を管理（基本は***表示）
   const [showPatterns, setShowPatterns] = useState(false)
   
@@ -32,26 +33,50 @@ export function MutedKeywordsSettings() {
       }
     }
 
-    setIsAdding(true)
+    // ローカル状態を楽観的に更新
+    const newKeywords = [
+      ...settings.muted_comment_keywords,
+      {
+        pattern: newKeyword,
+        match: matchType,
+      } as DtoMutedCommentKeyword,
+    ]
+    updateSettings({ muted_comment_keywords: newKeywords })
+
+    // API経由で設定を保存
     try {
-      const newKeywords = [
-        ...settings.muted_comment_keywords,
-        {
-          pattern: newKeyword,
-          match: matchType,
-        } as DtoMutedCommentKeyword,
-      ]
-      updateSettings({ muted_comment_keywords: newKeywords })
+      await updateSettingsMutation.mutateAsync({
+        ...settings,
+        muted_comment_keywords: newKeywords,
+      })
       setNewKeyword('')
       setMatchType('partial')
-    } finally {
-      setIsAdding(false)
+    } catch (error) {
+      // エラー時はローカル状態を戻す
+      updateSettings({ muted_comment_keywords: settings.muted_comment_keywords })
+      console.error('Failed to update keyword settings:', error)
     }
   }
 
   const handleRemoveKeyword = (index: number) => {
     const newKeywords = settings.muted_comment_keywords.filter((_, i) => i !== index)
+    
+    // ローカル状態を楽観的に更新
     updateSettings({ muted_comment_keywords: newKeywords })
+
+    // API経由で設定を保存
+    updateSettingsMutation.mutate(
+      {
+        ...settings,
+        muted_comment_keywords: newKeywords,
+      },
+      {
+        onError: () => {
+          // エラー時はローカル状態を戻す
+          updateSettings({ muted_comment_keywords: settings.muted_comment_keywords })
+        },
+      }
+    )
   }
 
   const getMatchTypeLabel = (type: string | undefined): string => {
@@ -84,13 +109,13 @@ export function MutedKeywordsSettings() {
               placeholder="キーワードを入力してください"
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
-              disabled={isAdding}
+              disabled={updateSettingsMutation.isPending}
               className="flex-1 text-sm"
             />
             <select
               value={matchType}
               onChange={(e) => setMatchType(e.target.value as any)}
-              disabled={isAdding}
+              disabled={updateSettingsMutation.isPending}
               className="px-3 py-2 border rounded-md border-input text-sm"
             >
               <option value="partial" className='bg-black/40'>部分一致</option>
@@ -101,10 +126,10 @@ export function MutedKeywordsSettings() {
             </select>
             <Button
               type="submit"
-              disabled={!newKeyword.trim() || isAdding}
+              disabled={!newKeyword.trim() || updateSettingsMutation.isPending}
               className="bg-primary whitespace-nowrap"
             >
-              {isAdding ? (
+              {updateSettingsMutation.isPending ? (
                 <>
                   <Spinner className="mr-2 size-4" />
                   追加中...
@@ -152,7 +177,22 @@ export function MutedKeywordsSettings() {
                         const newKeywords = settings.muted_comment_keywords.map((kw, i) =>
                           i === index ? { ...kw, pattern: e.target.value } : kw
                         )
+                        // ローカル状態を楽観的に更新
                         updateSettings({ muted_comment_keywords: newKeywords })
+
+                        // API経由で設定を保存（デバウンスなしで毎回実行）
+                        updateSettingsMutation.mutate(
+                          {
+                            ...settings,
+                            muted_comment_keywords: newKeywords,
+                          },
+                          {
+                            onError: () => {
+                              // エラー時はローカル状態を戻す
+                              updateSettings({ muted_comment_keywords: settings.muted_comment_keywords })
+                            },
+                          }
+                        )
                       }}
                       className="text-xs px-2 py-1 rounded border border-border bg-background text-foreground placeholder-muted-foreground flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
@@ -182,11 +222,29 @@ export function MutedKeywordsSettings() {
             type="checkbox"
             id="normalize"
             checked={settings.mute_comment_keywords_normalize_alphanumeric_width_case}
-            onChange={(e) =>
+            onChange={(e) => {
+              const newValue = e.target.checked
+              // ローカル状態を楽観的に更新
               updateSettings({
-                mute_comment_keywords_normalize_alphanumeric_width_case: e.target.checked,
+                mute_comment_keywords_normalize_alphanumeric_width_case: newValue,
               })
-            }
+
+              // API経由で設定を保存
+              updateSettingsMutation.mutate(
+                {
+                  ...settings,
+                  mute_comment_keywords_normalize_alphanumeric_width_case: newValue,
+                },
+                {
+                  onError: () => {
+                    // エラー時はローカル状態を戻す
+                    updateSettings({
+                      mute_comment_keywords_normalize_alphanumeric_width_case: settings.mute_comment_keywords_normalize_alphanumeric_width_case,
+                    })
+                  },
+                }
+              )
+            }}
             className="w-4 h-4 rounded border border-input cursor-pointer"
           />
           <Label htmlFor="normalize" className="font-semibold cursor-pointer">

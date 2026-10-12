@@ -79,7 +79,7 @@ export function useSettingsQuery(options?: any) {
 export function useUpdateSettingsMutation(options?: any) {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<any, Error, DtoClientSettingsDTO>({
     mutationFn: updateClientSettings,
     onSuccess: () => {
       // 設定キャッシュを無効化して再フェッチ
