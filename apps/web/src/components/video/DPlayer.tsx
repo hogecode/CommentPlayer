@@ -260,6 +260,230 @@ export default function DPlayer({
           }
         };
 
+        /**
+         * ─── コメント付きスクショ機能 ───
+         * コメント情報の構造化と Canvas への描画処理
+         */
+
+        // コメント情報のインターフェース定義
+        interface CaptureCommentItem {
+          top: number;
+          left: number;
+          color: string;
+          font_size: number;
+          text: string;
+        }
+
+        interface ICaptureCommentData {
+          container_width: number;
+          container_height: number;
+          opacity: number;
+          comments: CaptureCommentItem[];
+        }
+
+        /**
+         * DPlayer の danmaku コンテナから現在表示中のコメント情報を抽出
+         * @returns コメント情報、またはコメントがない場合は null
+         */
+        const createCaptureCommentData = (): ICaptureCommentData | null => {
+          // danmaku コンテナが存在しない場合は null を返す
+          if (!DPlayerRef.current?.danmaku?.container) {
+            console.warn('[DPlayer] Danmaku container not found');
+            return null;
+          }
+
+          const capture_comment_data: ICaptureCommentData = {
+            // DOM 上のコメントのコンテナ要素の幅と高さ (px)
+            container_width: DPlayerRef.current.danmaku.container.offsetWidth,
+            container_height: DPlayerRef.current.danmaku.container.offsetHeight,
+            // コメント全体の不透明度 (0.0 ～ 1.0)
+            opacity: DPlayerRef.current.danmaku._opacity || 1.0,
+            // コメントごとの情報
+            comments: [],
+          };
+
+          // 各コメントの DOM 要素を取得（デモ用のコメントは除外）
+          const selector = '.dplayer-danmaku-item:not(.dplayer-danmaku-item--demo)';
+          const commentElements = DPlayerRef.current.danmaku.container.querySelectorAll(selector);
+          for (const comment_element of commentElements) {
+            const commentEl = comment_element as HTMLDivElement;
+            // コメントのテキストが null の場合はスキップ
+            if (commentEl.textContent === null) {
+              continue;
+            }
+
+            // スタイル情報を基に、描画に必要なコメント情報を構築
+            const computed_style = window.getComputedStyle(commentEl);
+            const commentRect = commentEl.getBoundingClientRect();
+            const containerRect = DPlayerRef.current.danmaku.container.getBoundingClientRect();
+
+            capture_comment_data.comments.push({
+              // スクロール中・固定表示中のコメント表示座標
+              top: commentRect.top - containerRect.top,
+              left: commentRect.left - containerRect.left,
+              // コメントの色
+              color: computed_style.color,
+              // コメントのフォントサイズ (px)
+              font_size: parseFloat(computed_style.fontSize.replace('px', '')),
+              // コメントのテキスト（前後の空白を削除）
+              text: commentEl.textContent.trim(),
+            });
+          }
+
+          // コメントがない場合は null を返す
+          if (capture_comment_data.comments.length === 0) {
+            console.log('[DPlayer] No comments found to capture');
+            return null;
+          }
+
+          console.log(`[DPlayer] Captured ${capture_comment_data.comments.length} comments`);
+          return capture_comment_data;
+        };
+
+        /**
+         * Canvas にコメント情報を描画
+         * @param ctx Canvas の 2D コンテキスト
+         * @param commentData コメント情報
+         */
+        const drawCommentsOnCanvas = (
+          ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+          commentData: ICaptureCommentData
+        ) => {
+          if (!commentData || commentData.comments.length === 0) {
+            console.log('[DPlayer] No comments to draw');
+            return;
+          }
+
+          // コメント全体の不透明度を保存
+          const previousAlpha = ctx.globalAlpha;
+          ctx.globalAlpha = commentData.opacity;
+
+          // 各コメントを描画
+          for (const comment of commentData.comments) {
+            // フォント情報を設定
+            ctx.font = `${comment.font_size *1.2}px Arial, sans-serif`;
+            ctx.fillStyle = comment.color;
+            ctx.textBaseline = 'top';
+
+            // コメント位置が有効な範囲内にあるかチェック
+            if (
+              comment.top >= 0 &&
+              comment.left >= 0 &&
+              comment.top <= commentData.container_height &&
+              comment.left <= commentData.container_width
+            ) {
+              try {
+                // コメントを描画
+                ctx.fillText(
+                  comment.text,
+                  comment.left,
+                  comment.top,
+                  commentData.container_width - comment.left  // maxWidth
+                );
+              } catch (e) {
+                console.warn('[DPlayer] Error drawing comment:', e);
+              }
+            }
+          }
+
+          // 不透明度を復元
+          ctx.globalAlpha = previousAlpha;
+        };
+
+        /**
+         * コメント付きスクショのハンドラー
+         */
+        const handleCaptureWithCommentClick = async (e: Event) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          try {
+            // ビデオ要素を直接キャプチャ
+            const videoWrapper = containerRef.current?.querySelector('.dplayer-video-wrap') as HTMLElement | null;
+            const videoElement = videoWrapper?.querySelector('video') as HTMLVideoElement | null;
+            
+            if (!videoElement) {
+              Message.error('ビデオ要素が見つかりません');
+              return;
+            }
+
+            // 現在再生中の動画のキャプチャを ImageBitmap として取得
+            const imageBitmap = await createImageBitmap(videoElement);
+            
+            try {
+              // コメント情報を取得
+              const commentData = createCaptureCommentData();
+
+              // OffscreenCanvas を使用して ImageBitmap から Blob に変換
+              const offscreenCanvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+              const ctx = offscreenCanvas.getContext('2d');
+              
+              if (ctx) {
+                // 動画フレームを描画
+                ctx.drawImage(imageBitmap, 0, 0);
+
+                // コメント情報がある場合は Canvas に描画
+                if (commentData) {
+                  // コメント領域の幅と動画フレームの幅が異なる場合、スケーリング処理が必要
+                  // 通常、動画フレームの幅がコメント領域の幅と一致する想定だが、
+                  // 異なる場合に対応するためスケーリング係数を計算
+                  const scaleX = imageBitmap.width / commentData.container_width;
+                  const scaleY = imageBitmap.height / commentData.container_height;
+
+                  // Canvas の座標変換を適用（スケーリング）
+                  ctx.save();
+                  ctx.scale(scaleX, scaleY);
+
+                  // コメントを描画
+                  drawCommentsOnCanvas(ctx, commentData);
+
+                  // 座標変換を復元
+                  ctx.restore();
+
+                  console.log('[DPlayer] Comments drawn on canvas with scaling');
+                }
+                
+                // OffscreenCanvas を Blob に変換
+                const blob = await offscreenCanvas.convertToBlob({ type: 'image/png' });
+                
+                if (!blob) {
+                  Message.error('スクリーンショットのBlob生成に失敗しました');
+                  return;
+                }
+                
+                if (!videoIdRef.current) {
+                  Message.error('ビデオIDが設定されていません');
+                  return;
+                }
+
+                const timestamp = new Date().getTime();
+                const file = new File([blob], `screenshot_with_comments_${timestamp}.png`, { type: 'image/png' });
+
+                // createCaptureMutation.mutate を直接呼び出す
+                createCaptureMutation.mutate({
+                  file,
+                  video_id: videoIdRef.current,
+                  playback_position: DPlayerRef.current.video.currentTime,
+                  comment_delay: delayOffsetRef.current,
+                });
+
+                console.log('[DPlayer] Screenshot with comments captured and submitted');
+              } else {
+                Message.error('キャンバスのコンテキストを取得できません');
+              }
+            } catch (canvasError) {
+              console.error('Canvas error:', canvasError);
+              Message.error('スクリーンショット変換中にエラーが発生しました');
+            } finally {
+              // ImageBitmap のクリーンアップ
+              imageBitmap.close();
+            }
+          } catch (error) {
+            console.error('Screenshot with comment error:', error);
+            Message.error('コメント付きスクリーンショット処理中にエラーが発生しました');
+          }
+        };
+
         // Document PIP を設定
         // DocumentPiPManager.ts のパターンに従った実装
         // video.requestPictureInPicture() をオーバーライドして Document Picture-in-Picture API を使用
@@ -494,6 +718,37 @@ export default function DPlayer({
         if (captureButton) {
           captureButton.addEventListener('click', handleCaptureClick);
         }
+
+        /**
+         * ─── コメント付きスクショボタンの追加 ───
+         * .dplayer-capture-icon の右側に、新しいボタンを挿入
+         */
+        const captureWithCommentButton = document.createElement('div');
+        captureWithCommentButton.className = 'dplayer-icon dplayer-capture-with-comment-icon';
+        captureWithCommentButton.setAttribute('aria-label', 'コメント付きキャプチャ');
+        captureWithCommentButton.setAttribute('data-balloon-nofocus', '');
+        captureWithCommentButton.setAttribute('data-balloon-pos', 'up');
+        captureWithCommentButton.innerHTML = `
+          <span class="dplayer-icon-content">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+              <!-- スクショアイコン（左半分） -->
+              <path d="M27 28h-22c-1.654 0-3-1.346-3-3v-16c0-1.654 1.346-3 3-3h3c0.552 0 1 0.448 1 1s-0.448 1-1 1h-3c-0.551 0-1 0.449-1 1v16c0 0.552 0.449 1 1 1h22c0.552 0 1-0.448 1-1v-16c0-0.551-0.448-1-1-1h-11c-0.552 0-1-0.448-1-1s0.448-1 1-1h11c1.654 0 3 1.346 3 3v16c0 1.654-1.346 3-3 3zM24 10.5c0 0.828 0.672 1.5 1.5 1.5s1.5-0.672 1.5-1.5c0-0.828-0.672-1.5-1.5-1.5s-1.5 0.672-1.5 1.5zM15 4c0 0.552-0.448 1-1 1h-4c-0.552 0-1-0.448-1-1v0c0-0.552 0.448-1 1-1h4c0.552 0 1 0.448 1 1v0z"/>
+              <!-- コメントアイコン（右半分） -->
+              <path d="M18 22c-0.552 0-1 0.448-1 1v4c0 0.552 0.448 1 1 1h8c0.552 0 1-0.448 1-1v-2h0.5c0.827 0 1.5-0.673 1.5-1.5v-2c0-0.827-0.673-1.5-1.5-1.5h-9z" fill="currentColor" opacity="0.5"/>
+            </svg>
+          </span>
+        `;
+
+        // .dplayer-capture-icon の直後にボタンを挿入
+        const captureIconElement = containerRef.current?.querySelector('.dplayer-capture-icon');
+        if (captureIconElement && captureIconElement.nextSibling) {
+          captureIconElement.parentNode?.insertBefore(captureWithCommentButton, captureIconElement.nextSibling);
+        } else if (captureIconElement) {
+          captureIconElement.parentNode?.appendChild(captureWithCommentButton);
+        }
+
+        // コメント付きキャプチャボタンにクリックイベントを付与
+        captureWithCommentButton.addEventListener('click', handleCaptureWithCommentClick);
       }, 100);
 
       DPlayerRef.current = dp;
