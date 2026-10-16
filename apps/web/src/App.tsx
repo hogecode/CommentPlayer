@@ -13,14 +13,9 @@ import { initializeApiClient } from "@/lib/api/api-setup";
 import type { DtoWatchedHistoryItem } from "@/generated/models";
 
 /**
- * 視聴履歴更新の間隔（秒）
- */
-const WATCHED_HISTORY_UPDATE_INTERVAL = 10;
-
-/**
  * 視聴開始から履歴に追加するまでの時間（秒）
  */
-const WATCHED_HISTORY_THRESHOLD_SECONDS = 10;
+const WATCHED_HISTORY_THRESHOLD_SECONDS = 180;
 
 /**
  * アプリケーション全体の初期化と Service Worker 管理を行うコンポーネント

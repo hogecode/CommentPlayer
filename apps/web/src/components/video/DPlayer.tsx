@@ -155,7 +155,7 @@ export default function DPlayer({
         dp.danmaku.options.time = () => dp.video.currentTime - delayOffset;
       }
 
-      // ビデオ視聴を記録（再生開始から30秒後に1回のみ）
+      // ビデオ視聴を記録（再生開始から180秒後に1回のみ）
       // dp.on('play', ...) が機能しないため、HTML5ネイティブイベントを使用
       const recordViewOnceHandler = () => {
         // 既存のタイムアウトがあればキャンセル
@@ -165,21 +165,21 @@ export default function DPlayer({
         }
 
         if (!hasRecordedViewRef.current && videoIdRef.current) {
-          // 再生開始から30秒後に APIコールを実行
+          // 再生開始から180秒後に APIコールを実行
           recordViewTimeoutRef.current = setTimeout(() => {
             if (!hasRecordedViewRef.current && videoIdRef.current) {
               hasRecordedViewRef.current = true;
               // ビデオ視聴記録を送信（非同期、エラーは無視）
               recordVideoViewMutation.mutate(videoIdRef.current);
               console.log(
-                `[DPlayer] Video view recorded after 30 seconds. (Video ID: ${videoIdRef.current})`
+                `[DPlayer] Video view recorded after 180 seconds. (Video ID: ${videoIdRef.current})`
               );
             }
             recordViewTimeoutRef.current = null;
-          }, 30000);
+          }, 180000);
           
           console.log(
-            `[DPlayer] Play event detected. View record will be sent after 30 seconds. (Video ID: ${videoIdRef.current})`
+            `[DPlayer] Play event detected. View record will be sent after 180 seconds. (Video ID: ${videoIdRef.current})`
           );
         } else {
           console.log('[DPlayer] Skipping view record - already recorded or no videoId');
