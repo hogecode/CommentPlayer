@@ -42,8 +42,8 @@ export const StaticFilesApiAxiosParamCreator = function (configuration?: Configu
             // verify required parameter 'filepath' is not null or undefined
             assertParamExists('apiV1FilesFolderIDFilepathGet', 'filepath', filepath)
             const localVarPath = `/api/v1/files/{folderID}/{filepath}`
-                .replace(`{${"folderID"}}`, encodeURIComponent(String(folderID)))
-                .replace(`{${"filepath"}}`, encodeURIComponent(String(filepath)));
+                .replace('{folderID}', encodeURIComponent(String(folderID)))
+                .replace('{filepath}', encodeURIComponent(String(filepath)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

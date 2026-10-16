@@ -19,6 +19,7 @@ export interface DtoCapture {
     'comment_delay'?: number;
     'created_at'?: string;
     'filename'?: string;
+    'has_comments'?: boolean;
     'id'?: number;
     'playback_position'?: number;
     'video_id'?: number;

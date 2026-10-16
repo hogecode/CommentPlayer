@@ -74,7 +74,7 @@ func (q *Queries) DeleteCapture(ctx context.Context, id int64) error {
 }
 
 const getAllCaptures = `-- name: GetAllCaptures :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?
@@ -103,6 +103,7 @@ func (q *Queries) GetAllCaptures(ctx context.Context, arg GetAllCapturesParams) 
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -118,7 +119,7 @@ func (q *Queries) GetAllCaptures(ctx context.Context, arg GetAllCapturesParams) 
 }
 
 const getAllCapturesCreatedAtAsc = `-- name: GetAllCapturesCreatedAtAsc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 ORDER BY created_at ASC
 LIMIT ? OFFSET ?
@@ -147,6 +148,7 @@ func (q *Queries) GetAllCapturesCreatedAtAsc(ctx context.Context, arg GetAllCapt
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -162,7 +164,7 @@ func (q *Queries) GetAllCapturesCreatedAtAsc(ctx context.Context, arg GetAllCapt
 }
 
 const getAllCapturesIdAsc = `-- name: GetAllCapturesIdAsc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 ORDER BY id ASC
 LIMIT ? OFFSET ?
@@ -191,6 +193,7 @@ func (q *Queries) GetAllCapturesIdAsc(ctx context.Context, arg GetAllCapturesIdA
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -206,7 +209,7 @@ func (q *Queries) GetAllCapturesIdAsc(ctx context.Context, arg GetAllCapturesIdA
 }
 
 const getAllCapturesIdDesc = `-- name: GetAllCapturesIdDesc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 ORDER BY id DESC
 LIMIT ? OFFSET ?
@@ -235,6 +238,7 @@ func (q *Queries) GetAllCapturesIdDesc(ctx context.Context, arg GetAllCapturesId
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -250,7 +254,7 @@ func (q *Queries) GetAllCapturesIdDesc(ctx context.Context, arg GetAllCapturesId
 }
 
 const getCaptureByID = `-- name: GetCaptureByID :one
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 WHERE id = ?
 `
@@ -267,12 +271,13 @@ func (q *Queries) GetCaptureByID(ctx context.Context, id int64) (Capture, error)
 		&i.CreatedAt,
 		&i.PlaybackPosition,
 		&i.CommentDelay,
+		&i.HasComments,
 	)
 	return i, err
 }
 
 const getCaptureListByVideo = `-- name: GetCaptureListByVideo :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 WHERE video_id = ?
 ORDER BY created_at DESC
@@ -303,6 +308,7 @@ func (q *Queries) GetCaptureListByVideo(ctx context.Context, arg GetCaptureListB
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -318,7 +324,7 @@ func (q *Queries) GetCaptureListByVideo(ctx context.Context, arg GetCaptureListB
 }
 
 const getCaptureListByVideoCreatedAtAsc = `-- name: GetCaptureListByVideoCreatedAtAsc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 WHERE video_id = ?
 ORDER BY created_at ASC
@@ -349,6 +355,7 @@ func (q *Queries) GetCaptureListByVideoCreatedAtAsc(ctx context.Context, arg Get
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -364,7 +371,7 @@ func (q *Queries) GetCaptureListByVideoCreatedAtAsc(ctx context.Context, arg Get
 }
 
 const getCaptureListByVideoIdAsc = `-- name: GetCaptureListByVideoIdAsc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 WHERE video_id = ?
 ORDER BY id ASC
@@ -395,6 +402,7 @@ func (q *Queries) GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCapture
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}
@@ -410,7 +418,7 @@ func (q *Queries) GetCaptureListByVideoIdAsc(ctx context.Context, arg GetCapture
 }
 
 const getCaptureListByVideoIdDesc = `-- name: GetCaptureListByVideoIdDesc :many
-SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay
+SELECT id, filename, video_id, save_dir, save_path, created_at, playback_position, comment_delay, has_comments
 FROM capture
 WHERE video_id = ?
 ORDER BY id DESC
@@ -441,6 +449,7 @@ func (q *Queries) GetCaptureListByVideoIdDesc(ctx context.Context, arg GetCaptur
 			&i.CreatedAt,
 			&i.PlaybackPosition,
 			&i.CommentDelay,
+			&i.HasComments,
 		); err != nil {
 			return nil, err
 		}

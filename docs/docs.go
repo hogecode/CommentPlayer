@@ -172,7 +172,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "新しいキャプチャを作成します",
+                "description": "新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します",
                 "produces": [
                     "application/json"
                 ],
@@ -205,6 +205,12 @@ const docTemplate = `{
                         "type": "number",
                         "description": "コメント遅延秒数",
                         "name": "comment_delay",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "コメント付きスクショかどうか（true または 1 で true、その他で false）",
+                        "name": "has_comments",
                         "in": "formData"
                     }
                 ],
@@ -1311,6 +1317,9 @@ const docTemplate = `{
                 "filename": {
                     "type": "string"
                 },
+                "has_comments": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -2154,6 +2163,9 @@ const docTemplate = `{
                 },
                 "filename": {
                     "type": "string"
+                },
+                "has_comments": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"

@@ -122,6 +122,7 @@ export function useCreateCaptureMutation() {
       video_id: number;
       playback_position?: number;
       comment_delay?: number;
+      has_comments?: boolean;
     }) => {
       // OpenAPI生成の apiV1CapturesPost メソッドを使用
       const response = await capturesApi.apiV1CapturesPost(
@@ -129,6 +130,7 @@ export function useCreateCaptureMutation() {
         data.video_id,
         data.playback_position,
         data.comment_delay,
+        data.has_comments,
       );
       return response.data;
     },

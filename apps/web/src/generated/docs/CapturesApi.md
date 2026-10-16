@@ -186,7 +186,7 @@ No authorization required
 # **apiV1CapturesPost**
 > EntityCapture apiV1CapturesPost()
 
-新しいキャプチャを作成します
+新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
 
 ### Example
 
@@ -203,12 +203,14 @@ let file: File; //キャプチャファイル (default to undefined)
 let videoId: number; //ビデオID (default to undefined)
 let playbackPosition: number; //ビデオの再生位置（秒） (optional) (default to undefined)
 let commentDelay: number; //コメント遅延秒数 (optional) (default to undefined)
+let hasComments: boolean; //コメント付きスクショかどうか（true または 1 で true、その他で false） (optional) (default to undefined)
 
 const { status, data } = await apiInstance.apiV1CapturesPost(
     file,
     videoId,
     playbackPosition,
-    commentDelay
+    commentDelay,
+    hasComments
 );
 ```
 
@@ -220,6 +222,7 @@ const { status, data } = await apiInstance.apiV1CapturesPost(
 | **videoId** | [**number**] | ビデオID | defaults to undefined|
 | **playbackPosition** | [**number**] | ビデオの再生位置（秒） | (optional) defaults to undefined|
 | **commentDelay** | [**number**] | コメント遅延秒数 | (optional) defaults to undefined|
+| **hasComments** | [**boolean**] | コメント付きスクショかどうか（true または 1 で true、その他で false） | (optional) defaults to undefined|
 
 
 ### Return type

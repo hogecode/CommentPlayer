@@ -51,6 +51,7 @@ type Capture struct {
 	SavePath         string    `json:"_"`
 	PlaybackPosition float64   `json:"playback_position"`
 	CommentDelay     float64   `json:"comment_delay"`
+	HasComments      bool      `json:"has_comments"`
 	CreatedAt        time.Time `json:"created_at"`
 }
 

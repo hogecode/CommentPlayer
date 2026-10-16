@@ -162,7 +162,7 @@ FROM video v
 LEFT JOIN watched_history wh ON v.id = wh.video_id
 WHERE v.series_id = ?
   AND v.is_deleted = 0
-ORDER BY v.episode ASC, wh.watched_at DESC
+OR
 `
 
 type GetSeriesEpisodeWatchHistoryRow struct {

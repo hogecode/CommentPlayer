@@ -116,7 +116,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1VideosIdDownloadGet', 'id', id)
             const localVarPath = `/api/v1/videos/{id}/download`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -150,7 +150,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1VideosIdGet', 'id', id)
             const localVarPath = `/api/v1/videos/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -185,7 +185,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1VideosIdThumbnailRegeneratePost', 'id', id)
             const localVarPath = `/api/v1/videos/{id}/thumbnail/regenerate`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -221,7 +221,7 @@ export const VideosApiAxiosParamCreator = function (configuration?: Configuratio
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1VideosIdViewPost', 'id', id)
             const localVarPath = `/api/v1/videos/{id}/view`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

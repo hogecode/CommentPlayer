@@ -70,6 +70,8 @@ definitions:
         type: string
       filename:
         type: string
+      has_comments:
+        type: boolean
       id:
         type: integer
       playback_position:
@@ -640,6 +642,8 @@ definitions:
         type: string
       filename:
         type: string
+      has_comments:
+        type: boolean
       id:
         type: integer
       playback_position:
@@ -889,7 +893,7 @@ paths:
       tags:
       - Captures
     post:
-      description: 新しいキャプチャを作成します
+      description: 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
       parameters:
       - description: キャプチャファイル
         in: formData
@@ -909,6 +913,10 @@ paths:
         in: formData
         name: comment_delay
         type: number
+      - description: コメント付きスクショかどうか（true または 1 で true、その他で false）
+        in: formData
+        name: has_comments
+        type: boolean
       produces:
       - application/json
       responses:

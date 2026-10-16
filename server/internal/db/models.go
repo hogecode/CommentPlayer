@@ -18,6 +18,7 @@ type Capture struct {
 	CreatedAt        sql.NullTime
 	PlaybackPosition sql.NullFloat64
 	CommentDelay     sql.NullFloat64
+	HasComments      sql.NullInt64
 }
 
 type Folder struct {

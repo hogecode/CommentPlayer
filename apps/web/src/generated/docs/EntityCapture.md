@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **comment_delay** | **number** |  | [optional] [default to undefined]
 **created_at** | **string** |  | [optional] [default to undefined]
 **filename** | **string** |  | [optional] [default to undefined]
+**has_comments** | **boolean** |  | [optional] [default to undefined]
 **id** | **number** |  | [optional] [default to undefined]
 **playback_position** | **number** |  | [optional] [default to undefined]
 **video_id** | **number** |  | [optional] [default to undefined]
@@ -23,6 +24,7 @@ const instance: EntityCapture = {
     comment_delay,
     created_at,
     filename,
+    has_comments,
     id,
     playback_position,
     video_id,

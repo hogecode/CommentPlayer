@@ -284,6 +284,7 @@ func (a *App) GetCaptures(capturesGroup *gin.RouterGroup) {
 				SavePath:         dbCapture.SavePath.String,
 				PlaybackPosition: dbCapture.PlaybackPosition.Float64,
 				CommentDelay:     dbCapture.CommentDelay.Float64,
+				HasComments:      dbCapture.HasComments.Int64 != 0,
 				CreatedAt:        dbCapture.CreatedAt.Time,
 			}
 		}
@@ -347,6 +348,7 @@ func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
 			CreatedAt:        dbCapture.CreatedAt.Time,
 			PlaybackPosition: dbCapture.PlaybackPosition.Float64,
 			CommentDelay:     dbCapture.CommentDelay.Float64,
+			HasComments:      dbCapture.HasComments.Int64 != 0,
 		}
 
 		// レスポンス
@@ -356,12 +358,13 @@ func (a *App) GetCaptureByID(capturesGroup *gin.RouterGroup) {
 
 // CreateCapture - キャプチャを作成
 // @Summary キャプチャを作成
-// @Description 新しいキャプチャを作成します
+// @Description 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
 // @Tags Captures
 // @Param file formData file true "キャプチャファイル"
 // @Param video_id formData int true "ビデオID"
 // @Param playback_position formData number false "ビデオの再生位置（秒）"
 // @Param comment_delay formData number false "コメント遅延秒数"
+// @Param has_comments formData boolean false "コメント付きスクショかどうか（true または 1 で true、その他で false）"
 // @Consume multipart/form-data
 // @Produce json
 // @Success 201 {object} entity.Capture
@@ -411,6 +414,13 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			}
 		}
 
+		// has_comments フラグを取得（オプション）
+		hasCommentsStr := ctx.PostForm("has_comments")
+		var hasComments bool
+		if hasCommentsStr != "" {
+			hasComments = hasCommentsStr == "true" || hasCommentsStr == "1"
+		}
+
 		// ビデオの存在確認
 		video, err := a.VideoQuery.GetVideoByID(videoID)
 		if err != nil {
@@ -458,6 +468,7 @@ func (a *App) CreateCapture(capturesGroup *gin.RouterGroup) {
 			VideoID:          videoID,
 			PlaybackPosition: playbackPosition,
 			CommentDelay:     commentDelay,
+			HasComments:      hasComments,
 			CreatedAt:        time.Now(),
 		}
 

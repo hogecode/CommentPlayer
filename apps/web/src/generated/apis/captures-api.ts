@@ -107,7 +107,7 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1CapturesIdDelete', 'id', id)
             const localVarPath = `/api/v1/captures/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -141,7 +141,7 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiV1CapturesIdGet', 'id', id)
             const localVarPath = `/api/v1/captures/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace('{id}', encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -165,16 +165,17 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * 新しいキャプチャを作成します
+         * 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
          * @param {number} [playbackPosition] ビデオの再生位置（秒）
          * @param {number} [commentDelay] コメント遅延秒数
+         * @param {boolean} [hasComments] コメント付きスクショかどうか（true または 1 で true、その他で false）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesPost: async (file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiV1CapturesPost: async (file: File, videoId: number, playbackPosition?: number, commentDelay?: number, hasComments?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'file' is not null or undefined
             assertParamExists('apiV1CapturesPost', 'file', file)
             // verify required parameter 'videoId' is not null or undefined
@@ -207,6 +208,10 @@ export const CapturesApiAxiosParamCreator = function (configuration?: Configurat
 
             if (commentDelay !== undefined) { 
                 localVarFormParams.append('comment_delay', commentDelay as any);
+            }
+
+            if (hasComments !== undefined) { 
+                localVarFormParams.append('has_comments', String(hasComments) as any);
             }
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -305,17 +310,18 @@ export const CapturesApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 新しいキャプチャを作成します
+         * 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
          * @param {number} [playbackPosition] ビデオの再生位置（秒）
          * @param {number} [commentDelay] コメント遅延秒数
+         * @param {boolean} [hasComments] コメント付きスクショかどうか（true または 1 で true、その他で false）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options);
+        async apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, hasComments?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityCapture>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, hasComments, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CapturesApi.apiV1CapturesPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -377,17 +383,18 @@ export const CapturesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.apiV1CapturesIdGet(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 新しいキャプチャを作成します
+         * 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
          * @summary キャプチャを作成
          * @param {File} file キャプチャファイル
          * @param {number} videoId ビデオID
          * @param {number} [playbackPosition] ビデオの再生位置（秒）
          * @param {number} [commentDelay] コメント遅延秒数
+         * @param {boolean} [hasComments] コメント付きスクショかどうか（true または 1 で true、その他で false）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
-            return localVarFp.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options).then((request) => request(axios, basePath));
+        apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, hasComments?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<EntityCapture> {
+            return localVarFp.apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, hasComments, options).then((request) => request(axios, basePath));
         },
         /**
          * キャプチャが存在するシリーズのみの一覧を返します
@@ -444,17 +451,18 @@ export class CapturesApi extends BaseAPI {
     }
 
     /**
-     * 新しいキャプチャを作成します
+     * 新しいキャプチャを作成します。コメント付きスクショの場合は has_comments=true を指定します
      * @summary キャプチャを作成
      * @param {File} file キャプチャファイル
      * @param {number} videoId ビデオID
      * @param {number} [playbackPosition] ビデオの再生位置（秒）
      * @param {number} [commentDelay] コメント遅延秒数
+     * @param {boolean} [hasComments] コメント付きスクショかどうか（true または 1 で true、その他で false）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, options?: RawAxiosRequestConfig) {
-        return CapturesApiFp(this.configuration).apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, options).then((request) => request(this.axios, this.basePath));
+    public apiV1CapturesPost(file: File, videoId: number, playbackPosition?: number, commentDelay?: number, hasComments?: boolean, options?: RawAxiosRequestConfig) {
+        return CapturesApiFp(this.configuration).apiV1CapturesPost(file, videoId, playbackPosition, commentDelay, hasComments, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

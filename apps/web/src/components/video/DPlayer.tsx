@@ -243,6 +243,7 @@ export default function DPlayer({
                   video_id: videoIdRef.current,
                   playback_position: dp.video.currentTime,
                   comment_delay: delayOffsetRef.current,
+                  has_comments: false,
                 });
               } else {
                 Message.error('キャンバスのコンテキストを取得できません');
@@ -465,6 +466,7 @@ export default function DPlayer({
                   video_id: videoIdRef.current,
                   playback_position: DPlayerRef.current.video.currentTime,
                   comment_delay: delayOffsetRef.current,
+                  has_comments: true,
                 });
 
                 console.log('[DPlayer] Screenshot with comments captured and submitted');

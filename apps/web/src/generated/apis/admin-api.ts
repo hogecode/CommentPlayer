@@ -43,7 +43,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             // verify required parameter 'seriesId' is not null or undefined
             assertParamExists('apiV1AdminSeriesSeriesIdWatchHistoryGet', 'seriesId', seriesId)
             const localVarPath = `/api/v1/admin/series/{series_id}/watch-history`
-                .replace(`{${"series_id"}}`, encodeURIComponent(String(seriesId)));
+                .replace('{series_id}', encodeURIComponent(String(seriesId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

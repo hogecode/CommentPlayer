@@ -13,6 +13,7 @@ type Capture struct {
 	SavePath         string    `json:"_"`
 	PlaybackPosition float64   `json:"playback_position"`
 	CommentDelay     float64   `json:"comment_delay"`
+	HasComments      bool      `gorm:"column:has_comments;default:false" json:"has_comments"`
 	CreatedAt        time.Time `json:"created_at"`
 }
 
