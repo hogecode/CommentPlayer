@@ -85,7 +85,6 @@ WHERE substr(watched_at, 1, 26) >= ?
   AND watched_at IS NOT NULL;
 
 -- name: GetSeriesEpisodeWatchHistory :many
--- 特定シリーズのエピソード別視聴履歴を取得
 SELECT
     v.id,
     v.episode,

@@ -162,7 +162,7 @@ FROM video v
 LEFT JOIN watched_history wh ON v.id = wh.video_id
 WHERE v.series_id = ?
   AND v.is_deleted = 0
-OR
+ORDER BY v.episode ASC, wh.watched_at DESC
 `
 
 type GetSeriesEpisodeWatchHistoryRow struct {
@@ -175,7 +175,6 @@ type GetSeriesEpisodeWatchHistoryRow struct {
 	WatchedAt      sql.NullTime
 }
 
-// 特定シリーズのエピソード別視聴履歴を取得
 func (q *Queries) GetSeriesEpisodeWatchHistory(ctx context.Context, seriesID sql.NullInt64) ([]GetSeriesEpisodeWatchHistoryRow, error) {
 	rows, err := q.db.QueryContext(ctx, getSeriesEpisodeWatchHistory, seriesID)
 	if err != nil {
