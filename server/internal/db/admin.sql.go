@@ -289,7 +289,7 @@ func (q *Queries) GetSeriesEpisodeWatchHistory(ctx context.Context, seriesID sql
 const getSeriesViews = `-- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COALESCE(s.syobocal_title_name, '----------') AS series_name,
     COUNT(DISTINCT wh.id) AS view_count,
     COUNT(DISTINCT v.id) AS video_count
 FROM video v
@@ -347,7 +347,7 @@ func (q *Queries) GetSeriesViews(ctx context.Context, arg GetSeriesViewsParams) 
 const getSeriesViewsAll = `-- name: GetSeriesViewsAll :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COALESCE(s.syobocal_title_name, '----------') AS series_name,
     COUNT(DISTINCT wh.id) AS view_count,
     COUNT(DISTINCT v.id) AS video_count
 FROM video v
