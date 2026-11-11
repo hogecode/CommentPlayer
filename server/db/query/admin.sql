@@ -32,7 +32,7 @@ ORDER BY date DESC, MAX(wh.watched_at) DESC;
 -- name: GetSeriesViews :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COALESCE(s.syobocal_title_name, '----------') AS series_name,
     COUNT(DISTINCT wh.id) AS view_count,
     COUNT(DISTINCT v.id) AS video_count
 FROM video v
@@ -111,7 +111,7 @@ ORDER BY date DESC, MAX(wh.watched_at) DESC;
 -- name: GetSeriesViewsAll :many
 SELECT
     COALESCE(s.id, 0) AS series_id,
-    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COALESCE(s.syobocal_title_name, '----------') AS series_name,
     COUNT(DISTINCT wh.id) AS view_count,
     COUNT(DISTINCT v.id) AS video_count
 FROM video v
@@ -120,7 +120,6 @@ LEFT JOIN series s
 LEFT JOIN watched_history wh
     ON wh.video_id = v.id
 WHERE v.is_deleted = 0
-  AND wh.watched_at IS NOT NULL
 GROUP BY s.id, s.syobocal_title_name
 ORDER BY view_count DESC;
 

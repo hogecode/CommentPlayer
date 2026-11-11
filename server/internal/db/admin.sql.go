@@ -356,7 +356,6 @@ LEFT JOIN series s
 LEFT JOIN watched_history wh
     ON wh.video_id = v.id
 WHERE v.is_deleted = 0
-  AND wh.watched_at IS NOT NULL
 GROUP BY s.id, s.syobocal_title_name
 ORDER BY view_count DESC
 `
