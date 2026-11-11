@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**apiV1AdminSeriesSeriesIdWatchHistoryGet**](#apiv1adminseriesseriesidwatchhistoryget) | **GET** /api/v1/admin/series/{series_id}/watch-history | シリーズのエピソード別視聴履歴を取得|
+|[**apiV1AdminStatsAllGet**](#apiv1adminstatsallget) | **GET** /api/v1/admin/stats/all | 全統計情報を取得|
 |[**apiV1AdminStatsMonthlyGet**](#apiv1adminstatsmonthlyget) | **GET** /api/v1/admin/stats/monthly | 月別統計を取得|
 
 # **apiV1AdminSeriesSeriesIdWatchHistoryGet**
@@ -56,6 +57,51 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**400** | Bad Request |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiV1AdminStatsAllGet**
+> DtoAdminStatsResponse apiV1AdminStatsAllGet()
+
+すべての期間の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
+
+### Example
+
+```typescript
+import {
+    AdminApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AdminApi(configuration);
+
+const { status, data } = await apiInstance.apiV1AdminStatsAllGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**DtoAdminStatsResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
 |**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

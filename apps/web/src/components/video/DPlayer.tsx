@@ -362,7 +362,7 @@ export default function DPlayer({
           // 各コメントを描画
           for (const comment of commentData.comments) {
             // フォント情報を設定
-            ctx.font = `${comment.font_size *1.2}px Arial, sans-serif`;
+            ctx.font = `bold ${comment.font_size}px Arial, sans-serif`;
             ctx.fillStyle = comment.color;
             ctx.textBaseline = 'top';
 

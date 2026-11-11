@@ -22,7 +22,7 @@ export function createDefaultSettings(): Required<DtoClientSettingsDTO> {
     last_synced_at: 0,
     enable_playback_button: true,
     comment_speed_rate: 1,
-    comment_font_size: 25,
+    comment_font_size: 32,
     close_comment_form_after_sending: true,
     max_comments_display_count: 5000,
     default_comment_color: '#ffffff',

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { AdminApi } from '@/generated'
 import type { DtoSeriesEpisodeWatchHistoryResponse } from '@/generated'
-import { apiConfiguration } from "@/lib/api/api-config";
+import { apiConfiguration } from "@/lib/api/api-config"
 
 const adminApi = new AdminApi(apiConfiguration)
 
@@ -16,6 +16,24 @@ export function useAdminStatsQuery(year: number, month: number) {
     queryFn: async () => {
       try {
         const response = await adminApi.apiV1AdminStatsMonthlyGet(year, month)
+        return response.data
+      } catch (error) {
+        throw error
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5分
+  })
+}
+
+/**
+ * 管理画面の全期間統計データを取得
+ */
+export function useAdminStatsAllQuery() {
+  return useQuery({
+    queryKey: ['admin-stats-all'],
+    queryFn: async () => {
+      try {
+        const response = await adminApi.apiV1AdminStatsAllGet()
         return response.data
       } catch (error) {
         throw error

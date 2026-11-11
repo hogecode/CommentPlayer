@@ -6,9 +6,10 @@ import { MonthlySummary } from './MonthlySummary'
 
 interface AdminDashboardProps {
   stats: any
+  isAllData?: boolean
 }
 
-export function AdminDashboard({ stats }: AdminDashboardProps) {
+export function AdminDashboard({ stats, isAllData = false }: AdminDashboardProps) {
   return (
     <div className='grid grid-cols-1 gap-6'>
       {/* 月間サマリー */}
@@ -16,8 +17,8 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
         <MonthlySummary summary={stats.monthly_summary} />
       )}
 
-      {/* カレンダービュー */}
-      {stats?.daily_views && (
+      {/* カレンダービュー - 全データの場合は表示しない */}
+      {!isAllData && stats?.daily_views && (
         <CalendarView
           data={stats.daily_views}
           year={stats.year}

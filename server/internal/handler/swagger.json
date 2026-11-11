@@ -48,6 +48,29 @@
                 }
             }
         },
+        "/api/v1/admin/stats/all": {
+            "get": {
+                "description": "すべての期間の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得",
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "全統計情報を取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdminStatsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/stats/monthly": {
             "get": {
                 "description": "指定年月の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得",

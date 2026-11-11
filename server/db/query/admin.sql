@@ -84,6 +84,55 @@ WHERE substr(watched_at, 1, 26) >= ?
   AND substr(watched_at, 1, 26) < ?
   AND watched_at IS NOT NULL;
 
+-- name: GetAllStats :one
+SELECT
+    COUNT(DISTINCT strftime('%Y-%m-%d', substr(watched_at, 1, 26))) AS days_with_views,
+    COUNT(*) AS total_views_this_month,
+    COUNT(DISTINCT video_id) AS unique_videos_watched
+FROM watched_history
+WHERE watched_at IS NOT NULL;
+
+-- name: GetDailyViewsWithDetailsAll :many
+SELECT
+    strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)) AS date,
+    COUNT(*) AS view_count,
+    wh.id,
+    v.file_name,
+    v.episode,
+    v.subtitle,
+    COALESCE(s.syobocal_title_name, 'No Series') AS series_name
+FROM watched_history wh
+LEFT JOIN video v ON wh.video_id = v.id
+LEFT JOIN series s ON v.series_id = s.id
+WHERE wh.watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, v.episode, s.syobocal_title_name
+ORDER BY date DESC, MAX(wh.watched_at) DESC;
+
+-- name: GetSeriesViewsAll :many
+SELECT
+    COALESCE(s.id, 0) AS series_id,
+    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COUNT(DISTINCT wh.id) AS view_count,
+    COUNT(DISTINCT v.id) AS video_count
+FROM video v
+LEFT JOIN series s
+    ON v.series_id = s.id
+LEFT JOIN watched_history wh
+    ON wh.video_id = v.id
+WHERE v.is_deleted = 0
+  AND wh.watched_at IS NOT NULL
+GROUP BY s.id, s.syobocal_title_name
+ORDER BY view_count DESC;
+
+-- name: GetWatchedHistoryByDateAll :many
+SELECT
+    strftime('%Y-%m-%d', substr(watched_at, 1, 26)) AS date,
+    COUNT(*) AS watch_count
+FROM watched_history
+WHERE watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(watched_at, 1, 26))
+ORDER BY date DESC;
+
 -- name: GetSeriesEpisodeWatchHistory :many
 SELECT
     v.id,

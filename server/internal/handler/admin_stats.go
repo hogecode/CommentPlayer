@@ -74,6 +74,31 @@ func (h *AdminStatsHandler) GetMonthlyStats(c *gin.Context) {
 	c.JSON(http.StatusOK, stats)
 }
 
+// GetAllStats - 全期間の統計情報を取得
+// @Summary 全統計情報を取得
+// @Description すべての期間の統計情報（日付ごと再生数、シリーズ別再生数、動画ランキング等）を取得
+// @Tags Admin
+// @Success 200 {object} dto.AdminStatsResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /api/v1/admin/stats/all [get]
+func (h *AdminStatsHandler) GetAllStats(c *gin.Context) {
+	slog.Info("GetAllStats requested")
+
+	// 全統計情報を取得
+	stats, err := h.statsService.GetAllStats(c.Request.Context())
+	if err != nil {
+		slog.Error("Failed to get all stats",
+			slog.Any("error", err),
+		)
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+			Error: "Failed to retrieve all statistics",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
 // GetSeriesEpisodeWatchHistory - 特定シリーズのエピソード別視聴履歴を取得
 // @Summary シリーズのエピソード別視聴履歴を取得
 // @Description 指定したシリーズIDのエピソード別視聴履歴を取得

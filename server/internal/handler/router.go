@@ -59,6 +59,7 @@ func (a *App) RegisterAdminRoutes(group *gin.RouterGroup) {
 	// 統計ルートグループ
 	statsGroup := group.Group("/stats")
 	statsGroup.GET("/monthly", statsHandler.GetMonthlyStats)
+	statsGroup.GET("/all", statsHandler.GetAllStats)
 
 	// シリーズ関連ルート
 	seriesGroup := group.Group("/series")

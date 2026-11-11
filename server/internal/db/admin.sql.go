@@ -10,6 +10,28 @@ import (
 	"database/sql"
 )
 
+const getAllStats = `-- name: GetAllStats :one
+SELECT
+    COUNT(DISTINCT strftime('%Y-%m-%d', substr(watched_at, 1, 26))) AS days_with_views,
+    COUNT(*) AS total_views_this_month,
+    COUNT(DISTINCT video_id) AS unique_videos_watched
+FROM watched_history
+WHERE watched_at IS NOT NULL
+`
+
+type GetAllStatsRow struct {
+	DaysWithViews       int64
+	TotalViewsThisMonth int64
+	UniqueVideosWatched int64
+}
+
+func (q *Queries) GetAllStats(ctx context.Context) (GetAllStatsRow, error) {
+	row := q.db.QueryRowContext(ctx, getAllStats)
+	var i GetAllStatsRow
+	err := row.Scan(&i.DaysWithViews, &i.TotalViewsThisMonth, &i.UniqueVideosWatched)
+	return i, err
+}
+
 const getDailyViews = `-- name: GetDailyViews :many
 SELECT
     strftime('%Y-%m-%d', substr(watched_at, 1, 26)) AS date,
@@ -98,6 +120,64 @@ func (q *Queries) GetDailyViewsWithDetails(ctx context.Context, arg GetDailyView
 	var items []GetDailyViewsWithDetailsRow
 	for rows.Next() {
 		var i GetDailyViewsWithDetailsRow
+		if err := rows.Scan(
+			&i.Date,
+			&i.ViewCount,
+			&i.ID,
+			&i.FileName,
+			&i.Episode,
+			&i.Subtitle,
+			&i.SeriesName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDailyViewsWithDetailsAll = `-- name: GetDailyViewsWithDetailsAll :many
+SELECT
+    strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)) AS date,
+    COUNT(*) AS view_count,
+    wh.id,
+    v.file_name,
+    v.episode,
+    v.subtitle,
+    COALESCE(s.syobocal_title_name, 'No Series') AS series_name
+FROM watched_history wh
+LEFT JOIN video v ON wh.video_id = v.id
+LEFT JOIN series s ON v.series_id = s.id
+WHERE wh.watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(wh.watched_at, 1, 26)), wh.video_id, v.file_name, v.episode, s.syobocal_title_name
+ORDER BY date DESC, MAX(wh.watched_at) DESC
+`
+
+type GetDailyViewsWithDetailsAllRow struct {
+	Date       interface{}
+	ViewCount  int64
+	ID         int64
+	FileName   sql.NullString
+	Episode    sql.NullInt64
+	Subtitle   sql.NullString
+	SeriesName string
+}
+
+func (q *Queries) GetDailyViewsWithDetailsAll(ctx context.Context) ([]GetDailyViewsWithDetailsAllRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDailyViewsWithDetailsAll)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDailyViewsWithDetailsAllRow
+	for rows.Next() {
+		var i GetDailyViewsWithDetailsAllRow
 		if err := rows.Scan(
 			&i.Date,
 			&i.ViewCount,
@@ -264,6 +344,58 @@ func (q *Queries) GetSeriesViews(ctx context.Context, arg GetSeriesViewsParams) 
 	return items, nil
 }
 
+const getSeriesViewsAll = `-- name: GetSeriesViewsAll :many
+SELECT
+    COALESCE(s.id, 0) AS series_id,
+    COALESCE(s.syobocal_title_name, 'Total Series') AS series_name,
+    COUNT(DISTINCT wh.id) AS view_count,
+    COUNT(DISTINCT v.id) AS video_count
+FROM video v
+LEFT JOIN series s
+    ON v.series_id = s.id
+LEFT JOIN watched_history wh
+    ON wh.video_id = v.id
+WHERE v.is_deleted = 0
+  AND wh.watched_at IS NOT NULL
+GROUP BY s.id, s.syobocal_title_name
+ORDER BY view_count DESC
+`
+
+type GetSeriesViewsAllRow struct {
+	SeriesID   int64
+	SeriesName string
+	ViewCount  int64
+	VideoCount int64
+}
+
+func (q *Queries) GetSeriesViewsAll(ctx context.Context) ([]GetSeriesViewsAllRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSeriesViewsAll)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSeriesViewsAllRow
+	for rows.Next() {
+		var i GetSeriesViewsAllRow
+		if err := rows.Scan(
+			&i.SeriesID,
+			&i.SeriesName,
+			&i.ViewCount,
+			&i.VideoCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getVideoRanking = `-- name: GetVideoRanking :many
 SELECT
     v.id,
@@ -347,6 +479,44 @@ func (q *Queries) GetWatchedHistoryByDate(ctx context.Context, arg GetWatchedHis
 	var items []GetWatchedHistoryByDateRow
 	for rows.Next() {
 		var i GetWatchedHistoryByDateRow
+		if err := rows.Scan(&i.Date, &i.WatchCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWatchedHistoryByDateAll = `-- name: GetWatchedHistoryByDateAll :many
+SELECT
+    strftime('%Y-%m-%d', substr(watched_at, 1, 26)) AS date,
+    COUNT(*) AS watch_count
+FROM watched_history
+WHERE watched_at IS NOT NULL
+GROUP BY strftime('%Y-%m-%d', substr(watched_at, 1, 26))
+ORDER BY date DESC
+`
+
+type GetWatchedHistoryByDateAllRow struct {
+	Date       interface{}
+	WatchCount int64
+}
+
+func (q *Queries) GetWatchedHistoryByDateAll(ctx context.Context) ([]GetWatchedHistoryByDateAllRow, error) {
+	rows, err := q.db.QueryContext(ctx, getWatchedHistoryByDateAll)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetWatchedHistoryByDateAllRow
+	for rows.Next() {
+		var i GetWatchedHistoryByDateAllRow
 		if err := rows.Scan(&i.Date, &i.WatchCount); err != nil {
 			return nil, err
 		}
